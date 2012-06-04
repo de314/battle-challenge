@@ -30,4 +30,8 @@ public class NetworkConnection {
 	public void doTurn() {
 		
 	}
+	
+	public void placeShips() {
+		
+	}
 }
