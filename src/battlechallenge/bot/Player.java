@@ -2,7 +2,10 @@ package battlechallenge.bot;
 
 import java.util.List;
 
+import battlechallenge.Coordinate;
+import battlechallenge.Ship;
 import battlechallenge.client.Game;
+import battlechallenge.client.PlayerBoard;
 
 
 public class Player {
