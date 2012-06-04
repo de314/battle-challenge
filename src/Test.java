@@ -1,6 +1,5 @@
-
+import java.util.*;
 public class Test {
-
 	/**
 	 * @param args
 	 */
@@ -9,3 +8,4 @@ public class Test {
 	}
 
 }
+
