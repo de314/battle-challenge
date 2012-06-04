@@ -1,6 +1,10 @@
 package battlechallenge;
 
-public class Ship {
+import java.io.Serializable;
+
+public class Ship implements Serializable{
+
+	private static final long serialVersionUID = 0L;
 
 	public static enum Direction {
 		NORTH, EAST, SOUTH, WEST
@@ -52,5 +56,4 @@ public class Ship {
 	public Ship deepCopy() {
 		return new Ship(length, startPosition, direction);
 	}
-		
 }
