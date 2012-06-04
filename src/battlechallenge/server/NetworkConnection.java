@@ -2,6 +2,11 @@ package battlechallenge.server;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.Socket;
+import java.util.List;
+
+import battlechallenge.Coordinate;
+import battlechallenge.Ship;
 
 public class NetworkConnection {
 
@@ -9,8 +14,8 @@ public class NetworkConnection {
 	private ObjectOutputStream oos;
 	private ObjectInputStream ois;
 	
-	public NetworkConnection() {
-		// TODO
+	public NetworkConnection(Socket conn) {
+		this.conn = conn;
 	}
 	
 	public void setupHandshake() {
@@ -21,11 +26,17 @@ public class NetworkConnection {
 		// TODO
 	}
 	
-	public void placeShips() {
+	public void placeShips(List<Ship> ships) {
 		// TODO
 	}
 	
-	public void doTurn() {
+	public boolean requestTurn() {
 		// TODO
+		return false;
+	}
+	
+	public Coordinate getTurn() {
+		// TODO
+		return null;
 	}
 }

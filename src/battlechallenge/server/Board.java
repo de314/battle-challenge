@@ -1,8 +1,11 @@
 package battlechallenge.server;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import battlechallenge.Coordinate;
 import battlechallenge.Ship;
+import battlechallenge.Tile;
 
 public class Board {
 
@@ -14,10 +17,12 @@ public class Board {
 	private List<Coordinate> misses;
 	private List<Ship> ships;
 	
-	public Board(int width, int height) {
+	public Board(int width, int height, List<Ship> ships) {
 		this.width = width;
 		this.height = height;
-		// TODO
+		this.ships = ships;
+		hits = new ArrayList<Coordinate>();
+		misses = new ArrayList<Coordinate>();
 	}
 	
 	public int getHeight() {
@@ -34,5 +39,9 @@ public class Board {
 	
 	public List<Coordinate> getMisses() {
 		return misses;
+	}
+	
+	public List<Ship> getShips() {
+		return ships;
 	}
 }

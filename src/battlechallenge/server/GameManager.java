@@ -1,21 +1,37 @@
 package battlechallenge.server;
 
-import java.util.List;
-
-import battlechallenge.bot.Player;
-import battlechallenge.client.Game;
+import java.net.Socket;
+import java.util.HashSet;
+import java.util.Set;
 
 public class GameManager {
 
-	private List<Game> games; // FIXME: this needs to be battlechallenge.server.Game
-	private List<Player> players;
+	private Set<Game> games;
+	private Game lastGame;
+	private Set<Player> players;
 	
 	public GameManager() {
-		// TODO
+		games = new HashSet<Game>();
+		players = new HashSet<Player>();
 	}
 	
-	
 	public void addPlayer(Socket conn) {
-		// TODO
+		if (conn != null) {
+			Player p = new Player(conn, new Board(Game.DEFAULT_WIDTH, Game.DEFAULT_HEIGHT, Game.getShips()));
+			if (lastGame != null) {
+				if (!lastGame.addPlayer(p)) {
+					lastGame = new Game(p);
+					games.add(lastGame);
+				} // else player was successfully added
+			} else
+				lastGame = new Game(p);
+		}
+	}
+	
+	public void removeGame(Game g) {
+		if (games.contains(g)) {
+			games.remove(g);
+			
+		}
 	}
 }

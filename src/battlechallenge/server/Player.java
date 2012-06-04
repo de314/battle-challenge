@@ -1,26 +1,48 @@
 package battlechallenge.server;
 
+import java.net.Socket;
+import java.util.List;
+
+import battlechallenge.Coordinate;
+import battlechallenge.Ship;
+
 public class Player {
 
 	private String name;
 	private Board board;
 	private NetworkConnection conn;
+	private int score;
 	
-	public Player() {
+	
+	
+	public Player(Socket socket, Board board) {
+		this.conn = new NetworkConnection(socket);
 		// TODO
 	}
 	
 	public void placeShips(List<Ship> ships) {
-		// TODO
+		conn.placeShips(ships);
 	}
 	
 	public boolean requestTurn() {
-		// TODO
-		return false;
+		return conn.requestTurn();
 	}
 	
 	public Coordinate getTurn() {
-		// TODO
+		return conn.getTurn();
 	}
 	
+	public int getScore() {
+		return score;
+	}
+	
+	public void win() {
+		// TODO
+		score++;
+	}
+	
+	public void lose() {
+		// TODO
+		score--;
+	}
 }
