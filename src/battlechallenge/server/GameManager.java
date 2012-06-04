@@ -10,4 +10,12 @@ public class GameManager {
 	private List<Game> games; // FIXME: this needs to be battlechallenge.server.Game
 	private List<Player> players;
 	
+	public GameManager() {
+		// TODO
+	}
+	
+	
+	public void addPlayer(Socket conn) {
+		// TODO
+	}
 }
