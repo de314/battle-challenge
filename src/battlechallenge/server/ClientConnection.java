@@ -33,15 +33,6 @@ public class ClientConnection {
 	/** The Constant SERVER_REQUEST_TURN. */
 	public static final String SERVER_REQUEST_TURN;
 	
-	/** The Constant SERVER_RESULT_HIT. */
-	public static final String SERVER_RESULT_HIT;
-	
-	/** The Constant SERVER_RESULT_SUNK. */
-	public static final String SERVER_RESULT_SUNK;
-	
-	/** The Constant SERVER_RESULT_MISS. */
-	public static final String SERVER_RESULT_MISS;
-	
 	/** The Constant SERVER_RESULT_DISQUALIFIED. */
 	public static final String SERVER_RESULT_DISQUALIFIED;
 	
@@ -58,9 +49,6 @@ public class ClientConnection {
 		SERVER_REQUEST_NAME = "N";
 		SERVER_REQUEST_PLACE_SHIPS = "P";
 		SERVER_REQUEST_TURN = "T";
-		SERVER_RESULT_HIT = "H";
-		SERVER_RESULT_SUNK = "S";
-		SERVER_RESULT_MISS = "M";
 		SERVER_RESULT_DISQUALIFIED = "D";
 		SERVER_RESULT_WINNER = "W";
 		SERVER_RESULT_LOSER= "L";

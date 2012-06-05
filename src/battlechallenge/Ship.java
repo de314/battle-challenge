@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import battlechallenge.server.Board;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Ship. A data holder representing ships from the original game battleship.
  */

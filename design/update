@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cp ~/Dropbox/SideProjects/Battleship/Diagrams/*.png .
+
