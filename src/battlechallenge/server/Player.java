@@ -10,13 +10,13 @@ public class Player {
 
 	private String name;
 	private Board board;
-	private NetworkConnection conn;
+	private ClientConnection conn;
 	private int score;
 	
 	
 	
 	public Player(Socket socket, Board board) {
-		this.conn = new NetworkConnection(socket);
+		this.conn = new ClientConnection(socket);
 		// TODO
 	}
 	

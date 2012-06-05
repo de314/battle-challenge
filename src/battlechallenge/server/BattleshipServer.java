@@ -24,7 +24,7 @@ public class BattleshipServer extends Thread {
 	public void run() {
 		while(true) {
 			try {
-			Socket client = socket.accept();
+			Socket client = socket.accept(); // blocking
 			manager.addPlayer(client);
 			} catch (IOException e) {
 				e.printStackTrace();
