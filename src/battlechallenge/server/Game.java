@@ -1,43 +1,82 @@
 package battlechallenge.server;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import battlechallenge.Coordinate;
 import battlechallenge.Ship;
 import battlechallenge.Ship.Direction;
+import battlechallenge.bot.ClientPlayer;
 
-public class Game {
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Game.
+ */
+public class Game extends Thread {
 	
-	public static int DEFAULT_HEIGHT = 15;
-	public static int DEFAULT_WIDTH = 15;
+	/** The board width. */
+	private int boardWidth;
 	
-	private ServerPlayer playerOne;
-	private ServerPlayer playerTwo;
+	/** The board height. */
+	private int boardHeight;
+	
+	/** The players. */
+	private List<ServerPlayer> players;
 
+	/**
+	 * Instantiates a new game.
+	 */
 	public Game() {
 		this(null);
 	}
 	
+	/**
+	 * Instantiates a new game.
+	 *
+	 * @param player the player
+	 */
 	public Game(ServerPlayer player) {
-		this.playerOne = player;
+		this.players = new LinkedList<ServerPlayer>();
+		addPlayer(player);
 	}
 	
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Thread#run()
+	 */
+	public void run() {
+		// TODO: Start playing game
+		// Assume all players have been added. Do not allow other players to be added.
+	}
+	
+	/**
+	 * Adds the player.
+	 *
+	 * @param player the player
+	 * @return true, if successful
+	 */
 	public boolean addPlayer(ServerPlayer player) {
-		if (playerOne == null) {
-			playerOne = player;
-			return true;
-		} else if (playerTwo == null) {
-			playerTwo = player;
-			return true;
-		}
+		// FIXME: handle null players
+		// TODO: how to add players
 		return false;
 	}
 	
+	/**
+	 * Gets the winner.
+	 *
+	 * @return the winner
+	 */
 	public ServerPlayer getWinner() {
-		return playerTwo.getScore() > playerOne.getScore() ? playerTwo : playerOne;
+		// TODO: get player with max score
+		return null;
 	}
 	
+	/**
+	 * Gets the default ships for this game.
+	 *
+	 * @return the ships
+	 */
 	public static List<Ship> getShips() {
 		List<Ship> ships = new ArrayList<Ship>();
 		ships.add(new Ship(2,new Coordinate(-1, -1), Direction.NORTH));
