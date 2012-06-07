@@ -13,7 +13,6 @@ public class ServerConnection {
 	private int id;
 	private ObjectOutputStream oos;
 	private ObjectInputStream ois;
-	private Game game;
 	
 	public void run() {
 		

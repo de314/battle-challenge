@@ -14,13 +14,9 @@ public class ActionResult {
 		return coordinate;
 	}
 
-
-
 	public ShotResult getResult() {
 		return result;
 	}
-
-
 
 	public int getHealth() {
 		return health;

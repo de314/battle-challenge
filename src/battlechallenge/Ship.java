@@ -2,8 +2,6 @@ package battlechallenge;
 
 import java.io.Serializable;
 
-import battlechallenge.server.Board;
-
 /**
  * The Class Ship. A data holder representing ships from the original game battleship.
  */
@@ -71,7 +69,7 @@ public class Ship implements Serializable{
 	}
 	
 	/**
-	 * Gets the start position.
+	 * Gets the starting coordinate of the ship
 	 *
 	 * @return the start position
 	 */
@@ -80,7 +78,7 @@ public class Ship implements Serializable{
 	}
 	
 	/**
-	 * Sets the start position.
+	 * Sets the starting coordinate of the ship
 	 *
 	 * @param startPosition the new start position
 	 */
@@ -89,7 +87,7 @@ public class Ship implements Serializable{
 	}
 	
 	/**
-	 * Gets the direction.
+	 * Gets the direction in which the ship extends outward
 	 *
 	 * @return the direction
 	 */
@@ -98,7 +96,7 @@ public class Ship implements Serializable{
 	}
 	
 	/**
-	 * Sets the direction.
+	 * Sets the direction in which the ship extends outward
 	 *
 	 * @param direction the new direction
 	 */
@@ -107,20 +105,21 @@ public class Ship implements Serializable{
 	}
 	
 	/**
-	 * Gets the end position.
+	 * Gets the end position based on the direction
+	 * the ship extends outward from its starting position
 	 *
 	 * @return the end position
 	 */
 	public Coordinate getEndPosition() {
 		switch(direction) {
 		case NORTH:
-			return new Coordinate(startPosition.getX(), startPosition.getY() + length);
+			return new Coordinate(startPosition.getRow(), startPosition.getCol() + length);
 		case SOUTH:
-			return new Coordinate(startPosition.getX(), startPosition.getY() - length);
+			return new Coordinate(startPosition.getRow(), startPosition.getCol() - length);
 		case EAST:
-			return new Coordinate(startPosition.getX() + length, startPosition.getY());
+			return new Coordinate(startPosition.getRow() + length, startPosition.getCol());
 		case WEST:
-			return new Coordinate(startPosition.getX() - length, startPosition.getY());
+			return new Coordinate(startPosition.getRow() - length, startPosition.getCol());
 		}
 		return null; // Should not reach here, will only be true if the ship direction is invalid
 	}
@@ -152,27 +151,19 @@ public class Ship implements Serializable{
 	 * @return true, if is hit
 	 */
 	public boolean isHit(Coordinate c, int damage) {
-		// TODO: calculate if coordinate hit boat
 		// TODO: handle case where player hits same spot twice (force unique shot locations)
-		// if (hit) { health -= damage; return true; }
+		if (c.isBetween(startPosition, getEndPosition())) {
+			health -= damage; // reduce health on ship by damage
+			return true; // Is a hit
+		}
 		return false;
 	}
 	
 	
 	/**
-	 * Checks if is valid placement. Needs board so that it has 
-	 * access to a list of ships.
-	 *
-	 * @param board the board
-	 * @return true, if is valid placement
-	 */
-	public boolean isValidPlacement(Board board) {
-		// TODO
-		return false;
-	}
-	
-	/**
-	 * Deep copy.
+	 * Deep copy of the shipObject so that the player
+	 * can use the ship object as necessary while the 
+	 * server has keeps its own copy.
 	 *
 	 * @return the ship
 	 */
