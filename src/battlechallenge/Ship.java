@@ -155,7 +155,7 @@ public class Ship implements Serializable {
 	 *
 	 * @return the coordinate strings
 	 */
-	private Set<String> getCoordinateStrings() {
+	public Set<String> getCoordinateStrings() {
 		if (coords == null) {
 			coords = new HashSet<String>();
 			for (int i = 0; i < length; i++) {
