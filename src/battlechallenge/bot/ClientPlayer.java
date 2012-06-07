@@ -12,7 +12,9 @@ import battlechallenge.Ship;
 public class ClientPlayer {
 	
 	/** The player name. */
-	private String playerName;
+	private final String playerName;
+	
+	private final int networkID;
 	
 	/** The map width. */
 	private final int mapWidth;
@@ -28,10 +30,11 @@ public class ClientPlayer {
 	 * @param mapWidth the map width
 	 * @param mapHeight the map height
 	 */
-	public ClientPlayer(String playerName, final int mapWidth, final int mapHeight) {
+	public ClientPlayer(final String playerName, final int mapWidth, final int mapHeight, final int networkID) {
 		this.playerName = playerName;
 		this.mapWidth = mapWidth;
 		this.mapHeight = mapHeight;
+		this.networkID = networkID;
 	}
 	/**
 	 * This method is called at the beginning of the game to determine
