@@ -10,7 +10,6 @@ import battlechallenge.ConnectionLostException;
 import battlechallenge.Coordinate;
 import battlechallenge.Ship;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class ServerPlayer.
  */
@@ -34,6 +33,7 @@ public class ServerPlayer {
 	/** The hit log. */
 	private Set<String> hitLog;
 	
+	/** The id. */
 	private final int id;
 	
 	/**
@@ -44,12 +44,14 @@ public class ServerPlayer {
 	public List<Ship> getShips() {
 		return ships;
 	}
+	
+	private boolean hasShips = true;
 
 	/**
 	 * Instantiates a new server player.
-	 * 
-	 * @param socket
-	 *            the socket
+	 *
+	 * @param socket the socket
+	 * @param id the id
 	 */
 	public ServerPlayer(Socket socket, int id) {
 		this.id = id;
@@ -81,7 +83,8 @@ public class ServerPlayer {
 
 	/**
 	 * Request turn.
-	 * 
+	 *
+	 * @param ships the ships
 	 * @return true, if successful
 	 */
 	public boolean requestPlaceShips(List<Ship> ships) {
@@ -105,7 +108,7 @@ public class ServerPlayer {
 			for(Ship s : temp) {
 				// TODO: save new ship info into instance variables
 			}
-			return ships; // return instance ships for placement varification by game
+			return ships; // return instance ships for placement verification by game
 		} catch (ConnectionLostException e) {
 			// TODO: handle lost connection
 		}
@@ -157,6 +160,24 @@ public class ServerPlayer {
 		score++;
 	}
 
+	
+	/**
+	 * Checks for ships left.
+	 *
+	 * @return true, if player has ships left
+	 */
+	public boolean hasShipsLeft() {
+		if (hasShips) {
+			for (Ship s : ships) {
+				if (!s.isSunken()) {
+					return true;
+				}
+			}
+			hasShips = false;
+		}
+		return hasShips;
+	}
+	
 	/**
 	 * Lose.
 	 */
@@ -165,14 +186,24 @@ public class ServerPlayer {
 		score--;
 	}
 	
+	
+	/**
+	 * Checks if is hit.
+	 *
+	 * @param c the c
+	 * @param damage the damage
+	 * @return the action result
+	 */
 	public ActionResult isHit(Coordinate c, int damage) {
 		if (c == null)
 			return new ActionResult(c, ShotResult.MISS, -1, id);
 		for (Ship s : ships) {
 			if (s.isHit(c, damage)) {
-				return new ActionResult(c, ShotResult.HIT, s.getHealth(), id);
+				return new ActionResult(c, s.isSunken() ? ShotResult.SUNK : ShotResult.HIT, s.getHealth(), id);
 			}
 		}
 		return new ActionResult(c, ShotResult.MISS, -1, id);
 	}
+	
+	
 }
