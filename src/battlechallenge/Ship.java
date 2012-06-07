@@ -156,26 +156,28 @@ public class Ship implements Serializable {
 	 * @return the coordinate strings
 	 */
 	private Set<String> getCoordinateStrings() {
-		Set<String> coords = new HashSet<String>();
-		for (int i = 0; i < length; i++) {
-
-			switch (direction) {
-			case NORTH: {
-				coords.add((this.startPosition.row + i) + ","
-						+ this.startPosition.col);
-			} break;
-			case SOUTH: {
-				coords.add((this.startPosition.row - i) + ","
-						+ this.startPosition.col);
-			} break;
-			case EAST: {
-				coords.add(this.startPosition.row + ","
-						+ (this.startPosition.col + i));
-			} break;
-			case WEST: {
-				coords.add(this.startPosition.row + ","
-						+ (this.startPosition.col - i));
-			} break;
+		if (coords == null) {
+			coords = new HashSet<String>();
+			for (int i = 0; i < length; i++) {
+	
+				switch (direction) {
+				case NORTH: {
+					coords.add((this.startPosition.row + i) + ","
+							+ this.startPosition.col);
+				} break;
+				case SOUTH: {
+					coords.add((this.startPosition.row - i) + ","
+							+ this.startPosition.col);
+				} break;
+				case EAST: {
+					coords.add(this.startPosition.row + ","
+							+ (this.startPosition.col + i));
+				} break;
+				case WEST: {
+					coords.add(this.startPosition.row + ","
+							+ (this.startPosition.col - i));
+				} break;
+				}
 			}
 		}
 		return coords;
