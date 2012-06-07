@@ -5,10 +5,10 @@ package battlechallenge;
  */
 public class Coordinate {
 	
-	/** The row */
+	/** The row. */
 	final int row;
 	
-	/** The col */
+	/** The col. */
 	final int col; 
 	
 	/**
@@ -32,8 +32,8 @@ public class Coordinate {
 	/**
 	 * Instantiates a new coordinate.
 	 *
-	 * @param x the x
-	 * @param y the y
+	 * @param row the row
+	 * @param col the col
 	 */
 	public Coordinate(int row, int col) {
 		this.row = row;
@@ -41,7 +41,10 @@ public class Coordinate {
 	}
 	
 	/**
-	 * Used to check if a coordinate is between A and B
+	 * Used to check if a coordinate is between A and B. Used to test that
+	 * a coordinate lies on a horizontal or vertical line of coordinates by
+	 * specifying the starting and ending position.
+	 *
 	 * @param A coordinate 1
 	 * @param B coordinate 2
 	 * @return true if the coordinates are between coordinates A and B
@@ -59,8 +62,26 @@ public class Coordinate {
 		return false;
 	}
 	
+	/**
+	 * In bounds inclusive. Checks that a coordinate is in a box 
+	 * created by the given bounds.
+	 *
+	 * @param rowMin the row min
+	 * @param rowMax the row max
+	 * @param colMin the col min
+	 * @param colMax the col max
+	 * @return true, if successful
+	 */
 	public boolean inBoundsInclusive(int rowMin, int rowMax, int colMin, int colMax) {
 		return this.row >= rowMin && this.row <= rowMax && this.col >= colMin && this.col >= colMax;
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return new StringBuilder(this.row).append(",").append(this.col).toString();
 	}
 	
 } // End Coordinate Class

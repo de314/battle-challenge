@@ -12,7 +12,7 @@ public class Ship implements Serializable {
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 0L;
-
+	
 	/**
 	 * The Enum Direction. Which direction the ship will be extended.
 	 */
@@ -44,6 +44,12 @@ public class Ship implements Serializable {
 	 * be extended.
 	 */
 	private Direction direction;
+	
+	/** The hits. */
+	private Set<String> hits;
+	
+	/** The coordinates */
+	private Set<String> coords;
 
 	/**
 	 * Instantiates a new ship.
@@ -60,6 +66,8 @@ public class Ship implements Serializable {
 		this.health = length;
 		this.startPosition = startPosition;
 		this.direction = direction;
+		this.hits = new HashSet<String>();
+		this.coords = getCoordinateStrings();
 	}
 
 	/**
@@ -147,7 +155,7 @@ public class Ship implements Serializable {
 	 *
 	 * @return the coordinate strings
 	 */
-	public Set<String> getCoordinateStrings() {
+	private Set<String> getCoordinateStrings() {
 		Set<String> coords = new HashSet<String>();
 		for (int i = 0; i < length; i++) {
 
@@ -231,8 +239,11 @@ public class Ship implements Serializable {
 			return false;
 		}
 		
-		if (c.isBetween(startPosition, getEndPosition())) {
-			health -= damage; // reduce health on ship by damage
+		if (coords.contains(c.toString())) {
+			if (!hits.contains(c.toString())) {
+				health -= damage; // reduce health on ship by damage
+				hits.add(c.toString());
+			}
 			return true; // Is a hit
 		}
 		
