@@ -1,5 +1,6 @@
 package battlechallenge.bot;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import battlechallenge.ActionResult;
@@ -43,6 +44,16 @@ public class ClientPlayer {
 	 * and direction the ship is facing
 	 */
 	public List<Ship> placeShips(List<Ship> shipList) {
+		List<Integer> shipRow = new ArrayList();
+		int row = 0;
+		for (Ship ship: shipList) {
+			while (shipRow.contains(row)) {
+				row = (int) (Math.random() * (mapHeight-1));
+			}
+			shipRow.add(new Integer(row));
+			ship.setStartPosition(new Coordinate(row,0));
+			ship.setDirection(Ship.Direction.EAST);
+		}
 		return shipList;		
 	}
 	
@@ -59,6 +70,8 @@ public class ClientPlayer {
 	 */
 	public List<Coordinate> doTurn(List<Ship> myShips, List<Ship> oppShips, List<ActionResult> myLastTurn,
 			List<ActionResult> oppLastTurn) {
-		return null;
+		List<Coordinate> shotCoordinates = new ArrayList<Coordinate>();
+		shotCoordinates.add(new Coordinate((int) (Math.random() * (mapHeight -1)), (int) (Math.random() * (mapWidth - 1))));
+		return shotCoordinates;
 	}
 }

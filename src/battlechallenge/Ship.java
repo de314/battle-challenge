@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Ship. A data holder representing ships from the original game
  * battleship.
@@ -128,10 +127,10 @@ public class Ship implements Serializable {
 		switch (direction) {
 		case NORTH:
 			return new Coordinate(startPosition.getRow(),
-					startPosition.getCol() + length);
+					startPosition.getCol() - length);
 		case SOUTH:
 			return new Coordinate(startPosition.getRow(),
-					startPosition.getCol() - length);
+					startPosition.getCol() + length);
 		case EAST:
 			return new Coordinate(startPosition.getRow() + length,
 					startPosition.getCol());
@@ -227,10 +226,16 @@ public class Ship implements Serializable {
 	public boolean isHit(Coordinate c, int damage) {
 		// TODO: handle case where player hits same spot twice (force unique
 		// shot locations)
+		
+		if (isSunken()) {
+			return false;
+		}
+		
 		if (c.isBetween(startPosition, getEndPosition())) {
 			health -= damage; // reduce health on ship by damage
 			return true; // Is a hit
 		}
+		
 		return false;
 	}
 

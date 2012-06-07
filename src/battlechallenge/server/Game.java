@@ -12,7 +12,6 @@ import battlechallenge.Ship;
 import battlechallenge.ActionResult.ShotResult;
 import battlechallenge.Ship.Direction;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Game.
  */
@@ -80,9 +79,12 @@ public class Game extends Thread {
 		/*
 		 * 			[[ PLAY GAME ]]
 		 */
-		
-		while (true /* noWinner()*/) {
+		int livePlayers = players.size();
+		while (livePlayers > 1) {
 			for(ServerPlayer p : players) {
+				if (!p.hasShipsLeft()) { // Player is dead, don't request their turn
+					continue;
+				}
 				if (!p.requestTurn()) {
 					// TODO: handle lost socket connection
 				}
@@ -98,11 +100,14 @@ public class Game extends Thread {
 			
 			for(int j=0;j<players.size();j++) {
 				ServerPlayer p = players.get(j);
+				if (!p.hasShipsLeft()) { // Player is dead no need to get actions when they cannot act
+					continue;
+				}
 				List<Coordinate> coords = p.getTurn(); // these are shot coordinates...
 				// FIXME: remove magic number: "1"
 				List<ActionResult> results = new LinkedList<ActionResult>();
 				for(int i=0;i<coords.size() && i < 1;i++) {
-					if (!coords.get(i).inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1)) {
+					if (!coords.get(i).inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1)) { // check if shot is within game boundries
 						// TODO: handle shot out of bounds. ignore?
 					} else {
 						// valid shot location received
@@ -123,7 +128,15 @@ public class Game extends Thread {
 					// TODO: respond with action results
 				}
 			}
+			livePlayers = 0;
+			for (ServerPlayer player: players) {
+				if (player.hasShipsLeft()) {
+					livePlayers++;
+				}
+			}
 		}
+		getWinner();
+		
 		
 		/*
 		 * 			[[ END GAME ]]
@@ -151,6 +164,11 @@ public class Game extends Thread {
 	 */
 	public ServerPlayer getWinner() {
 		// TODO: get player with max score
+		for (ServerPlayer player: players) {
+			if (player.hasShipsLeft()) {
+				return player;
+			}
+		}
 		return null;
 	}
 	
