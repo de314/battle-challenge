@@ -8,16 +8,16 @@ public class GameManager {
 
 	private Set<Game> games;
 	private Game lastGame;
-	private Set<Player> players;
+	private Set<ServerPlayer> players;
 	
 	public GameManager() {
 		games = new HashSet<Game>();
-		players = new HashSet<Player>();
+		players = new HashSet<ServerPlayer>();
 	}
 	
 	public void addPlayer(Socket conn) {
 		if (conn != null) {
-			Player p = new Player(conn, new Board(Game.DEFAULT_WIDTH, Game.DEFAULT_HEIGHT, Game.getShips()));
+			ServerPlayer p = new ServerPlayer(conn, new Board(Game.DEFAULT_WIDTH, Game.DEFAULT_HEIGHT, Game.getShips()));
 			if (lastGame != null) {
 				if (!lastGame.addPlayer(p)) {
 					lastGame = new Game(p);

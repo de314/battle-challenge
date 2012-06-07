@@ -12,18 +12,18 @@ public class Game {
 	public static int DEFAULT_HEIGHT = 15;
 	public static int DEFAULT_WIDTH = 15;
 	
-	private Player playerOne;
-	private Player playerTwo;
+	private ServerPlayer playerOne;
+	private ServerPlayer playerTwo;
 
 	public Game() {
 		this(null);
 	}
 	
-	public Game(Player player) {
+	public Game(ServerPlayer player) {
 		this.playerOne = player;
 	}
 	
-	public boolean addPlayer(Player player) {
+	public boolean addPlayer(ServerPlayer player) {
 		if (playerOne == null) {
 			playerOne = player;
 			return true;
@@ -34,7 +34,7 @@ public class Game {
 		return false;
 	}
 	
-	public Player getWinner() {
+	public ServerPlayer getWinner() {
 		return playerTwo.getScore() > playerOne.getScore() ? playerTwo : playerOne;
 	}
 	
