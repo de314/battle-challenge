@@ -47,16 +47,17 @@ public class ClientPlayer {
 	 * and direction the ship is facing
 	 */
 	public List<Ship> placeShips(List<Ship> shipList) {
-		List<Integer> shipRow = new ArrayList();
+		List<Integer> shipRow = new ArrayList<Integer>();
 		int row = 0;
 		for (Ship ship: shipList) {
-			while (shipRow.contains(row)) {
+			//while (shipRow.contains(row)) {
 				row = (int) (Math.random() * (mapHeight-1));
-			}
-			shipRow.add(new Integer(row));
+			//}
+			shipRow.add(row);
 			ship.setStartPosition(new Coordinate(row,0));
 			ship.setDirection(Ship.Direction.EAST);
 		}
+		System.out.println("placed ships");
 		return shipList;		
 	}
 	

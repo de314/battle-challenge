@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
+import battlechallenge.CommunicationConstants;
 import battlechallenge.ConnectionLostException;
 import battlechallenge.Coordinate;
 import battlechallenge.Ship;
@@ -33,15 +33,20 @@ public class ClientConnection {
 	 *
 	 * @param conn the conn
 	 */
-	public ClientConnection(Socket conn) {
+	public ClientConnection(Socket conn, int id) {
 		this.conn = conn;
 		if (conn == null)
 			throw new IllegalArgumentException("Socket cannot be null");
 		try {
 			oos = new ObjectOutputStream(conn.getOutputStream());
 			ois = new ObjectInputStream(conn.getInputStream());
+			setupHandshake();
+			System.out.println("Client connection confirmed:" + id);
 		} catch (IOException e) {
 			// TODO: handle client socket exception
+			e.printStackTrace();
+		} catch (ConnectionLostException e) {
+			// TODO: handle socket lost connection
 			e.printStackTrace();
 		}
 	}
@@ -68,9 +73,12 @@ public class ClientConnection {
 		if (conn == null)
 			throw new ConnectionLostException();
 		try {
-			oos.writeObject(BattleshipServer.SERVER_VERSION);
+			oos.writeObject(CommunicationConstants.REQUEST_HANDSHAKE);
+			oos.writeObject(CommunicationConstants.SERVER_VERSION);
+			oos.flush();
+			// TODO: hack a non-blocking read
 			String client_version = (String)ois.readObject();
-			if (client_version != null && BattleshipServer.SUPPORTED_CLIENTS.contains(client_version)) {
+			if (client_version != null && CommunicationConstants.SUPPORTED_CLIENTS.contains(client_version)) {
 				return true;
 			} else {
 				// TODO: handle unsupported client version
@@ -97,18 +105,19 @@ public class ClientConnection {
 	 * @return the string
 	 * @throws ConnectionLostException the connection lost exception
 	 */
-	public String setPlayerCredentials() throws ConnectionLostException {
+	public String setCredentials(int id, int height, int width) throws ConnectionLostException {
 		if (conn == null)
 			throw new ConnectionLostException();
 		try {
-			oos.writeObject(BattleshipServer.SERVER_VERSION.getBytes());
+			oos.writeObject(CommunicationConstants.REQUEST_CREDENTIALS);
+			oos.writeInt(id);
+			oos.writeInt(width);
+			oos.writeInt(height);
+			oos.flush();
+			System.out.println("\trequest/ID/width/height written over socket");
+			System.out.println("\tWaiting on client name...");
 			String client_name = (String)ois.readObject();
-			if (client_name != null && client_name.contains("Name:")) {
-				return client_name.replace("Name:", "");
-			} else {
-				// TODO: handle unsupported client version
-				return null;
-			}
+			return client_name;
 		} catch (IOException e) {
 			// TODO: cannot send server objects over the socket
 			e.printStackTrace();
@@ -135,8 +144,10 @@ public class ClientConnection {
 		if (conn == null)
 			throw new ConnectionLostException();
 		try {
-			oos.writeObject(BattleshipServer.SERVER_REQUEST_PLACE_SHIPS);
+			oos.writeObject(CommunicationConstants.REQUEST_PLACE_SHIPS);
 			oos.writeObject(ships);
+			oos.flush();
+			System.out.println("Ships sent");
 			return true;
 		} catch (IOException e) {
 			// TODO: cannot send server objects over the socket
@@ -157,14 +168,10 @@ public class ClientConnection {
 		try {
 			// check to see if something is arrived in time. Otherwise, assume
 			// no input
-			if (ois.available() == 0)
-				return null;
-			List<Ship> c = (List<Ship>)ois.readObject();
-			if (c != null) {
-				return c;
-			} else {
-				// TODO: handle null input from socket (I don't think this will happen)
-			}
+			// FIXME: validate input (no null ships)
+			List<Ship> temp = new LinkedList<Ship>();
+			System.out.println(ois.available() > 0 ? "Ships returned" : "No ships returned");
+			return ois.available() == 0 ? temp : (List<Ship>)ois.readObject();
 		} catch (IOException e) {
 			// TODO: cannot send server objects over the socket
 			e.printStackTrace();
@@ -190,7 +197,8 @@ public class ClientConnection {
 		if (conn == null)
 			throw new ConnectionLostException();
 		try {
-			oos.writeObject(BattleshipServer.SERVER_REQUEST_TURN);
+			oos.writeObject(CommunicationConstants.REQUEST_DO_TURN);
+			oos.flush();
 			return true;
 		} catch (IOException e) {
 			// TODO: cannot send server objects over the socket
@@ -211,14 +219,10 @@ public class ClientConnection {
 		try {
 			// check to see if something is arrived in time. Otherwise, assume
 			// no input
-			if (ois.available() == 0)
-				return null;
-			List<Coordinate> c = (List<Coordinate>)ois.readObject();
-			if (c != null) {
-				return c;
-			} else {
-				// TODO: handle null input from socket (I don't think this will happen)
-			}
+			// FIXME: validate input (no null coordinates)
+			List<Coordinate> temp = new LinkedList<Coordinate>();
+			return ois.available() <= 0 ? temp : (List<Coordinate>)ois.readObject();
+			
 		} catch (IOException e) {
 			// TODO: cannot send server objects over the socket
 			e.printStackTrace();

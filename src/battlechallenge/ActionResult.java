@@ -1,6 +1,13 @@
 package battlechallenge;
 
-public class ActionResult {
+import java.io.Serializable;
+
+public class ActionResult implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 0L;
 
 	public static enum ShotResult {
 		HIT, SUNK, MISS

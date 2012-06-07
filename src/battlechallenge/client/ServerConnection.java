@@ -30,8 +30,10 @@ public class ServerConnection {
 			ois = new ObjectInputStream(conn.getInputStream());
 		} catch (Exception e) {
 			// TODO: Handle client cannot connect to server
+			e.printStackTrace();
 		}
 		this.name = name;
+		this.run();
 	}
 
 	public void kill() {
@@ -51,8 +53,12 @@ public class ServerConnection {
 
 	public void run() {
 		while (true) {
+			System.out.println("Loop");
 			try {
 				String req = (String) ois.readObject();
+				
+				System.out.println("Request: " + req);
+				
 				/*
 				 * [[ HANDLE REQUESTS ]]
 				 */
@@ -70,14 +76,17 @@ public class ServerConnection {
 				if (req.equals(CommunicationConstants.RESULT_DISQUALIFIED)) {
 					// TODO: handle disqualified player
 					System.out.println("You have been disqualified from the game");
+					break;
 				}
 				if (req.equals(CommunicationConstants.RESULT_DISQUALIFIED)) {
 					// TODO: handle winner
 					System.out.println("You have WON the game!!");
+					break;
 				}
 				if (req.equals(CommunicationConstants.RESULT_DISQUALIFIED)) {
 					// TODO: handle loser
 					System.out.println("You have lost the game.");
+					break;
 				}
 			} catch (IOException e) {
 				// TODO: handle client socket failure
@@ -87,6 +96,8 @@ public class ServerConnection {
 				// ignore invalid requests
 			}
 		}
+		System.out.println("The game is over.");
+		this.kill();
 	}
 
 	public void setupHandShake() {
@@ -94,6 +105,7 @@ public class ServerConnection {
 			// check that server version is supported
 			if (CommunicationConstants.SUPPORTED_SERVERS.contains((String)ois.readObject())) {
 				oos.writeObject(CommunicationConstants.CLIENT_VERSION);
+				oos.flush();
 				return;
 			}
 		} catch (IOException e) {
@@ -105,32 +117,43 @@ public class ServerConnection {
 		}
 		// TODO handle unsupported server
 		System.out.println("Server is not supported");
+		this.kill();
 		System.exit(0);
 	}
 
 	public void setCredentials(String name) {
 		try {
+			System.out.println("Reading id/width/height");
 			id = ois.readInt();
+			System.out.println("Got ID");
 			int width = ois.readInt();
+			System.out.println("Got width");
 			int height = ois.readInt();
+			System.out.println("Got height");
 			bot = new ClientPlayer(name, width, height, id);
+			System.out.println("bot generated");
 			// send name to server
 			oos.writeObject(name);
+			oos.flush();
 			return;
 		} catch (IOException e) {
 			
 		}
 		// TODO: handle error setting ID
 		System.out.println("Could not set ID");
+		this.kill();
 		System.exit(0);
 	}
 
 	public void placeShips() {
 		try {
+			System.out.print("Getting ships... ");
 			List<Ship> ships = (List<Ship>)ois.readObject();
+			System.out.println("Got Ships");
 			// place ships and send resulting ships to server
 			// FIXME: handle null
 			oos.writeObject(bot.placeShips(ships));
+			oos.flush();
 			return;
 		} catch (IOException e) {
 			
@@ -140,7 +163,8 @@ public class ServerConnection {
 			
 		}
 		// TODO: handle error setting ID
-		System.out.println("Lost socket connection during doTurn");
+		System.out.println("Lost socket connection during placeShips");
+		this.kill();
 		System.exit(0);
 	}
 
@@ -153,16 +177,18 @@ public class ServerConnection {
 			// doTurn and send resulting coordinates to server
 			// FIXME: handle null
 			oos.writeObject(bot.doTurn(myShips, oppShips, myAR, oppAR));
+			oos.flush();
 			return;
 		} catch (IOException e) {
-			
+			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			
+			e.printStackTrace();
 		} catch (ClassCastException e) {
-			
+			e.printStackTrace();
 		}
 		// TODO: handle error setting ID
 		System.out.println("Lost socket connection during doTurn");
+		this.kill();
 		System.exit(0);
 	}
 }

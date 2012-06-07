@@ -1,10 +1,17 @@
 package battlechallenge;
 
+import java.io.Serializable;
+
 /**
  * The Class Coordinate.
  */
-public class Coordinate {
+public class Coordinate implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 0L;
+
 	/** The row. */
 	final int row;
 	

@@ -18,12 +18,15 @@ public class GameManager {
 	/** The waiting players. */
 	private Queue<ServerPlayer> waitingPlayers;
 	
+	private int playerCount;
+	
 	/**
 	 * Instantiates a new game manager.
 	 */
 	public GameManager() {
 		games = new HashSet<Game>();
 		waitingPlayers = new LinkedList<ServerPlayer>();
+		playerCount = 0;
 	}
 	
 	/**
@@ -32,15 +35,19 @@ public class GameManager {
 	 * @param conn the conn
 	 */
 	public void addPlayer(Socket conn) {
+		System.out.println("Adding Player");
 		// TODO: more robust socket validation/
 		if (conn != null) {
-			waitingPlayers.add(new ServerPlayer(conn));
+			waitingPlayers.add(new ServerPlayer(conn, playerCount++));
+			System.out.println("Added Player: " + playerCount);
 			// FIXME: remove magic number "2"
 			while (waitingPlayers.size() >= 2) {
 				List<ServerPlayer> players = new LinkedList<ServerPlayer>();
 				// FIXME: allow for more players later
 				players.add(waitingPlayers.poll());
 				players.add(waitingPlayers.poll());
+				// Game constructor start its own thread
+				System.out.println("Starting new Game");
 				games.add(new Game(players));
 			}
 		}

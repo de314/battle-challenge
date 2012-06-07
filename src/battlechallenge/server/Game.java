@@ -50,6 +50,11 @@ public class Game extends Thread {
 		 * 			[[ INITIALIZE GAME ]]
 		 */
 		for(ServerPlayer p : players) {
+			System.out.println("Setting player credentials: " + p.getId());
+			p.setCredentials(boardWidth, boardHeight);
+		}
+		System.out.println("Placing ships");
+		for(ServerPlayer p : players) {
 			p.requestPlaceShips(this.getShips());
 		}
 		try {
@@ -75,12 +80,15 @@ public class Game extends Thread {
 				}
 			}
 		}
+		System.out.println("Ships placed");
+		
 		
 		/*
 		 * 			[[ PLAY GAME ]]
 		 */
 		int livePlayers = players.size();
 		while (livePlayers > 1) {
+			System.out.println("New Turn");
 			for(ServerPlayer p : players) {
 				if (!p.hasShipsLeft()) { // Player is dead, don't request their turn
 					continue;
@@ -135,7 +143,7 @@ public class Game extends Thread {
 				}
 			}
 		}
-		getWinner();
+		System.out.println(getWinner().getId());
 		
 		
 		/*

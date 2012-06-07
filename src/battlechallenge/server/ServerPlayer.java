@@ -10,6 +10,7 @@ import battlechallenge.ConnectionLostException;
 import battlechallenge.Coordinate;
 import battlechallenge.Ship;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class ServerPlayer.
  */
@@ -36,6 +37,10 @@ public class ServerPlayer {
 	/** The id. */
 	private final int id;
 	
+	public int getId() {
+		return id;
+	}
+	
 	/**
 	 * Gets the ships.
 	 *
@@ -45,6 +50,7 @@ public class ServerPlayer {
 		return ships;
 	}
 	
+	/** The has ships. */
 	private boolean hasShips = true;
 
 	/**
@@ -55,16 +61,11 @@ public class ServerPlayer {
 	 */
 	public ServerPlayer(Socket socket, int id) {
 		this.id = id;
-		this.conn = new ClientConnection(socket);
+		this.conn = new ClientConnection(socket, id);
 		// TODO: initialize player
 		try {
 			if (!conn.setupHandshake()) {
 				// TODO: handle invalid player
-				throw new IllegalArgumentException();
-			}
-			this.name = conn.setPlayerCredentials();
-			if (name == null) {
-				// TODO: handle invalid player name
 				throw new IllegalArgumentException();
 			}
 		} catch (ConnectionLostException e) {
@@ -79,6 +80,21 @@ public class ServerPlayer {
 	 */
 	public void kill() {
 		this.conn.kill();
+	}
+
+	/**
+	 * Sets the credentials.
+	 *
+	 * @param boardWidth the board width
+	 * @param boardHeight the board height
+	 */
+	public void setCredentials(int boardWidth, int boardHeight) {
+		try {
+			this.name = conn.setCredentials(id, boardWidth, boardHeight);
+		} catch (ConnectionLostException e) {
+			// TODO handle lost socket connection
+			e.printStackTrace();
+		}
 	}
 
 	/**

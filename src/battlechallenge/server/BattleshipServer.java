@@ -11,42 +11,6 @@ import java.util.Set;
  */
 public class BattleshipServer extends Thread {
 
-	/** The SERVE r_ version. */
-	public static String SERVER_VERSION;
-
-	/** The SUPPORTE d_ clients. */
-	public static Set<String> SUPPORTED_CLIENTS;
-
-	/** The Constant SERVER_REQUEST_NAME. */
-	public static final String SERVER_REQUEST_NAME;
-
-	/** The Constant SERVER_REQUEST_PLACE_SHIPS. */
-	public static final String SERVER_REQUEST_PLACE_SHIPS;
-
-	/** The Constant SERVER_REQUEST_TURN. */
-	public static final String SERVER_REQUEST_TURN;
-
-	/** The Constant SERVER_RESULT_DISQUALIFIED. */
-	public static final String SERVER_RESULT_DISQUALIFIED;
-
-	/** The Constant SERVER_RESULT_WINNER. */
-	public static final String SERVER_RESULT_WINNER;
-
-	/** The Constant SERVER_RESULT_LOSER. */
-	public static final String SERVER_RESULT_LOSER;
-
-	static {
-		SERVER_VERSION = "battleship_S-v0";
-		SUPPORTED_CLIENTS = new HashSet<String>();
-		SUPPORTED_CLIENTS.add("battleship_C-v0");
-		SERVER_REQUEST_NAME = "N";
-		SERVER_REQUEST_PLACE_SHIPS = "P";
-		SERVER_REQUEST_TURN = "T";
-		SERVER_RESULT_DISQUALIFIED = "D";
-		SERVER_RESULT_WINNER = "W";
-		SERVER_RESULT_LOSER = "L";
-	}
-
 	/** The socket. */
 	private ServerSocket socket;
 
@@ -69,6 +33,7 @@ public class BattleshipServer extends Thread {
 			socket = new ServerSocket(port);
 			this.start();
 		} catch (IOException e) {
+			// TODO: Handle server cannot open port
 			e.printStackTrace();
 		}
 	}
@@ -79,10 +44,12 @@ public class BattleshipServer extends Thread {
 	 * @see java.lang.Thread#run()
 	 */
 	public void run() {
+		System.out.println("Server started");
 		while (true) {
 			try {
 				manager.addPlayer(socket.accept());
 			} catch (IOException e) {
+				// TODO Handle error opening client socket 
 				e.printStackTrace();
 			}
 		}
