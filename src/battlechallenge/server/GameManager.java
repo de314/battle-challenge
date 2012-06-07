@@ -3,6 +3,7 @@ package battlechallenge.server;
 import java.net.Socket;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
@@ -31,8 +32,17 @@ public class GameManager {
 	 * @param conn the conn
 	 */
 	public void addPlayer(Socket conn) {
+		// TODO: more robust socket validation/
 		if (conn != null) {
-			// TODO: methodology for adding players and and handling games
+			waitingPlayers.add(new ServerPlayer(conn));
+			// FIXME: remove magic number "2"
+			while (waitingPlayers.size() >= 2) {
+				List<ServerPlayer> players = new LinkedList<ServerPlayer>();
+				// FIXME: allow for more players later
+				players.add(waitingPlayers.poll());
+				players.add(waitingPlayers.poll());
+				games.add(new Game(players));
+			}
 		}
 	}
 	

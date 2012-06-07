@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import battlechallenge.ActionResult;
+import battlechallenge.ActionResult.ShotResult;
 import battlechallenge.ConnectionLostException;
 import battlechallenge.Coordinate;
 import battlechallenge.Ship;
@@ -17,48 +18,103 @@ public class ServerPlayer {
 
 	/** The name. */
 	private String name;
-	
+
 	/** The ships. */
 	private List<Ship> ships;
-	
+
 	/** The conn. */
 	private ClientConnection conn;
-	
+
 	/** The score. */
 	private int score;
-	
+
 	/** The action log. */
 	private List<ActionResult> actionLog;
-	
+
 	/** The hit log. */
 	private Set<String> hitLog;
-
+	
+	private final int id;
+	
 	/**
-	 * Instantiates a new server player.
+	 * Gets the ships.
 	 *
-	 * @param socket the socket
+	 * @return the ships
 	 */
-	public ServerPlayer(Socket socket) {
-		this.conn = new ClientConnection(socket);
-		// TODO: initialize player
+	public List<Ship> getShips() {
+		return ships;
 	}
 
 	/**
-	 * Place ships.
-	 *
-	 * @param ships the ships
+	 * Instantiates a new server player.
+	 * 
+	 * @param socket
+	 *            the socket
 	 */
-	public void placeShips(List<Ship> ships) {
+	public ServerPlayer(Socket socket, int id) {
+		this.id = id;
+		this.conn = new ClientConnection(socket);
+		// TODO: initialize player
 		try {
-			conn.placeShips(ships);
+			if (!conn.setupHandshake()) {
+				// TODO: handle invalid player
+				throw new IllegalArgumentException();
+			}
+			this.name = conn.setPlayerCredentials();
+			if (name == null) {
+				// TODO: handle invalid player name
+				throw new IllegalArgumentException();
+			}
 		} catch (ConnectionLostException e) {
-			// TODO: handle lost connection
+			// TODO; Handle lost connection
 		}
 	}
 
 	/**
+	 * Kill the player and socket connection.
+	 * 
+	 * DO NOT FORGET TO DO THIS!!!
+	 */
+	public void kill() {
+		this.conn.kill();
+	}
+
+	/**
 	 * Request turn.
-	 *
+	 * 
+	 * @return true, if successful
+	 */
+	public boolean requestPlaceShips(List<Ship> ships) {
+		try {
+			this.ships = ships;
+			return conn.requestPlaceShips(ships);
+		} catch (ConnectionLostException e) {
+			// TODO: handle lost connection
+		}
+		return false;
+	}
+
+	/**
+	 * Gets the turn.
+	 * 
+	 * @return the turn
+	 */
+	public List<Ship> getPlaceShips() {
+		try {
+			List<Ship> temp = conn.getPlaceShips();
+			for(Ship s : temp) {
+				// TODO: save new ship info into instance variables
+			}
+			return ships; // return instance ships for placement varification by game
+		} catch (ConnectionLostException e) {
+			// TODO: handle lost connection
+		}
+		return null;
+	}
+
+	/**
+	 * Request turn.
+	 * 
 	 * @return true, if successful
 	 */
 	public boolean requestTurn() {
@@ -72,7 +128,7 @@ public class ServerPlayer {
 
 	/**
 	 * Gets the turn.
-	 *
+	 * 
 	 * @return the turn
 	 */
 	public List<Coordinate> getTurn() {
@@ -86,7 +142,7 @@ public class ServerPlayer {
 
 	/**
 	 * Gets the score.
-	 *
+	 * 
 	 * @return the score
 	 */
 	public int getScore() {
@@ -107,5 +163,16 @@ public class ServerPlayer {
 	public void lose() {
 		// TODO: decide how to score a loss
 		score--;
+	}
+	
+	public ActionResult isHit(Coordinate c, int damage) {
+		if (c == null)
+			return new ActionResult(c, ShotResult.MISS, -1, id);
+		for (Ship s : ships) {
+			if (s.isHit(c, damage)) {
+				return new ActionResult(c, ShotResult.HIT, s.getHealth(), id);
+			}
+		}
+		return new ActionResult(c, ShotResult.MISS, -1, id);
 	}
 }

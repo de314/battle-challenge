@@ -47,7 +47,6 @@ public class Coordinate {
 	 * @return true if the coordinates are between coordinates A and B
 	 */
 	public boolean isBetween(Coordinate A, Coordinate B) {
-		
 		if (A.row == B.row && A.row == this.row) { // coordinates on same row
 			if (Math.min(A.col, B.col) <= this.col  && this.col <= Math.max(A.col, B.col))
 				return true;
@@ -56,7 +55,12 @@ public class Coordinate {
 			if (Math.min(A.row, B.col) <= this.row && this.row <= Math.max(A.row, B.row)) 
 				return true;
 		}
+		// handle diagonal cases?
 		return false;
+	}
+	
+	public boolean inBoundsInclusive(int rowMin, int rowMax, int colMin, int colMax) {
+		return this.row >= rowMin && this.row <= rowMax && this.col >= colMin && this.col >= colMax;
 	}
 	
 } // End Coordinate Class

@@ -41,7 +41,7 @@ public class ClientConnection {
 			oos = new ObjectOutputStream(conn.getOutputStream());
 			ois = new ObjectInputStream(conn.getInputStream());
 		} catch (IOException e) {
-			// TODO
+			// TODO: handle client socket exception
 			e.printStackTrace();
 		}
 	}
@@ -125,26 +125,43 @@ public class ClientConnection {
 	}
 	
 	/**
-	 * Place ships.
+	 * Request place ships.
 	 *
 	 * @param ships the ships
-	 * @return the list
+	 * @return true, if successful
 	 * @throws ConnectionLostException the connection lost exception
 	 */
-	public List<Ship> placeShips(List<Ship> ships) throws ConnectionLostException {
+	public boolean requestPlaceShips(List<Ship> ships) throws ConnectionLostException {
 		if (conn == null)
 			throw new ConnectionLostException();
 		try {
+			oos.writeObject(BattleshipServer.SERVER_REQUEST_PLACE_SHIPS);
 			oos.writeObject(ships);
-			@SuppressWarnings("unchecked")
-			List<Ship> newShips = (List<Ship>)ois.readObject();
-			if (newShips != null) {
-				for (Ship s : newShips) {
-					if (s == null) {
-						// TODO: handle invalid input
-					}
-				}
-				return newShips;
+			return true;
+		} catch (IOException e) {
+			// TODO: cannot send server objects over the socket
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	/**
+	 * Gets the place ships.
+	 *
+	 * @return the place ships
+	 * @throws ConnectionLostException the connection lost exception
+	 */
+	public List<Ship> getPlaceShips() throws ConnectionLostException {
+		if (conn == null)
+			throw new ConnectionLostException();
+		try {
+			// check to see if something is arrived in time. Otherwise, assume
+			// no input
+			if (ois.available() == 0)
+				return null;
+			List<Ship> c = (List<Ship>)ois.readObject();
+			if (c != null) {
+				return c;
 			} else {
 				// TODO: handle null input from socket (I don't think this will happen)
 			}
