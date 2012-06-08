@@ -2,6 +2,7 @@ package battlechallenge.server;
 
 import java.net.Socket;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import battlechallenge.ActionResult;
@@ -122,8 +123,10 @@ public class ServerPlayer {
 		try {
 			List<Ship> temp = conn.getPlaceShips();
 			for(Ship s : temp) {
-				// TODO: save new ship info into instance variables
+				// FIXME: save new ship info into instance variables
+				// DO NOT TRUST THE USER
 			}
+			this.ships = temp;
 			return ships; // return instance ships for placement verification by game
 		} catch (ConnectionLostException e) {
 			// TODO: handle lost connection
@@ -136,9 +139,9 @@ public class ServerPlayer {
 	 * 
 	 * @return true, if successful
 	 */
-	public boolean requestTurn() {
+	public boolean requestTurn(Map<Integer, List<ActionResult>> actionResults) {
 		try {
-			return conn.requestTurn();
+			return conn.requestTurn(this.ships, actionResults);
 		} catch (ConnectionLostException e) {
 			// TODO: handle lost connection
 		}
@@ -221,5 +224,10 @@ public class ServerPlayer {
 		return new ActionResult(c, ShotResult.MISS, -1, id);
 	}
 	
-	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder(this.id+"");
+		sb.append(":").append(this.name).append("(");
+		return sb.append(this.score+"").append(")").toString();
+	}
 }

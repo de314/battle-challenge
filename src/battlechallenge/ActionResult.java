@@ -42,4 +42,11 @@ public class ActionResult implements Serializable {
 		this.playerId = playerId;
 	}
 	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder("[ ");
+		sb.append(this.result.toString()).append(" : ").append(this.coordinate);
+		return sb.append(" ]").toString();
+	}
+	
 }

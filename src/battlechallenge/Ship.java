@@ -261,4 +261,11 @@ public class Ship implements Serializable {
 	public Ship deepCopy() {
 		return new Ship(length, startPosition, direction);
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder("Ship: ");
+		sb.append(this.startPosition).append(" ").append(this.direction);
+		return sb.toString();
+	}
 }

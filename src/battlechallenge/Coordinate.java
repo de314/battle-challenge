@@ -2,14 +2,13 @@ package battlechallenge;
 
 import java.io.Serializable;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class Coordinate.
  */
 public class Coordinate implements Serializable {
 	
-	/**
-	 * 
-	 */
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 0L;
 
 	/** The row. */
@@ -80,7 +79,7 @@ public class Coordinate implements Serializable {
 	 * @return true, if successful
 	 */
 	public boolean inBoundsInclusive(int rowMin, int rowMax, int colMin, int colMax) {
-		return this.row >= rowMin && this.row <= rowMax && this.col >= colMin && this.col >= colMax;
+		return this.row >= rowMin && this.row <= rowMax && this.col >= colMin && this.col <= colMax;
 	}
 	
 	/* (non-Javadoc)
@@ -88,7 +87,15 @@ public class Coordinate implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return new StringBuilder(this.row).append(",").append(this.col).toString();
+		return row+ "," + col;
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return (this.row + "," + this.col).hashCode();
 	}
 	
 } // End Coordinate Class

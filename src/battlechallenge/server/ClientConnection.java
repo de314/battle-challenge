@@ -6,7 +6,9 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+import battlechallenge.ActionResult;
 import battlechallenge.CommunicationConstants;
 import battlechallenge.ConnectionLostException;
 import battlechallenge.Coordinate;
@@ -114,8 +116,6 @@ public class ClientConnection {
 			oos.writeInt(width);
 			oos.writeInt(height);
 			oos.flush();
-			System.out.println("\trequest/ID/width/height written over socket");
-			System.out.println("\tWaiting on client name...");
 			String client_name = (String)ois.readObject();
 			return client_name;
 		} catch (IOException e) {
@@ -169,9 +169,12 @@ public class ClientConnection {
 			// check to see if something is arrived in time. Otherwise, assume
 			// no input
 			// FIXME: validate input (no null ships)
-			List<Ship> temp = new LinkedList<Ship>();
-			System.out.println(ois.available() > 0 ? "Ships returned" : "No ships returned");
-			return ois.available() == 0 ? temp : (List<Ship>)ois.readObject();
+			//List<Ship> temp = new LinkedList<Ship>();
+			//System.out.print(System.currentTimeMillis() + " - ");
+			//System.out.println(ois.available() > 0 ? "Ships returned" : "No ships returned");
+			//return ois.available() == 0 ? temp : (List<Ship>)ois.readObject();
+			// FIXME
+			return (List<Ship>)ois.readObject();
 		} catch (IOException e) {
 			// TODO: cannot send server objects over the socket
 			e.printStackTrace();
@@ -193,11 +196,13 @@ public class ClientConnection {
 	 * @return true, if successful
 	 * @throws ConnectionLostException the connection lost exception
 	 */
-	public boolean requestTurn() throws ConnectionLostException {
+	public boolean requestTurn(List<Ship> ships, Map<Integer, List<ActionResult>> actionResults) throws ConnectionLostException {
 		if (conn == null)
 			throw new ConnectionLostException();
 		try {
 			oos.writeObject(CommunicationConstants.REQUEST_DO_TURN);
+			oos.writeObject(ships);
+			oos.writeObject(actionResults);
 			oos.flush();
 			return true;
 		} catch (IOException e) {
@@ -220,8 +225,12 @@ public class ClientConnection {
 			// check to see if something is arrived in time. Otherwise, assume
 			// no input
 			// FIXME: validate input (no null coordinates)
-			List<Coordinate> temp = new LinkedList<Coordinate>();
-			return ois.available() <= 0 ? temp : (List<Coordinate>)ois.readObject();
+			//System.out.print(System.currentTimeMillis() + " - ");
+			//System.out.println(ois.available() > 0 ? "Coordinates returned" : "No coordinates returned");
+			//List<Coordinate> temp = new LinkedList<Coordinate>();
+			// return ois.available() <= 0 ? temp : (List<Coordinate>)ois.readObject();
+			// FIXME 
+			return (List<Coordinate>)ois.readObject();
 			
 		} catch (IOException e) {
 			// TODO: cannot send server objects over the socket

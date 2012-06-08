@@ -5,9 +5,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.List;
+import java.util.Map;
 
 import battlechallenge.ActionResult;
 import battlechallenge.CommunicationConstants;
+import battlechallenge.Coordinate;
 import battlechallenge.Ship;
 import battlechallenge.bot.ClientPlayer;
 
@@ -53,7 +55,6 @@ public class ServerConnection {
 
 	public void run() {
 		while (true) {
-			System.out.println("Loop");
 			try {
 				String req = (String) ois.readObject();
 				
@@ -123,16 +124,14 @@ public class ServerConnection {
 
 	public void setCredentials(String name) {
 		try {
-			System.out.println("Reading id/width/height");
 			id = ois.readInt();
-			System.out.println("Got ID");
 			int width = ois.readInt();
-			System.out.println("Got width");
 			int height = ois.readInt();
-			System.out.println("Got height");
 			bot = new ClientPlayer(name, width, height, id);
 			System.out.println("bot generated");
 			// send name to server
+			System.out.print(System.currentTimeMillis() + " - ");
+			System.out.println("Send name to server");
 			oos.writeObject(name);
 			oos.flush();
 			return;
@@ -149,10 +148,12 @@ public class ServerConnection {
 		try {
 			System.out.print("Getting ships... ");
 			List<Ship> ships = (List<Ship>)ois.readObject();
-			System.out.println("Got Ships");
 			// place ships and send resulting ships to server
 			// FIXME: handle null
-			oos.writeObject(bot.placeShips(ships));
+			List<Ship> shipsList = bot.placeShips(ships);
+			System.out.print(System.currentTimeMillis() + " - ");
+			System.out.println("Sending ships");
+			oos.writeObject(shipsList);
 			oos.flush();
 			return;
 		} catch (IOException e) {
@@ -171,12 +172,13 @@ public class ServerConnection {
 	public void doTurn() {
 		try {
 			List<Ship> myShips = (List<Ship>)ois.readObject();
-			List<Ship> oppShips = (List<Ship>)ois.readObject();
-			List<ActionResult> myAR = (List<ActionResult>)ois.readObject();
-			List<ActionResult> oppAR = (List<ActionResult>)ois.readObject();
+			Map<Integer, List<ActionResult>> actionResults = (Map<Integer, List<ActionResult>>)ois.readObject();
 			// doTurn and send resulting coordinates to server
 			// FIXME: handle null
-			oos.writeObject(bot.doTurn(myShips, oppShips, myAR, oppAR));
+			List<Coordinate> coords = bot.doTurn(myShips, actionResults);
+			System.out.print(System.currentTimeMillis() + " - ");
+			System.out.println("Sending coordinates");
+			oos.writeObject(coords);
 			oos.flush();
 			return;
 		} catch (IOException e) {
