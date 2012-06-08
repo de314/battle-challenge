@@ -20,7 +20,8 @@
 			updateBoard($("#p0svg"), data[0]);
 			updateBoard($("#p1svg"), data[1]);
 		}
-		setTimeout(blank, 3000);
+		//setTimeout(blank, 3000);
+		setTimeout(update, 500);
 	}
 	function updateBoard(ele, data) {
 		var str = "<pre>";
