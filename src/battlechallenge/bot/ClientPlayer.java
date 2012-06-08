@@ -25,6 +25,7 @@ public class ClientPlayer {
 	private final int mapHeight;
 	
 	
+	
 	/**
 	 * Instantiates a new client player.
 	 *
@@ -75,7 +76,9 @@ public class ClientPlayer {
 	 */
 	public List<Coordinate> doTurn(List<Ship> myShips, Map<Integer, List<ActionResult>> actionResults) {
 		List<Coordinate> shotCoordinates = new ArrayList<Coordinate>();
-		shotCoordinates.add(new Coordinate((int) (Math.random() * (mapHeight -1)), (int) (Math.random() * (mapWidth - 1))));
+		//shotCoordinates.add(new Coordinate((int) (Math.random() * (mapHeight -1)), (int) (Math.random() * (mapWidth - 1))));
+		ActionResult myResults = actionResults.get(this.networkID).get(0);
+			
 		return shotCoordinates;
 	}
 }

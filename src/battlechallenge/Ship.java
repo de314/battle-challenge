@@ -156,17 +156,16 @@ public class Ship implements Serializable {
 	 * @return the coordinate strings
 	 */
 	public Set<String> getCoordinateStrings() {
-		if (coords == null) {
 			coords = new HashSet<String>();
 			for (int i = 0; i < length; i++) {
 	
 				switch (direction) {
 				case NORTH: {
-					coords.add((this.startPosition.row + i) + ","
+					coords.add((this.startPosition.row - i) + ","
 							+ this.startPosition.col);
 				} break;
 				case SOUTH: {
-					coords.add((this.startPosition.row - i) + ","
+					coords.add((this.startPosition.row + i) + ","
 							+ this.startPosition.col);
 				} break;
 				case EAST: {
@@ -179,7 +178,6 @@ public class Ship implements Serializable {
 				} break;
 				}
 			}
-		}
 		return coords;
 	}
 	

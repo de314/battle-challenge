@@ -46,7 +46,8 @@ public class ActionResult implements Serializable {
 	public String toString() {
 		StringBuilder sb = new StringBuilder("[ ");
 		sb.append(this.result.toString()).append(" : ").append(this.coordinate);
-		return sb.append(" ]").toString();
+		sb.append(" ]");
+		return sb.append(" Health: ").append(this.health).toString();
 	}
 	
 }

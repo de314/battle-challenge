@@ -123,6 +123,8 @@ public class ServerPlayer {
 		try {
 			List<Ship> temp = conn.getPlaceShips();
 			for(Ship s : temp) {
+				//ships.get(counter).setStartPosition(s.getStartPosition());
+				//ships.get(counter).setDirection(s.getDirection());
 				// FIXME: save new ship info into instance variables
 				// DO NOT TRUST THE USER
 			}
