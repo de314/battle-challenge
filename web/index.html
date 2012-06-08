@@ -3,6 +3,7 @@
 <title>Battle Challenge Visualizer</title>
 <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
 <script type="text/javascript">
+	var pause = false;
 	function blank() {
 		$("#p0svg").html("");
 		$("#p1svg").html("");
@@ -15,33 +16,70 @@
 			}).done(handle_update);
 	}
 	function handle_update(data) {
+		console.debug(data);
 		data = JSON.parse(data);
 		if (data) {
 			updateBoard($("#p0svg"), data[0]);
+			updateInfo($("#p0name"), data[0]);
 			updateBoard($("#p1svg"), data[1]);
+			updateInfo($("#p1name"), data[1]);
 		}
-		//setTimeout(blank, 3000);
-		setTimeout(update, 500);
+		if (!pause)
+			setTimeout(update, 500);
 	}
 	function updateBoard(ele, data) {
 		var str = "<pre>";
-		str += data.w + ", " + data.h +"\n";
+		//str += data.w + ", " + data.h +"\n";
 		for (row in data.board) {
-			for (c in data.board[row]) {
-				str += data.board[row][c];
+			console.debug(data.board[row][0]);
+			row = (data.board[row][0]+"").split('');
+			for (c in row) {
+				str += "<span class='" +row[c] + "'>&nbsp;&nbsp;" + row[c] + "</span>";
 			}
 			str += "\n";
 		}
 		str += "<\pre>";
 		ele.html(str);
 	}
+	function updateInfo(ele, data) {
+		ele.html(data.name);
+	}
+	function togglePause() {
+		var ele = $("#pauseButton");
+		if (pause) {
+			pause = false;
+			update();
+			ele.html("Pause");
+		} else {
+			ele.html("Resume");
+			pause = true;
+		}
+	}
 </script>
+<style>
+	.O{
+		background-color: green;
+	}
+	.X{
+		background-color: red;
+	}
+	.B{
+		background-color: grey;
+	}
+	.S{
+		background-color: blue;
+	}
+	.l{
+		background-color: lightblue;
+	}
+</style>
 </head>
 <body>
+<button id="pauseButton" onclick="togglePause();">Pause</button>
 <table border="1px">
 	<tr>
-		<th>Player One</th>
-		<th>Player Two</th>
+		<th id="p0name">Player One</th>
+		<th id="p1name">Player Two</th>
 	</tr>
 	<tr>
 		<td><div id="p0svg"></div></td>

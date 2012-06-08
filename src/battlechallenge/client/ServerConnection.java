@@ -4,14 +4,18 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import battlechallenge.ActionResult;
 import battlechallenge.CommunicationConstants;
 import battlechallenge.Coordinate;
 import battlechallenge.Ship;
 import battlechallenge.bot.ClientPlayer;
+import battlechallenge.bot.DavidBot;
 
 public class ServerConnection {
 
@@ -57,9 +61,7 @@ public class ServerConnection {
 		while (true) {
 			try {
 				String req = (String) ois.readObject();
-				
-				System.out.println("Request: " + req);
-				
+				System.out.println(req);
 				/*
 				 * [[ HANDLE REQUESTS ]]
 				 */
@@ -79,12 +81,12 @@ public class ServerConnection {
 					System.out.println("You have been disqualified from the game");
 					break;
 				}
-				if (req.equals(CommunicationConstants.RESULT_DISQUALIFIED)) {
+				if (req.equals(CommunicationConstants.RESULT_WIN)) {
 					// TODO: handle winner
 					System.out.println("You have WON the game!!");
 					break;
 				}
-				if (req.equals(CommunicationConstants.RESULT_DISQUALIFIED)) {
+				if (req.equals(CommunicationConstants.RESULT_LOSE)) {
 					// TODO: handle loser
 					System.out.println("You have lost the game.");
 					break;
@@ -127,11 +129,10 @@ public class ServerConnection {
 			id = ois.readInt();
 			int width = ois.readInt();
 			int height = ois.readInt();
-			bot = new ClientPlayer(name, width, height, id);
-			System.out.println("bot generated");
+			bot = new DavidBot(name, width, height, id);
+			System.out.println("bot generated with network ID: " + id);
 			// send name to server
 			System.out.print(System.currentTimeMillis() + " - ");
-			System.out.println("Send name to server");
 			oos.writeObject(name);
 			oos.flush();
 			return;
@@ -146,13 +147,10 @@ public class ServerConnection {
 
 	public void placeShips() {
 		try {
-			System.out.print("Getting ships... ");
 			List<Ship> ships = (List<Ship>)ois.readObject();
 			// place ships and send resulting ships to server
 			// FIXME: handle null
 			List<Ship> shipsList = bot.placeShips(ships);
-			System.out.print(System.currentTimeMillis() + " - ");
-			System.out.println("Sending ships");
 			oos.writeObject(shipsList);
 			oos.flush();
 			return;
@@ -171,13 +169,19 @@ public class ServerConnection {
 
 	public void doTurn() {
 		try {
+			@SuppressWarnings("unchecked")
 			List<Ship> myShips = (List<Ship>)ois.readObject();
-			Map<Integer, List<ActionResult>> actionResults = (Map<Integer, List<ActionResult>>)ois.readObject();
+			// FIXME: send a list of ActionResults
+			Map<Integer, ActionResult> temp = (Map<Integer, ActionResult>)ois.readObject();
+			Map<Integer, List<ActionResult>> actionResults = new HashMap<Integer, List<ActionResult>>();
+			for (Entry<Integer, ActionResult> e : temp.entrySet()) {
+				actionResults.put(e.getKey(), new LinkedList<ActionResult>());
+				if (e.getValue() != null)
+					actionResults.get(e.getKey()).add(e.getValue());
+			}
 			// doTurn and send resulting coordinates to server
 			// FIXME: handle null
 			List<Coordinate> coords = bot.doTurn(myShips, actionResults);
-			System.out.print(System.currentTimeMillis() + " - ");
-			System.out.println("Sending coordinates");
 			oos.writeObject(coords);
 			oos.flush();
 			return;

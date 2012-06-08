@@ -45,7 +45,7 @@ public class GameManager {
 				players.add(waitingPlayers.poll());
 				players.add(waitingPlayers.poll());
 				// Game constructor start its own thread
-				games.add(new Game(players));
+				games.add(new Game(players, this));
 			}
 		}
 	}
@@ -58,7 +58,6 @@ public class GameManager {
 	public void removeGame(Game g) {
 		if (games.contains(g)) {
 			games.remove(g);
-			
 		}
 	}
 }

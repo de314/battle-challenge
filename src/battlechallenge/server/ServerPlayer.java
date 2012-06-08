@@ -1,6 +1,7 @@
 package battlechallenge.server;
 
 import java.net.Socket;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,9 +38,16 @@ public class ServerPlayer {
 	
 	/** The id. */
 	private final int id;
+
+	/** The has ships. */
+	private boolean hasShips = true;
 	
 	public int getId() {
 		return id;
+	}
+	
+	public String getName() {
+		return name;
 	}
 	
 	/**
@@ -50,10 +58,11 @@ public class ServerPlayer {
 	public List<Ship> getShips() {
 		return ships;
 	}
-	
-	/** The has ships. */
-	private boolean hasShips = true;
 
+	public List<ActionResult> getActionLog() {
+		return actionLog;
+	}
+	
 	/**
 	 * Instantiates a new server player.
 	 *
@@ -72,6 +81,11 @@ public class ServerPlayer {
 		} catch (ConnectionLostException e) {
 			// TODO; Handle lost connection
 		}
+		this.actionLog = new LinkedList<ActionResult>();
+	}
+	
+	public void endGame(String result) {
+		conn.endGame(result);
 	}
 
 	/**
@@ -143,6 +157,7 @@ public class ServerPlayer {
 	 */
 	public boolean requestTurn(Map<Integer, List<ActionResult>> actionResults) {
 		try {
+			this.actionLog.addAll(actionResults.get(this.id));
 			return conn.requestTurn(this.ships, actionResults);
 		} catch (ConnectionLostException e) {
 			// TODO: handle lost connection

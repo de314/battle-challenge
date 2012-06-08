@@ -4,9 +4,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import battlechallenge.ActionResult;
 import battlechallenge.CommunicationConstants;
@@ -53,14 +54,24 @@ public class ClientConnection {
 		}
 	}
 	
+	public void endGame(String result) {
+		try {
+			oos.writeObject(result);
+			oos.flush();
+		} catch (IOException e) { }
+		  catch (NullPointerException e) { }
+		kill();
+	}
+	
 	/**
 	 * Kill.
 	 */
 	public void kill() {
 		if (this.conn != null) {
-			try {
-				this.conn.close();
-			} catch (IOException e) { /* don't care if this messes up */}
+			/* don't care if these mess up */
+			try { this.oos.close(); } catch (IOException e) { }catch (NullPointerException e) { }
+			try { this.ois.close(); } catch (IOException e) { }catch (NullPointerException e) { }
+			try { this.conn.close(); } catch (IOException e) { }catch (NullPointerException e) { }
 			this.conn = null;
 		}
 	}
@@ -202,7 +213,12 @@ public class ClientConnection {
 		try {
 			oos.writeObject(CommunicationConstants.REQUEST_DO_TURN);
 			oos.writeObject(ships);
-			oos.writeObject(actionResults);
+			// FIXME: send a list of action results
+			Map<Integer, ActionResult> temp = new HashMap<Integer, ActionResult>();
+			for(Entry<Integer, List<ActionResult>> e : actionResults.entrySet()) {
+				temp.put(e.getKey(), e.getValue().isEmpty() ? null : e.getValue().get(0));
+			}
+			oos.writeObject(temp);
 			oos.flush();
 			return true;
 		} catch (IOException e) {
