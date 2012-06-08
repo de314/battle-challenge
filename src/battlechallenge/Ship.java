@@ -268,4 +268,8 @@ public class Ship implements Serializable {
 		sb.append(this.startPosition).append(" ").append(this.direction);
 		return sb.toString();
 	}
+
+	public Set<String> getHitStrings() {
+		return hits;
+	}
 }

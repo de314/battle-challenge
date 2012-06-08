@@ -1,0 +1,54 @@
+<html>
+<head>
+<title>Battle Challenge Visualizer</title>
+<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+<script type="text/javascript">
+	function blank() {
+		$("#p0svg").html("");
+		$("#p1svg").html("");
+		setTimeout(update, 50);
+	}
+	function update() {
+		$.ajax({
+			  url: "scrips/graphics_utils.php",
+			  context: document.body
+			}).done(handle_update);
+	}
+	function handle_update(data) {
+		data = JSON.parse(data);
+		if (data) {
+			updateBoard($("#p0svg"), data[0]);
+			updateBoard($("#p1svg"), data[1]);
+		}
+		setTimeout(blank, 3000);
+	}
+	function updateBoard(ele, data) {
+		var str = "<pre>";
+		str += data.w + ", " + data.h +"\n";
+		for (row in data.board) {
+			for (c in data.board[row]) {
+				str += data.board[row][c];
+			}
+			str += "\n";
+		}
+		str += "<\pre>";
+		ele.html(str);
+	}
+</script>
+</head>
+<body>
+<table border="1px">
+	<tr>
+		<th>Player One</th>
+		<th>Player Two</th>
+	</tr>
+	<tr>
+		<td><div id="p0svg"></div></td>
+		<td><div id="p1svg"></div></td>
+	</tr>
+</table>
+<script type="text/javascript">
+update();
+</script>
+</body>
+</html>
