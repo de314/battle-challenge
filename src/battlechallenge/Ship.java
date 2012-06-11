@@ -153,7 +153,8 @@ public class Ship implements Serializable {
 	/**
 	 * Gets the coordinate strings.
 	 *
-	 * @return the coordinate strings
+	 * @return a Set of coordinates in String form of all
+	 * coordinates that the ship is located on
 	 */
 	public Set<String> getCoordinateStrings() {
 			coords = new HashSet<String>();
@@ -182,7 +183,7 @@ public class Ship implements Serializable {
 	}
 	
 	/**
-	 * In bounds inclusive.
+	 * Checks to see if any part of the ship is within the specified bounds
 	 *
 	 * @param rowMin the row min
 	 * @param rowMax the row max

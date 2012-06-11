@@ -12,7 +12,6 @@ import battlechallenge.ConnectionLostException;
 import battlechallenge.Coordinate;
 import battlechallenge.Ship;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class ServerPlayer.
  */
@@ -58,7 +57,12 @@ public class ServerPlayer {
 	public List<Ship> getShips() {
 		return ships;
 	}
-
+	
+	/**
+	 * 
+	 * @return a list of action results returned over the
+	 * period of a game
+	 */
 	public List<ActionResult> getActionLog() {
 		return actionLog;
 	}
@@ -89,7 +93,7 @@ public class ServerPlayer {
 	}
 
 	/**
-	 * Kill the player and socket connection.
+	 * Kills the player and socket connection.
 	 * 
 	 * DO NOT FORGET TO DO THIS!!!
 	 */
@@ -113,9 +117,9 @@ public class ServerPlayer {
 	}
 
 	/**
-	 * Request turn.
+	 * Requests ships from the ClientPlayer through the ClientConnection
 	 *
-	 * @param ships the ships
+	 * @param ships the original ships to be updated by the ClientPlayer's
 	 * @return true, if successful
 	 */
 	public boolean requestPlaceShips(List<Ship> ships) {
@@ -129,9 +133,11 @@ public class ServerPlayer {
 	}
 
 	/**
-	 * Gets the turn.
+	 * Will request the ships updated by the ClientPlayers placeShips 
+	 * method and update the default list of ships with the updated
+	 * player ships
 	 * 
-	 * @return the turn
+	 * @return the list of ships with updated starting coordinates
 	 */
 	public List<Ship> getPlaceShips() {
 		try {
@@ -166,9 +172,9 @@ public class ServerPlayer {
 	}
 
 	/**
-	 * Gets the turn.
+	 * Requests the result
 	 * 
-	 * @return the turn
+	 * @return the list of coordinates returned by the ClientPlayer
 	 */
 	public List<Coordinate> getTurn() {
 		try {
@@ -198,7 +204,7 @@ public class ServerPlayer {
 
 	
 	/**
-	 * Checks for ships left.
+	 * Checks to see if the player has any ships not sunk
 	 *
 	 * @return true, if player has ships left
 	 */
@@ -224,10 +230,10 @@ public class ServerPlayer {
 	
 	
 	/**
-	 * Checks if is hit.
+	 * Checks if the ship is hit as a result of an action
 	 *
-	 * @param c the c
-	 * @param damage the damage
+	 * @param c the coordinate affected by the action
+	 * @param damage the damage incurred as a result of the action
 	 * @return the action result
 	 */
 	public ActionResult isHit(Coordinate c, int damage) {

@@ -51,9 +51,9 @@ public class GameManager {
 	}
 	
 	/**
-	 * Removes the game.
+	 * Removes the game from the GameManager
 	 *
-	 * @param g the g
+	 * @param g the game
 	 */
 	public void removeGame(Game g) {
 		if (games.contains(g)) {

@@ -16,11 +16,12 @@ public class BattleshipClient {
 		int port = PORT;
 		if (args.length > 1) 
 			try {
-			port = Integer.parseInt(args[0]);
+			port = Integer.parseInt(args[1]);
 			} catch (NumberFormatException e) { /* ignore exception */ }
 		String ip = IP;
 		if (args.length > 2)
-			ip = args[1];
+			ip = args[2];
+		System.out.println(port + " " + ip);
 		new ServerConnection(port, ip, name);
 	}
 }

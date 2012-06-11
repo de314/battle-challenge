@@ -16,27 +16,45 @@ public class ClientPlayer {
 	/** The player name. */
 	protected final String playerName;
 	
-	protected final int networkID;
+	/** The id to identify the player */
+	protected int networkID;
 	
-	/** The map width. */
-	protected final int mapWidth;
+	/** The board width. */
+	protected int boardWidth;
+
+	/** The board height. */
 	
-	/** The map height. */
-	protected final int mapHeight;
+	protected int boardHeight;
 	
+	/**
+	 * Save the width of the game board
+	 * @param boardWidth the width of the game board
+	 */
+	public void setBoardWidth(int boardWidth) {
+		this.boardWidth = boardWidth;
+	}
+	/**
+	 * Save the height of the game board
+	 * @param boardHeight the height of the game board
+	 */
+	public void setBoardHeight(int boardHeight) {
+		this.boardHeight = boardHeight;
+	}
 	
-	
+	public ClientPlayer(final String playerName) {
+		this(playerName, 0, 0, 0);
+	}
 	/**
 	 * Instantiates a new client player.
 	 *
 	 * @param playerName the player name
-	 * @param mapWidth the map width
-	 * @param mapHeight the map height
+	 * @param boardWidth the map width
+	 * @param boardHeight the map height
 	 */
 	public ClientPlayer(final String playerName, final int mapWidth, final int mapHeight, final int networkID) {
 		this.playerName = playerName;
-		this.mapWidth = mapWidth;
-		this.mapHeight = mapHeight;
+		this.boardWidth = mapWidth;
+		this.boardHeight = mapHeight;
 		this.networkID = networkID;
 	}
 	/**
@@ -53,7 +71,7 @@ public class ClientPlayer {
 		int row = 0;
 		for (Ship ship: shipList) {
 			while (shipRow.contains(row)) {
-				row = (int) (Math.random() * (mapHeight-1));
+				row = (int) (Math.random() * (boardHeight-1));
 			}
 			shipRow.add(row);
 			ship.setStartPosition(new Coordinate(row,0));
@@ -76,7 +94,8 @@ public class ClientPlayer {
 	 */
 	public List<Coordinate> doTurn(List<Ship> myShips, Map<Integer, List<ActionResult>> actionResults) {
 		List<Coordinate> shotCoordinates = new ArrayList<Coordinate>();
-		shotCoordinates.add(new Coordinate((int) (Math.random() * (mapHeight -1)), (int) (Math.random() * (mapWidth - 1))));	
+		shotCoordinates.add(new Coordinate((int) (Math.random() * (boardHeight -1)), (int) (Math.random() * (boardWidth - 1))));	
 		return shotCoordinates;
 	}
 }
+

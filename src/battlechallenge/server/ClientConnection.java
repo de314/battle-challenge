@@ -22,10 +22,10 @@ public class ClientConnection {
 
 	
 	
-	/** The conn. */
+	/** The Socket conn. */
 	private Socket conn;
 	
-	/** The oos. */
+	/** ObjectOutputStream object */
 	private ObjectOutputStream oos;
 	
 	/** The ois. */
@@ -64,7 +64,7 @@ public class ClientConnection {
 	}
 	
 	/**
-	 * Kill.
+	 * Kill the client connection
 	 */
 	public void kill() {
 		if (this.conn != null) {
@@ -114,9 +114,11 @@ public class ClientConnection {
 	
 	/**
 	 * Sets the player credentials.
-	 *
-	 * @return the string
-	 * @throws ConnectionLostException the connection lost exception
+	 * @param id The id that identifies a player
+	 * @param height the height of the board
+	 * @param width the width of the board
+	 * @return the name of the client if successful, otherwise null
+	 * @throws ConnectionLostException the connection was lost throw an exception
 	 */
 	public String setCredentials(int id, int height, int width) throws ConnectionLostException {
 		if (conn == null)
@@ -168,9 +170,9 @@ public class ClientConnection {
 	}
 	
 	/**
-	 * Gets the place ships.
+	 * Gets the updated ship locations returned by the client
 	 *
-	 * @return the place ships
+	 * @return the list of ships passed back from the client
 	 * @throws ConnectionLostException the connection lost exception
 	 */
 	public List<Ship> getPlaceShips() throws ConnectionLostException {
@@ -200,12 +202,14 @@ public class ClientConnection {
 		}
 		return null;
 	}
-	
+
 	/**
-	 * Request turn.
-	 *
+	 * Tells the client to expect turn parameters then passes 
+	 * the current list of ships and actionResult list to the client
+	 * @param ships the current list of ships as of last turn
+	 * @param actionResults list of actionResults from last turn
 	 * @return true, if successful
-	 * @throws ConnectionLostException the connection lost exception
+	 * @throws ConnectionLostException a lost connection exception
 	 */
 	public boolean requestTurn(List<Ship> ships, Map<Integer, List<ActionResult>> actionResults) throws ConnectionLostException {
 		if (conn == null)
@@ -229,9 +233,9 @@ public class ClientConnection {
 	}
 	
 	/**
-	 * Gets the turn.
+	 * Gets the coordinates passed by the client at the end of a turn
 	 *
-	 * @return the turn
+	 * @return the list of coordinates returned by the ClientPlayer's doTurn method
 	 * @throws ConnectionLostException the connection lost exception
 	 */
 	public List<Coordinate> getTurn() throws ConnectionLostException {

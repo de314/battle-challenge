@@ -16,6 +16,7 @@ import battlechallenge.Coordinate;
 import battlechallenge.Ship;
 import battlechallenge.bot.ClientPlayer;
 import battlechallenge.bot.DavidBot;
+import battlechallenge.bot.KevinBot;
 
 public class ServerConnection {
 
@@ -25,7 +26,16 @@ public class ServerConnection {
 	private ObjectInputStream ois;
 	private ClientPlayer bot;
 	private String name;
-
+	
+	/**
+	 * Constructor that creates a client socket and request and set
+	 * the name of the ClientPlayer. The server connection will then 
+	 * call the run method
+	 * 
+	 * @param port The port to connect to the server
+	 * @param ip The ip address of the server
+	 * @param name The name to identify the player
+	 */
 	public ServerConnection(int port, String ip, String name) {
 		// TODO: validate port and IP
 		try {

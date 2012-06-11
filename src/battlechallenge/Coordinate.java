@@ -2,7 +2,6 @@ package battlechallenge;
 
 import java.io.Serializable;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Coordinate.
  */
@@ -82,6 +81,8 @@ public class Coordinate implements Serializable {
 		return this.row >= rowMin && this.row <= rowMax && this.col >= colMin && this.col <= colMax;
 	}
 	
+	
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
@@ -96,6 +97,16 @@ public class Coordinate implements Serializable {
 	@Override
 	public int hashCode() {
 		return (this.row + "," + this.col).hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		boolean result = false;
+		if (obj instanceof Coordinate) {
+			Coordinate that = (Coordinate) obj;
+			result = (that.getRow() == this.getRow() && that.getCol() == this.getCol());
+		}	
+ 		return result;	
 	}
 	
 } // End Coordinate Class

@@ -20,9 +20,9 @@ public class DavidBot extends ClientPlayer {
 	private Set<String> guessed;
 	private Queue<Coordinate> adjacentList;
 	
-	public DavidBot(String playerName, int mapWidth, int mapHeight,
+	public DavidBot(String playerName, int boardWidth, int boardHeight,
 			int networkID) {
-		super(playerName, mapWidth, mapHeight, networkID);
+		super(playerName, boardWidth, boardHeight, networkID);
 		this.guessed = new HashSet<String>();
 		adjacentList = new LinkedList<Coordinate>();
 	}
@@ -39,8 +39,8 @@ public class DavidBot extends ClientPlayer {
 				Direction dir = Direction.NORTH;
 				if (Math.random() > 0.5)
 					dir = Direction.EAST;
-				row = (int)(Math.random() * mapHeight);
-				col = (int)(Math.random() * mapWidth);
+				row = (int)(Math.random() * boardHeight);
+				col = (int)(Math.random() * boardWidth);
 				
 			}
 		}
@@ -51,7 +51,7 @@ public class DavidBot extends ClientPlayer {
 		int row = 0;
 		for (Ship ship: shipList) {
 			while (shipRow.contains(row)) {
-				row = (int) (Math.random() * (mapHeight-1));
+				row = (int) (Math.random() * (boardHeight-1));
 			}
 			shipRow.add(row);
 			ship.setStartPosition(new Coordinate(row,0));
@@ -76,7 +76,7 @@ public class DavidBot extends ClientPlayer {
 				c = null;
 		}
 		while (c == null) {
-			c = new Coordinate((int)(Math.random() * super.mapHeight), (int)(Math.random() * super.mapWidth));
+			c = new Coordinate((int)(Math.random() * super.boardHeight), (int)(Math.random() * super.boardWidth));
 			if (guessed.contains(c.toString()))
 				c = null;
 		}
@@ -88,11 +88,11 @@ public class DavidBot extends ClientPlayer {
 	}
 	
 	public void addAdjacent(int row, int col) {
-		if (col < super.mapWidth-1)
+		if (col < super.boardWidth-1)
 			adjacentList.offer(new Coordinate(row, col+1));
 		if (col > 0)
 			adjacentList.offer(new Coordinate(row, col-1));
-		if (row < super.mapHeight-1)
+		if (row < super.boardHeight-1)
 			adjacentList.offer(new Coordinate(row+1, col));
 		if (col > 0)
 			adjacentList.offer(new Coordinate(row-1, col));

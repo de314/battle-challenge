@@ -46,12 +46,19 @@ public class Game extends Thread {
 	/**
 	 * Instantiates a new game.
 	 *  
-	 * @param players2 the player
+	 * @param players the player
 	 */
 	public Game(List<ServerPlayer> players, GameManager manager) {
 		this(players, DEFAULT_WIDTH, DEFAULT_HEIGHT, manager);
 	}
 	
+	/**
+	 * Constructor for a game that requires at least two players
+	 * @param players The players that make up the game
+	 * @param height The height of the game board
+	 * @param width  The width of the game board
+	 * @param manager The GameManager that creates the game
+	 */
 	public Game(List<ServerPlayer> players, int height, int width, GameManager manager) {
 		if (players == null || players.size() < 2)
 			throw new IllegalArgumentException();
@@ -124,6 +131,11 @@ public class Game extends Thread {
 		}
 	}
 	
+	/**
+	 * The method will pass the initial ships to be updated by each player's
+	 * placeShip method. The method then checks for invalid placements of 
+	 * ships for each player
+	 */
 	private void placeShips() {
 		for(ServerPlayer p : players) {
 			p.requestPlaceShips(Game.getShips());
@@ -174,7 +186,8 @@ public class Game extends Thread {
 			}
 		}
 		try {
-			// FIXME: remove magic number
+			// FIXME: Change speed depending on how fast players return results from calls
+			// to their doTurn method.
 			Thread.sleep(DEFAULT_SPEED);
 		} catch (InterruptedException e) {
 			// TODO: handle thread failure
@@ -198,6 +211,9 @@ public class Game extends Thread {
 					for(ServerPlayer opp : players) {
 						if (opp != p) {
 							// FIXME: get rid of magic number for damage
+							// This is done for multiple opponents, recording multiple hits
+							// on multiple opponents if necessary, otherwise recording
+							// a single miss
 							ActionResult ar = opp.isHit(coords.get(i), 1);
 							if (ar.getResult() == ShotResult.HIT) {
 								actionResults.get(p.getId()).add(ar);
@@ -215,8 +231,8 @@ public class Game extends Thread {
 	/**
 	 * Adds the player.
 	 *
-	 * @param player the player
-	 * @return true, if successful
+	 * @param player the player to add to the game
+	 * @return true, if player is successfuly added to the game
 	 */
 	public boolean addPlayer(ServerPlayer player) {
 		// FIXME: handle null players
@@ -225,9 +241,10 @@ public class Game extends Thread {
 	}
 	
 	/**
-	 * Gets the winner.
+	 * Gets the winner by checking each player to see if they
+	 * have any ships left
 	 *
-	 * @return the winner
+	 * @return the winner who is the only player with at least one ship left unsunk.
 	 */
 	public ServerPlayer getWinner() {
 		// TODO: get player with max score
@@ -240,7 +257,7 @@ public class Game extends Thread {
 	}
 	
 	/**
-	 * Gets the default ships for this game.
+	 * Creates the default ships for this game.
 	 *
 	 * @return the ships
 	 */
