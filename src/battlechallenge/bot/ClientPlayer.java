@@ -14,15 +14,15 @@ import battlechallenge.Ship;
 public class ClientPlayer {
 	
 	/** The player name. */
-	private final String playerName;
+	protected final String playerName;
 	
-	private final int networkID;
+	protected final int networkID;
 	
 	/** The map width. */
-	private final int mapWidth;
+	protected final int mapWidth;
 	
 	/** The map height. */
-	private final int mapHeight;
+	protected final int mapHeight;
 	
 	
 	
@@ -76,9 +76,7 @@ public class ClientPlayer {
 	 */
 	public List<Coordinate> doTurn(List<Ship> myShips, Map<Integer, List<ActionResult>> actionResults) {
 		List<Coordinate> shotCoordinates = new ArrayList<Coordinate>();
-		//shotCoordinates.add(new Coordinate((int) (Math.random() * (mapHeight -1)), (int) (Math.random() * (mapWidth - 1))));
-		ActionResult myResults = actionResults.get(this.networkID).get(0);
-			
+		shotCoordinates.add(new Coordinate((int) (Math.random() * (mapHeight -1)), (int) (Math.random() * (mapWidth - 1))));	
 		return shotCoordinates;
 	}
 }
