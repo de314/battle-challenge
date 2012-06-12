@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd bin/
+
 clear
 
 java battlechallenge.client.BattleshipClient
