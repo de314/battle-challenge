@@ -181,6 +181,13 @@ public class ServerConnection {
 		try {
 			@SuppressWarnings("unchecked")
 			List<Ship> myShips = (List<Ship>)ois.readObject();
+			// send number of players i.e. number of lists to receive
+			int size = (Integer)ois.readObject();
+			// for each entry in hash table, send the player's network id then action results list
+			Map<Integer, List<ActionResult>> actionResults = new HashMap<Integer, List<ActionResult>>();
+			for(int i=0;i<size;i++)
+				actionResults.put((Integer)ois.readObject(), (List<ActionResult>)ois.readObject());
+			// make sure everything is sent
 			// FIXME: send a list of ActionResults
 			Map<Integer, ActionResult> temp = (Map<Integer, ActionResult>)ois.readObject();
 			Map<Integer, List<ActionResult>> actionResults = new HashMap<Integer, List<ActionResult>>();

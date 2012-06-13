@@ -215,14 +215,18 @@ public class ClientConnection {
 		if (conn == null)
 			throw new ConnectionLostException();
 		try {
+			// send command
 			oos.writeObject(CommunicationConstants.REQUEST_DO_TURN);
+			// send current players boats
 			oos.writeObject(ships);
-			// FIXME: send a list of action results
-			Map<Integer, ActionResult> temp = new HashMap<Integer, ActionResult>();
+			// send number of players i.e. number of lists to receive
+			oos.writeObject(actionResults.size());
+			// for each entry in hash table, send the player's network id then action results list
 			for(Entry<Integer, List<ActionResult>> e : actionResults.entrySet()) {
-				temp.put(e.getKey(), e.getValue().isEmpty() ? null : e.getValue().get(0));
+				oos.writeObject(e.getKey());
+				oos.writeObject(e.getValue());
 			}
-			oos.writeObject(temp);
+			// make sure everything is sent
 			oos.flush();
 			return true;
 		} catch (IOException e) {
