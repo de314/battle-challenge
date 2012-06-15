@@ -37,6 +37,8 @@ public class CommunicationConstants {
 
 	/** The Constant SERVER_RESULT_LOSER. */
 	public static final String RESULT_LOSE;
+	
+	public static final int SOCKET_WAIT_TIME;
 
 	static {
 		// Server Credentials
@@ -56,6 +58,8 @@ public class CommunicationConstants {
 		RESULT_DISQUALIFIED = "D";
 		RESULT_WIN = "W";
 		RESULT_LOSE = "L";
+		
+		SOCKET_WAIT_TIME = 1000;
 	}
 	
 	public CommunicationConstants() {

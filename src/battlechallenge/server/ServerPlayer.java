@@ -77,13 +77,9 @@ public class ServerPlayer {
 		this.id = id;
 		this.conn = new ClientConnection(socket, id);
 		// TODO: initialize player
-		try {
-			if (!conn.setupHandshake()) {
-				// TODO: handle invalid player
-				throw new IllegalArgumentException();
-			}
-		} catch (ConnectionLostException e) {
-			// TODO; Handle lost connection
+		if (!conn.setupHandshake()) {
+			// TODO: handle invalid player
+			throw new IllegalArgumentException();
 		}
 		this.actionLog = new LinkedList<ActionResult>();
 	}
@@ -107,13 +103,9 @@ public class ServerPlayer {
 	 * @param boardWidth the board width
 	 * @param boardHeight the board height
 	 */
-	public void setCredentials(int boardWidth, int boardHeight) {
-		try {
-			this.name = conn.setCredentials(id, boardWidth, boardHeight);
-		} catch (ConnectionLostException e) {
-			// TODO handle lost socket connection
-			e.printStackTrace();
-		}
+	public boolean setCredentials(int boardWidth, int boardHeight) {
+		this.name = conn.setCredentials(id, boardWidth, boardHeight);
+		return this.name != null;
 	}
 
 	/**
@@ -139,21 +131,16 @@ public class ServerPlayer {
 	 * 
 	 * @return the list of ships with updated starting coordinates
 	 */
-	public List<Ship> getPlaceShips() {
-		try {
-			List<Ship> temp = conn.getPlaceShips();
-			for(Ship s : temp) {
-				//ships.get(counter).setStartPosition(s.getStartPosition());
-				//ships.get(counter).setDirection(s.getDirection());
-				// FIXME: save new ship info into instance variables
-				// DO NOT TRUST THE USER
-			}
-			this.ships = temp;
-			return ships; // return instance ships for placement verification by game
-		} catch (ConnectionLostException e) {
-			// TODO: handle lost connection
+	public List<Ship> getPlaceShips(List<Ship> ships) {
+		List<Ship> temp = conn.getPlaceShips();
+		for(Ship s : temp) {
+			//ships.get(counter).setStartPosition(s.getStartPosition());
+			//ships.get(counter).setDirection(s.getDirection());
+			// FIXME: save new ship info into instance variables
+			// DO NOT TRUST THE USER
 		}
-		return null;
+		this.ships = temp;
+		return ships; // return instance ships for placement verification by game
 	}
 
 	/**
@@ -162,13 +149,8 @@ public class ServerPlayer {
 	 * @return true, if successful
 	 */
 	public boolean requestTurn(Map<Integer, List<ActionResult>> actionResults) {
-		try {
-			this.actionLog.addAll(actionResults.get(this.id));
-			return conn.requestTurn(this.ships, actionResults);
-		} catch (ConnectionLostException e) {
-			// TODO: handle lost connection
-		}
-		return false;
+		this.actionLog.addAll(actionResults.get(this.id));
+		return conn.requestTurn(this.ships, actionResults);
 	}
 
 	/**
@@ -208,7 +190,9 @@ public class ServerPlayer {
 	 *
 	 * @return true, if player has ships left
 	 */
-	public boolean hasShipsLeft() {
+	public boolean isAlive() {
+		if (!conn.isOpen())
+			return false;
 		if (hasShips) {
 			for (Ship s : ships) {
 				if (!s.isSunken()) {

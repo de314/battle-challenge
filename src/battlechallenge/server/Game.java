@@ -43,6 +43,10 @@ public class Game extends Thread {
 	
 	private GameManager manager;
 	
+	public int numberOfPlayers() {
+		return players.size();
+	}
+	
 	/**
 	 * Instantiates a new game.
 	 *  
@@ -97,12 +101,17 @@ public class Game extends Thread {
 		Map<Integer, List<ActionResult>> actionResults = new HashMap<Integer, List<ActionResult>>();
 		for(ServerPlayer p : players)
 			actionResults.put(p.getId(), new LinkedList<ActionResult>());
-		int livePlayers = players.size();
+		int livePlayers = 0;
+		for (ServerPlayer player: players) {
+			if (player.isAlive()) {
+				livePlayers++;
+			}
+		}
 		while (livePlayers > 1) {
 			doTurn(actionResults);
 			livePlayers = 0;
 			for (ServerPlayer player: players) {
-				if (player.hasShipsLeft()) {
+				if (player.isAlive()) {
 					livePlayers++;
 				}
 			}
@@ -130,8 +139,11 @@ public class Game extends Thread {
 	
 	private void setPlayerCredentials() {
 		for(ServerPlayer p : players) {
-			p.setCredentials(boardWidth, boardHeight);
-			System.out.println("Set player credentials: " + p.toString());
+			if (p.setCredentials(boardWidth, boardHeight))
+				System.out.println("Set player credentials: " + p.toString());
+			else {
+				// TODO: remove player and pause game if necessary
+			}
 		}
 	}
 	
@@ -144,19 +156,18 @@ public class Game extends Thread {
 		for(ServerPlayer p : players) {
 			p.requestPlaceShips(Game.getShips());
 		}
-		System.out.print("Sleep... ");
 		try {
 			// FIXME: remove magic number
-			Thread.sleep(5000);
+			Thread.sleep(CommunicationConstants.SOCKET_WAIT_TIME);
 		} catch (InterruptedException e) {
 			// FIXME: handle thread failure
 		}
-		System.out.println("Awake");
 		for(ServerPlayer p : players) {
-			List<Ship> ships = p.getPlaceShips();
+			// FIXME: pass in correct ships, save original in a hash map
+			List<Ship> ships = p.getPlaceShips(Game.getShips());
 			// TODO: verify valid location
 			Set<String> coords = new HashSet<String>();
-			for(Ship s : p.getShips()) {
+			for(Ship s : ships) {
 				if (!s.inBoundsInclusive(0, this.boardHeight-1, 0, boardWidth-1)) {
 					// TODO: handle invalid ship placement (out of bounds)
 				}
@@ -185,7 +196,7 @@ public class Game extends Thread {
 		System.out.println(sb.toString());
 				
 		for(ServerPlayer p : players) {
-			if (!p.hasShipsLeft()) // Player is dead, don't request their turn
+			if (!p.isAlive()) // Player is dead, don't request their turn
 				continue;
 			if (!p.requestTurn(actionResults)) {
 				// TODO: handle lost socket connection
@@ -201,7 +212,7 @@ public class Game extends Thread {
 		
 		for(int j=0;j<players.size();j++) {
 			ServerPlayer p = players.get(j);
-			if (!p.hasShipsLeft()) // Player is dead no need to get actions when they cannot act
+			if (!p.isAlive()) // Player is dead no need to get actions when they cannot act
 				continue;
 			// shot coordinates
 			List<Coordinate> coords = p.getTurn();
@@ -255,7 +266,7 @@ public class Game extends Thread {
 	public ServerPlayer getWinner() {
 		// TODO: get player with max score
 		for (ServerPlayer player: players) {
-			if (player.hasShipsLeft()) {
+			if (player.isAlive()) {
 				return player;
 			}
 		}
