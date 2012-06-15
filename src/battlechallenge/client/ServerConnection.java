@@ -1,5 +1,6 @@
 package battlechallenge.client;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -24,6 +25,7 @@ public class ServerConnection {
 	private int id;
 	private ObjectOutputStream oos;
 	private ObjectInputStream ois;
+	private BufferedInputStream bis;
 	private ClientPlayer bot;
 	private String name;
 	
@@ -43,10 +45,12 @@ public class ServerConnection {
 			conn = new Socket(ip, port);
 			// open I/O streams for objects
 			oos = new ObjectOutputStream(conn.getOutputStream());
-			ois = new ObjectInputStream(conn.getInputStream());
+			bis = new BufferedInputStream(conn.getInputStream());
+			ois = new ObjectInputStream(bis);
 		} catch (Exception e) {
 			// TODO: Handle client cannot connect to server
-			e.printStackTrace();
+//			e.printStackTrace();
+			System.err.println("Application Exception: Invalid network connection parameters.");
 		}
 		this.name = name;
 		this.run();
@@ -102,11 +106,14 @@ public class ServerConnection {
 					break;
 				}
 			} catch (IOException e) {
-				// TODO: handle client socket failure
+//				e.printStackTrace();
+				System.err.println("Socket Exception: Cannot read from socket.");
 			} catch (ClassNotFoundException e) {
-				// ignore invalid requests
+//				e.printStackTrace();
+				System.err.println("Network Exception: Cannot receive game object from server. Check server version.");
 			} catch (ClassCastException e) {
-				// ignore invalid requests
+//				e.printStackTrace();
+				System.err.println("Network Exception: Unexpected game object from server. Check server version.");
 			}
 		}
 		System.out.println("The game is over.");
@@ -118,15 +125,19 @@ public class ServerConnection {
 			// check that server version is supported
 			if (CommunicationConstants.SUPPORTED_SERVERS.contains((String)ois.readObject())) {
 				oos.writeObject(CommunicationConstants.CLIENT_VERSION);
+				// Ensure objects are sent.
 				oos.flush();
 				return;
 			}
 		} catch (IOException e) {
-			
+//			e.printStackTrace();
+			System.err.println("Socket Exception: Cannot read from socket.");
 		} catch (ClassNotFoundException e) {
-			
+//			e.printStackTrace();
+			System.err.println("Network Exception: Cannot receive game object from server. Check server version.");
 		} catch (ClassCastException e) {
-			
+//			e.printStackTrace();
+			System.err.println("Network Exception: Unexpected game object from server. Check server version.");
 		}
 		// TODO handle unsupported server
 		System.out.println("Server is not supported");
@@ -144,10 +155,12 @@ public class ServerConnection {
 			// send name to server
 			System.out.print(System.currentTimeMillis() + " - ");
 			oos.writeObject(name);
+			// Ensure objects are sent.
 			oos.flush();
 			return;
 		} catch (IOException e) {
-			
+//			e.printStackTrace();
+			System.err.println("Socket Exception: Cannot read from socket.");
 		}
 		// TODO: handle error setting ID
 		System.out.println("Could not set ID");
@@ -161,15 +174,21 @@ public class ServerConnection {
 			// place ships and send resulting ships to server
 			// FIXME: handle null
 			List<Ship> shipsList = bot.placeShips(ships);
+			// Clear socket object cache. Causes problems when sending same object with different data.
+			oos.reset();
 			oos.writeObject(shipsList);
+			// Ensure objects are sent.
 			oos.flush();
 			return;
 		} catch (IOException e) {
-			
+//			e.printStackTrace();
+			System.err.println("Socket Exception: Cannot read from socket.");
 		} catch (ClassNotFoundException e) {
-			
+//			e.printStackTrace();
+			System.err.println("Network Exception: Cannot receive game object from server. Check server version.");
 		} catch (ClassCastException e) {
-			
+//			e.printStackTrace();
+			System.err.println("Network Exception: Unexpected game object from server. Check server version.");
 		}
 		// TODO: handle error setting ID
 		System.out.println("Lost socket connection during placeShips");
@@ -181,33 +200,27 @@ public class ServerConnection {
 		try {
 			@SuppressWarnings("unchecked")
 			List<Ship> myShips = (List<Ship>)ois.readObject();
-			// send number of players i.e. number of lists to receive
-			int size = (Integer)ois.readObject();
-			// for each entry in hash table, send the player's network id then action results list
-			Map<Integer, List<ActionResult>> actionResults = new HashMap<Integer, List<ActionResult>>();
-			for(int i=0;i<size;i++)
-				actionResults.put((Integer)ois.readObject(), (List<ActionResult>)ois.readObject());
-			// make sure everything is sent
-			// FIXME: send a list of ActionResults
-			Map<Integer, ActionResult> temp = (Map<Integer, ActionResult>)ois.readObject();
-			Map<Integer, List<ActionResult>> actionResults = new HashMap<Integer, List<ActionResult>>();
-			for (Entry<Integer, ActionResult> e : temp.entrySet()) {
-				actionResults.put(e.getKey(), new LinkedList<ActionResult>());
-				if (e.getValue() != null)
-					actionResults.get(e.getKey()).add(e.getValue());
-			}
+			@SuppressWarnings("unchecked")
+			Map<Integer, List<ActionResult>> actionResults = (Map<Integer, List<ActionResult>>)ois.readObject();
 			// doTurn and send resulting coordinates to server
-			// FIXME: handle null
 			List<Coordinate> coords = bot.doTurn(myShips, actionResults);
-			oos.writeObject(coords);
-			oos.flush();
+			if (coords != null) {
+				// Clear socket object cache. Causes problems when sending same object with different data.
+				oos.reset();
+				oos.writeObject(coords);
+				// Ensure objects are sent.
+				oos.flush();
+			}
 			return;
 		} catch (IOException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
+			System.err.println("Socket Exception: Cannot read from socket.");
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
+			System.err.println("Network Exception: Cannot receive game object from server. Check server version.");
 		} catch (ClassCastException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
+			System.err.println("Network Exception: Unexpected game object from server. Check server version.");
 		}
 		// TODO: handle error setting ID
 		System.out.println("Lost socket connection during doTurn");

@@ -1,19 +1,19 @@
 package battlechallenge.server;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import battlechallenge.ActionResult;
 import battlechallenge.CommunicationConstants;
-import battlechallenge.ConnectionLostException;
 import battlechallenge.Coordinate;
 import battlechallenge.Ship;
+import battlechallenge.network.ConnectionLostException;
 
 /**
  * The Class ClientConnection.
@@ -27,6 +27,9 @@ public class ClientConnection {
 	
 	/** ObjectOutputStream object */
 	private ObjectOutputStream oos;
+
+	/** The bis. */
+	private BufferedInputStream bis;
 	
 	/** The ois. */
 	private ObjectInputStream ois;
@@ -42,7 +45,8 @@ public class ClientConnection {
 			throw new IllegalArgumentException("Socket cannot be null");
 		try {
 			oos = new ObjectOutputStream(conn.getOutputStream());
-			ois = new ObjectInputStream(conn.getInputStream());
+			bis = new BufferedInputStream(conn.getInputStream());
+			ois = new ObjectInputStream(bis);
 			setupHandshake();
 			System.out.println("Client connection confirmed:" + id);
 		} catch (IOException e) {
@@ -57,7 +61,10 @@ public class ClientConnection {
 	public void endGame(String result) {
 		try {
 			oos.writeObject(result);
+			// Ensure objects are sent.
 			oos.flush();
+			// Clear socket object cache. Causes problems when sending same object with different data.
+			oos.reset();
 		} catch (IOException e) { }
 		  catch (NullPointerException e) { }
 		kill();
@@ -88,7 +95,10 @@ public class ClientConnection {
 		try {
 			oos.writeObject(CommunicationConstants.REQUEST_HANDSHAKE);
 			oos.writeObject(CommunicationConstants.SERVER_VERSION);
+			// Ensure objects are sent.
 			oos.flush();
+			// Clear socket object cache. Causes problems when sending same object with different data.
+			oos.reset();
 			// TODO: hack a non-blocking read
 			String client_version = (String)ois.readObject();
 			if (client_version != null && CommunicationConstants.SUPPORTED_CLIENTS.contains(client_version)) {
@@ -128,7 +138,10 @@ public class ClientConnection {
 			oos.writeInt(id);
 			oos.writeInt(width);
 			oos.writeInt(height);
+			// Ensure objects are sent.
 			oos.flush();
+			// Clear socket object cache. Causes problems when sending same object with different data.
+			oos.reset();
 			String client_name = (String)ois.readObject();
 			return client_name;
 		} catch (IOException e) {
@@ -159,7 +172,10 @@ public class ClientConnection {
 		try {
 			oos.writeObject(CommunicationConstants.REQUEST_PLACE_SHIPS);
 			oos.writeObject(ships);
+			// Ensure objects are sent.
 			oos.flush();
+			// Clear socket object cache. Causes problems when sending same object with different data.
+			oos.reset();
 			System.out.println("Ships sent");
 			return true;
 		} catch (IOException e) {
@@ -179,15 +195,17 @@ public class ClientConnection {
 		if (conn == null)
 			throw new ConnectionLostException();
 		try {
-			// check to see if something is arrived in time. Otherwise, assume
-			// no input
-			// FIXME: validate input (no null ships)
-			//List<Ship> temp = new LinkedList<Ship>();
-			//System.out.print(System.currentTimeMillis() + " - ");
-			//System.out.println(ois.available() > 0 ? "Ships returned" : "No ships returned");
-			//return ois.available() == 0 ? temp : (List<Ship>)ois.readObject();
-			// FIXME
-			return (List<Ship>)ois.readObject();
+			/*
+			 * check to see if something is arrived in time. Otherwise, assume
+			 * no input. 
+			 */
+			List<Ship> temp = bis.available() == 0 ? new LinkedList<Ship>() : (List<Ship>)ois.readObject();
+			// validate that no ships in returned list are null
+			for (Ship s : temp) {
+				if (s == null)
+					return new LinkedList<Ship>();
+			}
+			return temp;
 		} catch (IOException e) {
 			// TODO: cannot send server objects over the socket
 			e.printStackTrace();
@@ -217,16 +235,13 @@ public class ClientConnection {
 		try {
 			// send command
 			oos.writeObject(CommunicationConstants.REQUEST_DO_TURN);
+			// Clear socket object cache. Causes problems when sending same object with different data.
+			oos.reset();
 			// send current players boats
 			oos.writeObject(ships);
-			// send number of players i.e. number of lists to receive
-			oos.writeObject(actionResults.size());
-			// for each entry in hash table, send the player's network id then action results list
-			for(Entry<Integer, List<ActionResult>> e : actionResults.entrySet()) {
-				oos.writeObject(e.getKey());
-				oos.writeObject(e.getValue());
-			}
-			// make sure everything is sent
+			// send action results hash table
+			oos.writeObject(actionResults);
+			// Ensure objects are sent.
 			oos.flush();
 			return true;
 		} catch (IOException e) {
@@ -246,15 +261,18 @@ public class ClientConnection {
 		if (conn == null)
 			throw new ConnectionLostException();
 		try {
-			// check to see if something is arrived in time. Otherwise, assume
-			// no input
-			// FIXME: validate input (no null coordinates)
-			//System.out.print(System.currentTimeMillis() + " - ");
-			//System.out.println(ois.available() > 0 ? "Coordinates returned" : "No coordinates returned");
-			//List<Coordinate> temp = new LinkedList<Coordinate>();
-			// return ois.available() <= 0 ? temp : (List<Coordinate>)ois.readObject();
-			// FIXME 
-			return (List<Coordinate>)ois.readObject();
+			/*
+			 * check to see if something is arrived in time. Otherwise, assume
+			 * no input. 
+			 */
+			System.out.println("Available: " + bis.available());
+			List<Coordinate> temp = bis.available() == 0 ? new LinkedList<Coordinate>() : (List<Coordinate>)ois.readObject();
+			// validate that no ships in returned list are null
+			for (Coordinate c : temp) {
+				if (c == null)
+					return new LinkedList<Coordinate>();
+			}
+			return temp;
 			
 		} catch (IOException e) {
 			// TODO: cannot send server objects over the socket

@@ -8,7 +8,7 @@ import java.util.Set;
 
 import battlechallenge.ActionResult;
 import battlechallenge.ActionResult.ShotResult;
-import battlechallenge.ConnectionLostException;
+import battlechallenge.network.ConnectionLostException;
 import battlechallenge.Coordinate;
 import battlechallenge.Ship;
 

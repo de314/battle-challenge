@@ -96,7 +96,6 @@ public class BoardExporter {
 	public static boolean exportBoards(String filename, char[][] p1, char[][] p2, String n1, String n2) {
 		try {
 			File f = new File(filename);
-			if (!f.exists()) f.createNewFile();
 			BufferedWriter bf = new BufferedWriter(new FileWriter(f));
 			bf.append(p1.length+"").append(",").append(p1[0].length+"");
 			bf.append(",").append(n1);

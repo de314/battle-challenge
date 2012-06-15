@@ -114,7 +114,11 @@ public class Game extends Thread {
 		 * 			[[ END GAME ]]
 		 */
 		ServerPlayer winner = getWinner();
-		System.out.println("Winner is " + winner.getName());
+		if (winner != null)
+			System.out.println("Winner is " + winner.getName());
+		else
+			System.out.println("Error: Winner not found.");
+		
 		for(ServerPlayer p : players) {
 			if (winner == p)
 				p.endGame(CommunicationConstants.RESULT_WIN);
@@ -140,12 +144,14 @@ public class Game extends Thread {
 		for(ServerPlayer p : players) {
 			p.requestPlaceShips(Game.getShips());
 		}
+		System.out.print("Sleep... ");
 		try {
 			// FIXME: remove magic number
-			Thread.sleep(1000);
+			Thread.sleep(5000);
 		} catch (InterruptedException e) {
 			// FIXME: handle thread failure
 		}
+		System.out.println("Awake");
 		for(ServerPlayer p : players) {
 			List<Ship> ships = p.getPlaceShips();
 			// TODO: verify valid location
