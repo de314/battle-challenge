@@ -208,7 +208,7 @@ public class ServerPlayer {
 	private void moveShips(List<ShipAction> shipAction, int boardWidth, int boardHeight) {
 		for (ShipAction shipAct: shipAction) {
 			if (this.id != shipAct.getShipIdentifier().playerId) { // playerId does not match shipId
-				System.out.println("Same player");
+				System.out.println("Same players");
 				continue;
 			}
 			Ship s = shipMap.get(shipAct.getShipIdentifier().toString());
