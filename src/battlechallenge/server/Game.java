@@ -43,6 +43,10 @@ public class Game extends Thread {
 	
 	private GameManager manager;
 	
+	/**
+	 * Used to check how many players are in the game
+	 * @return The number of players in the game
+	 */
 	public int numberOfPlayers() {
 		return players.size();
 	}
@@ -131,8 +135,9 @@ public class Game extends Thread {
 		for(ServerPlayer p : players) {
 			if (winner == p)
 				p.endGame(CommunicationConstants.RESULT_WIN);
-			else
+			else {
 				p.endGame(CommunicationConstants.RESULT_LOSE);
+			}
 		}
 		manager.removeGame(this);
 	}
@@ -184,6 +189,10 @@ public class Game extends Thread {
 		System.out.println("All player ships placed");
 	}
 	
+	/**
+	 * 
+	 * @param actionResults The results of last turns actions
+	 */
 	private void doTurn(Map<Integer, List<ActionResult>> actionResults) {
 		// DEGBUG INFO: print each users guess
 		StringBuilder sb = new StringBuilder();
@@ -249,7 +258,7 @@ public class Game extends Thread {
 	 * Adds the player.
 	 *
 	 * @param player the player to add to the game
-	 * @return true, if player is successfuly added to the game
+	 * @return true, if player is successfully added to the game
 	 */
 	public boolean addPlayer(ServerPlayer player) {
 		// FIXME: handle null players

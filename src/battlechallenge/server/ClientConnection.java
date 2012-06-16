@@ -29,7 +29,8 @@ public class ClientConnection {
 	/**
 	 * Instantiates a new client connection.
 	 *
-	 * @param conn the conn
+	 * @param conn the connection
+	 * @param id the player ID
 	 */
 	public ClientConnection(Socket conn, int id) {
 		if (conn == null)
@@ -39,14 +40,25 @@ public class ClientConnection {
 		System.out.println("Client connection confirmed:" + id);
 	}
 	
+	/**
+	 * 
+	 * @return True if the socket is open
+	 */
 	public boolean isOpen() {
 		return socket.isOpen();
 	}
 	
+	/**
+	 * If the game is over, write the result to the player
+	 * @param result The String result of the game to write to the player
+	 */
 	public void endGame(String result) {
 		try {
 			socket.writeObject(result);
+			Thread.sleep(CommunicationConstants.SOCKET_WAIT_TIME);
 		} catch (ConnectionLostException e) {
+			/* ignore exceptions */
+		} catch (InterruptedException e) {
 			/* ignore exceptions */
 		}
 		kill();
