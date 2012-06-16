@@ -6,17 +6,38 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+/**
+ * The Class NetworkSocket.
+ */
 public class NetworkSocket {
 	
+	/** The socket. */
 	private Socket socket;
+	
+	/** The oos. */
 	private ObjectOutputStream oos;
+	
+	/** The ois. */
 	private ObjectInputStream ois;
+	
+	/** The bis. */
 	private BufferedInputStream bis;
 	
+	/**
+	 * Checks if is open.
+	 *
+	 * @return true, if is open
+	 */
 	public boolean isOpen() {
 		return socket != null;
 	}
 
+	/**
+	 * Instantiates a new network socket.
+	 *
+	 * @param ip the ip
+	 * @param port the port
+	 */
 	public NetworkSocket(String ip, int port) {
 		// TODO: validate port and IP
 		try {
@@ -33,6 +54,11 @@ public class NetworkSocket {
 		}
 	}
 
+	/**
+	 * Instantiates a new network socket.
+	 *
+	 * @param socket the socket
+	 */
 	public NetworkSocket(Socket socket) {
 		try {
 			this.socket = socket;
@@ -48,6 +74,10 @@ public class NetworkSocket {
 		}
 	}
 
+	/**
+	 * Closes all I/O streams then socket. Does not check if 
+	 * sent bytes have been received.
+	 */
 	public void kill() {
 		if (socket == null) // Socket already closed
 			return;
@@ -69,6 +99,14 @@ public class NetworkSocket {
 		}
 	}
 	
+	/**
+	 * Write object to socket. Handles socket exceptions by closing socket.
+	 * After exception this network socket cannot be used for communication.
+	 *
+	 * @param o the o
+	 * @return true, if successful
+	 * @throws ConnectionLostException the connection lost exception
+	 */
 	public boolean writeObject(Object o) throws ConnectionLostException {
 		if (socket == null)
 			throw new ConnectionLostException();
@@ -89,6 +127,14 @@ public class NetworkSocket {
 		return false;
 	}
 	
+	/**
+	 * Write int to socket. Handles socket exceptions by closing socket.
+	 * After exception this network socket cannot be used for communication.
+	 *
+	 * @param i the i
+	 * @return true, if successful
+	 * @throws ConnectionLostException the connection lost exception
+	 */
 	public boolean writeInt(int i) throws ConnectionLostException {
 		if (socket == null)
 			throw new ConnectionLostException();
@@ -104,6 +150,14 @@ public class NetworkSocket {
 		}
 	}
 	
+	/**
+	 * Reads an object from the socket. If nothing is in the buffer and the
+	 * read is not blocking then null is returned.
+	 *
+	 * @param blocking defines if the read should be blocking or not.
+	 * @return the object, null if not blocking and nothing received.
+	 * @throws ConnectionLostException the connection lost exception
+	 */
 	public Object readObject(boolean blocking) throws ConnectionLostException {
 		if (socket == null)
 			throw new ConnectionLostException();
@@ -123,6 +177,15 @@ public class NetworkSocket {
 		return null;
 	}
 	
+	/**
+	 * Reads an object from the socket. If something has been received then the 
+	 * object is returned immediately. If nothing is found then this thread will
+	 * will sleep for timeout milliseconds then return a non-blocking read.
+	 *
+	 * @param timeout the milliseconds to wait if nothing received.
+	 * @return the object, null if time expired and nothing received.
+	 * @throws ConnectionLostException the connection lost exception
+	 */
 	public Object readObject(int timeout) throws ConnectionLostException {
 		if (socket == null)
 			throw new ConnectionLostException();
@@ -142,11 +205,19 @@ public class NetworkSocket {
 		} catch (ClassNotFoundException e) {
 			System.err.println("Network Exception: Cannot receive game object from server. Check server version.");
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+			return readObject(false);
 		}
 		return null;
 	}
 	
+	/**
+	 * Reads an Integer from the socket. If nothing is in the buffer and the
+	 * read is not blocking then null is returned.
+	 *
+	 * @param blocking the blocking
+	 * @return the Integer, null if time expired and nothing received.
+	 * @throws ConnectionLostException the connection lost exception
+	 */
 	public Integer readInt(boolean blocking) throws ConnectionLostException {
 		if (socket == null)
 			throw new ConnectionLostException();
