@@ -9,6 +9,7 @@ import battlechallenge.Coordinate;
 import battlechallenge.Ship;
 import battlechallenge.bot.ClientPlayer;
 import battlechallenge.bot.DavidBot;
+import battlechallenge.bot.KevinBot;
 import battlechallenge.network.ConnectionLostException;
 import battlechallenge.network.NetworkSocket;
 
@@ -39,7 +40,6 @@ public class ServerConnection {
 	 * @param name The name to identify the player
 	 * @param bot the bot
 	 */
-
 	public ServerConnection(int port, String ip, String name, ClientPlayer bot) {
 		socket = new NetworkSocket(ip, port);
 		this.bot = bot;
@@ -126,7 +126,7 @@ public class ServerConnection {
 	/**
 	 * Sets the credentials.
 	 *
-	 * @param name the new credentials
+	 * @param name the name of the player
 	 */
 	public void setCredentials(String name) {
 		try {
@@ -150,7 +150,8 @@ public class ServerConnection {
 	}
 
 	/**
-	 * Place ships.
+	 * Passes a list of ships to the player with a call to the client players
+	 * placeShips method
 	 */
 	public void placeShips() {
 		try {
@@ -174,7 +175,9 @@ public class ServerConnection {
 	}
 
 	/**
-	 * Do turn.
+	 * Will pass the ship list and action results list in a call 
+	 * to the client players doTurn method
+	 * Kill the connection if a call to the doTurn method fails
 	 */
 	public void doTurn() {
 		try {
