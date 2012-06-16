@@ -1,0 +1,47 @@
+title Start Game
+
+Server->Server: Open Port
+activate Server
+Client->Server: Connect Socket
+
+note over Server,Client: setupHandshake()
+Server->Client: REQUEST_HANDSHAKE
+activate Client
+Server->Client: SERVER_VERSION
+Client->Server: CLIENT_VERSION
+deactivate Client
+
+note over Server,Client: setCredentials()
+Server->Client: REQUEST_CREDENTIALS
+activate Client
+Server->Client: playerId
+Server->Client: boardWidth
+Server->Client: boardHeight
+Client->Server: name
+deactivate Client
+
+note over Server,Client: placeShips()
+Server->Client: REQUEST_PLACE_SHIPS
+activate Client
+Server->Client: List<Ship> ships
+Client->Server: List<Ship> ships
+Server->Client: finalBoardWidth
+Server->Client: finalBoardWidth
+deactivate Client
+
+loop while(numPlayer > 1)
+   note over Server,Client: doTurn()
+   Server->Client: REQUEST_DO_TURN
+   activate Client
+   Server->Client: List<Ship> ships
+   Server->Client: List<ActionResults> actionResults
+   Client->Server: List<ShipAction>
+   deactivate Client
+end
+
+note over Server,Client: endGame()
+Server->Client: result
+activate Client
+deactivate Client
+Server->Server: kill()
+deactivate Server

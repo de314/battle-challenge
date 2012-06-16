@@ -5,7 +5,7 @@ import java.util.Map;
 
 import battlechallenge.ActionResult;
 import battlechallenge.CommunicationConstants;
-import battlechallenge.Coordinate;
+import battlechallenge.ShipAction;
 import battlechallenge.bot.ClientPlayer;
 import battlechallenge.network.ConnectionLostException;
 import battlechallenge.network.NetworkSocket;
@@ -182,7 +182,7 @@ public class ServerConnection {
 			@SuppressWarnings("unchecked")
 			Map<Integer, List<ActionResult>> actionResults = (Map<Integer, List<ActionResult>>)socket.readObject(true);
 			// doTurn and send resulting coordinates to server
-			List<Coordinate> coords = bot.doTurn(myShips, actionResults);
+			List<ShipAction> coords = bot.doTurn(myShips, actionResults);
 			if (coords != null)
 				socket.writeObject(coords);
 			return;

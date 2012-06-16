@@ -15,7 +15,7 @@ public class ShipAction implements Serializable {
 	private static final long serialVersionUID = 0L;
 	
 	/** The ship identifier. */
-	private ShipIdentifier shipID;
+	private ShipIdentifier shipIdentifier;
 	
 	/** The shot coord. */
 	private List<Coordinate> shots;
@@ -32,7 +32,7 @@ public class ShipAction implements Serializable {
 	 */
 	public ShipAction(ShipIdentifier shipID, Coordinate shotCoord,
 			Direction moveDir) {
-		this.shipID = shipID;
+		this.shipIdentifier = shipID;
 		this.shots = new LinkedList<Coordinate>();
 		this.shots.add(shotCoord);
 		this.moves = new LinkedList<Direction>();
@@ -48,7 +48,7 @@ public class ShipAction implements Serializable {
 	 */
 	public ShipAction(ShipIdentifier shipID, List<Coordinate> shots,
 			List<Direction> moves) {
-		this.shipID = shipID;
+		this.shipIdentifier = shipID;
 		this.shots = shots;
 		this.moves = moves;
 	}
@@ -58,8 +58,8 @@ public class ShipAction implements Serializable {
 	 *
 	 * @return the ship id
 	 */
-	public ShipIdentifier getShipID() {
-		return shipID;
+	public ShipIdentifier getShipIdentifier() {
+		return shipIdentifier;
 	}
 
 	/**

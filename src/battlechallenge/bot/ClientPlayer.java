@@ -1,12 +1,15 @@
 package battlechallenge.bot;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import battlechallenge.ActionResult;
 import battlechallenge.Coordinate;
+import battlechallenge.ShipAction;
 import battlechallenge.ship.Ship;
+import battlechallenge.ship.Ship.Direction;
 
 /**
  * The Class ClientPlayer.
@@ -109,10 +112,12 @@ public class ClientPlayer {
 	 * @param actionResults the action results
 	 * @return a List of coordinates corresponding to where you wish to fire
 	 */
-	public List<Coordinate> doTurn(List<Ship> myShips, Map<Integer, List<ActionResult>> actionResults) {
+	public List<ShipAction> doTurn(List<Ship> myShips, Map<Integer, List<ActionResult>> actionResults) {
 		List<Coordinate> shotCoordinates = new ArrayList<Coordinate>();
-		shotCoordinates.add(new Coordinate((int) (Math.random() * (boardHeight -1)), (int) (Math.random() * (boardWidth - 1))));	
-		return shotCoordinates;
+		shotCoordinates.add(new Coordinate((int) (Math.random() * (boardHeight -1)), (int) (Math.random() * (boardWidth - 1))));
+		List<ShipAction> actions = new LinkedList<ShipAction>();
+		actions.add(new ShipAction(myShips.get(0).getIdentifier(), shotCoordinates, new LinkedList<Direction>()));
+		return actions;
 	}
 }
 
