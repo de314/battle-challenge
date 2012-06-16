@@ -13,6 +13,7 @@ import battlechallenge.ActionResult;
 import battlechallenge.ActionResult.ShotResult;
 import battlechallenge.CommunicationConstants;
 import battlechallenge.Coordinate;
+import battlechallenge.ShipAction;
 import battlechallenge.ship.Ship;
 import battlechallenge.ship.Ship.Direction;
 import battlechallenge.visual.BoardExporter;
@@ -167,25 +168,6 @@ public class Game extends Thread {
 		} catch (InterruptedException e) {
 			// FIXME: handle thread failure
 		}
-		for(ServerPlayer p : players) {
-			// FIXME: pass in correct ships, save original in a hash map
-			List<Ship> ships = p.getPlaceShips(Game.getShips());
-			// TODO: verify valid location
-			Set<String> coords = new HashSet<String>();
-			for(Ship s : ships) {
-				if (!s.inBoundsInclusive(0, this.boardHeight-1, 0, boardWidth-1)) {
-					// TODO: handle invalid ship placement (out of bounds)
-				}
-				Set<String> temp = s.getCoordinateStrings();
-				for(String c : temp) {
-					if (coords.contains(c)) {
-						// TODO: handle invalid ship placement (overlap)
-					} else {
-						coords.add(c);
-					}
-				}
-			}
-		}
 		System.out.println("All player ships placed");
 	}
 	
@@ -224,13 +206,13 @@ public class Game extends Thread {
 			if (!p.isAlive()) // Player is dead no need to get actions when they cannot act
 				continue;
 			// shot coordinates
-			List<Coordinate> coords = p.getTurn();
+			List<ShipAction> shipActions = p.getTurn(boardWidth, boardHeight);
 			// reset action results for current user
 			actionResults.get(p.getId()).clear();
 			// FIXME: remove magic number for allowed shots: "1"
-			for(int i=0;i<coords.size() && i < 1;i++) {
+			for(int i=0;i<shipActions.size() && i < 1;i++) {
 				// check if shot is within game boundries
-				if (!coords.get(i).inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1)) { 
+				if (!shipActions.get(i).getShotCoord().inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1)) { 
 					// TODO: handle shot out of bounds. ignore?
 				} else {
 					// valid shot location received
@@ -240,7 +222,7 @@ public class Game extends Thread {
 							// This is done for multiple opponents, recording multiple hits
 							// on multiple opponents if necessary, otherwise recording
 							// a single miss
-							ActionResult ar = opp.isHit(coords.get(i), 1);
+							ActionResult ar = opp.isHit(shipActions.get(i).getShotCoord(), 1);
 							if (ar.getResult() == ShotResult.HIT) {
 								actionResults.get(p.getId()).add(ar);
 							}
@@ -248,7 +230,7 @@ public class Game extends Thread {
 					}
 					// If shot did not hit any enemies, then record a miss
 					if (actionResults.get(p.getId()).isEmpty())
-						actionResults.get(p.getId()).add(new ActionResult(coords.get(i), ShotResult.MISS, -1, j));
+						actionResults.get(p.getId()).add(new ActionResult(shipActions.get(i).getShotCoord(), ShotResult.MISS, -1, j));
 				}
 			}
 		}
@@ -294,6 +276,10 @@ public class Game extends Thread {
 		ships.add(new Ship(3,new Coordinate(-1, -1), Direction.NORTH));
 		ships.add(new Ship(4,new Coordinate(-1, -1), Direction.NORTH));
 		ships.add(new Ship(5,new Coordinate(-1, -1), Direction.NORTH));
+		// Setting the original ship Ids
+		for (int i = 0; i < ships.size(); i++) {
+			ships.get(0).setShipId(i);
+		}
 		return ships;
 	}
 }

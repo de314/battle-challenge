@@ -10,7 +10,6 @@ import battlechallenge.ShipAction;
 import battlechallenge.ShipIdentifier;
 
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Ship. A data holder representing ships from the original game
  * battleship.
