@@ -8,10 +8,10 @@ public class ShipIdentifier implements Serializable {
 	private static final long serialVersionUID = 0L;
 
 	/** The ship id. */
-	private int shipID;
+	public final int shipID;
 	
 	/** The player id. */
-	private int playerID;
+	public final int playerID;
 	
 	/**
 	 * Instantiates a new ship identifier.

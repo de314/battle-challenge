@@ -8,6 +8,7 @@ import battlechallenge.Ship.Direction;
  */
 public class ShipAction implements Serializable {
 	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 0L;
 	
 	/** The ship identifier. */
@@ -15,7 +16,7 @@ public class ShipAction implements Serializable {
 	
 	/** The shot coord. */
 	private Coordinate shotCoord;
-	
+
 	/** The move direction. */
 	private Ship.Direction moveDir;
 	
@@ -31,6 +32,33 @@ public class ShipAction implements Serializable {
 		this.shipID = shipID;
 		this.shotCoord = shotCoord;
 		this.moveDir = moveDir;
+	}
+	
+	/**
+	 * Gets the ship id.
+	 *
+	 * @return the ship id
+	 */
+	public ShipIdentifier getShipID() {
+		return shipID;
+	}
+
+	/**
+	 * Gets the shot coord.
+	 *
+	 * @return the shot coord
+	 */
+	public Coordinate getShotCoord() {
+		return shotCoord;
+	}
+
+	/**
+	 * Gets the move dir.
+	 *
+	 * @return the move dir
+	 */
+	public Ship.Direction getMoveDir() {
+		return moveDir;
 	}
 	
 }
