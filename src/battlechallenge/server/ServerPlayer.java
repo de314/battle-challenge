@@ -216,9 +216,10 @@ public class ServerPlayer {
 				lastShipPositions.put(s.getIdentifier().toString(), s.getStartPosition());
 				Coordinate newCoord = move(shipAct.getMoveDir(), s.getStartPosition());
 				System.out.println("Moving ship from: " + s.getStartPosition().toString() + " to: " + newCoord.toString());
-				if (newCoord.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1)) {
-					System.out.println("ship in bounds");
-					s.setStartPosition(newCoord);
+				s.setStartPosition(newCoord);
+				if (!s.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1)) {
+					s.setStartPosition(lastShipPositions.get(s.getIdentifier().toString()));
+					System.out.println("ship out of bounds");
 				}
 			}
 		}
