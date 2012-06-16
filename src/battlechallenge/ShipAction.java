@@ -8,6 +8,8 @@ import battlechallenge.Ship.Direction;
  */
 public class ShipAction implements Serializable {
 	
+	private static final long serialVersionUID = 0L;
+	
 	/** The ship identifier. */
 	private ShipIdentifier shipID;
 	

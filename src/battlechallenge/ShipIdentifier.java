@@ -5,6 +5,8 @@ import java.io.Serializable;
  */
 public class ShipIdentifier implements Serializable {
 	
+	private static final long serialVersionUID = 0L;
+
 	/** The ship id. */
 	private int shipID;
 	
