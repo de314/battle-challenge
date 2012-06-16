@@ -13,8 +13,8 @@ import battlechallenge.ActionResult;
 import battlechallenge.ActionResult.ShotResult;
 import battlechallenge.CommunicationConstants;
 import battlechallenge.Coordinate;
-import battlechallenge.Ship;
-import battlechallenge.Ship.Direction;
+import battlechallenge.ship.Ship;
+import battlechallenge.ship.Ship.Direction;
 import battlechallenge.visual.BoardExporter;
 
 /**
@@ -294,6 +294,10 @@ public class Game extends Thread {
 		ships.add(new Ship(3,new Coordinate(-1, -1), Direction.NORTH));
 		ships.add(new Ship(4,new Coordinate(-1, -1), Direction.NORTH));
 		ships.add(new Ship(5,new Coordinate(-1, -1), Direction.NORTH));
+		// Setting the original ship Ids
+		for (int i = 0; i < ships.size(); i++) {
+			ships.get(0).setShipId(i);
+		}
 		return ships;
 	}
 }

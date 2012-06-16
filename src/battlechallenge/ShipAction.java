@@ -1,7 +1,10 @@
 package battlechallenge;
 import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
 
-import battlechallenge.Ship.Direction;
+import battlechallenge.ship.Ship;
+import battlechallenge.ship.Ship.Direction;
 
 /**
  * The Class ShipAction.
@@ -15,23 +18,39 @@ public class ShipAction implements Serializable {
 	private ShipIdentifier shipID;
 	
 	/** The shot coord. */
-	private Coordinate shotCoord;
+	private List<Coordinate> shots;
 
 	/** The move direction. */
-	private Ship.Direction moveDir;
+	private List<Direction> moves;
 	
 	/**
 	 * Instantiates a new ship action.
 	 *
 	 * @param shipID the ship id
 	 * @param shotCoord the shot coord
-	 * @param moveDir the move direction
+	 * @param moveDir the move dir
 	 */
 	public ShipAction(ShipIdentifier shipID, Coordinate shotCoord,
 			Direction moveDir) {
 		this.shipID = shipID;
-		this.shotCoord = shotCoord;
-		this.moveDir = moveDir;
+		this.shots = new LinkedList<Coordinate>();
+		this.shots.add(shotCoord);
+		this.moves = new LinkedList<Direction>();
+		this.moves.add(moveDir);
+	}
+	
+	/**
+	 * Instantiates a new ship action.
+	 *
+	 * @param shipID the ship id
+	 * @param shots the shots
+	 * @param moves the moves
+	 */
+	public ShipAction(ShipIdentifier shipID, List<Coordinate> shots,
+			List<Direction> moves) {
+		this.shipID = shipID;
+		this.shots = shots;
+		this.moves = moves;
 	}
 	
 	/**
@@ -44,21 +63,41 @@ public class ShipAction implements Serializable {
 	}
 
 	/**
-	 * Gets the shot coord.
+	 * Gets the first shot.
 	 *
 	 * @return the shot coord
 	 */
 	public Coordinate getShotCoord() {
-		return shotCoord;
+		return shots.size() > 0 ? shots.get(0) : null;
 	}
 
 	/**
-	 * Gets the move dir.
+	 * Gets the i-th shot.
+	 *
+	 * @param i the i
+	 * @return the shot coord
+	 */
+	public Coordinate getShotCoord(int i) {
+		return shots.size() > i ? shots.get(i) : null;
+	}
+	
+	/**
+	 * Gets the first move.
 	 *
 	 * @return the move dir
 	 */
 	public Ship.Direction getMoveDir() {
-		return moveDir;
+		return moves.size() > 0 ? moves.get(0) : null;
+	}
+	
+	/**
+	 * Gets the i-th move.
+	 *
+	 * @param i the i
+	 * @return the move dir
+	 */
+	public Ship.Direction getMoveDir(int i) {
+		return moves.size() > i ? moves.get(i) : null;
 	}
 	
 }

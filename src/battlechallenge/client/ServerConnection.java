@@ -6,12 +6,10 @@ import java.util.Map;
 import battlechallenge.ActionResult;
 import battlechallenge.CommunicationConstants;
 import battlechallenge.Coordinate;
-import battlechallenge.Ship;
 import battlechallenge.bot.ClientPlayer;
-import battlechallenge.bot.DavidBot;
-import battlechallenge.bot.KevinBot;
 import battlechallenge.network.ConnectionLostException;
 import battlechallenge.network.NetworkSocket;
+import battlechallenge.ship.Ship;
 
 /**
  * The Class ServerConnection.

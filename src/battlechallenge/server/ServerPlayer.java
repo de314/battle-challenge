@@ -10,10 +10,10 @@ import java.util.Set;
 import battlechallenge.ActionResult;
 import battlechallenge.ActionResult.ShotResult;
 import battlechallenge.Coordinate;
-import battlechallenge.Ship;
-import battlechallenge.Ship.Direction;
 import battlechallenge.ShipAction;
 import battlechallenge.network.ConnectionLostException;
+import battlechallenge.ship.Ship;
+import battlechallenge.ship.Ship.Direction;
 
 /**
  * The Class ServerPlayer.
@@ -46,7 +46,7 @@ public class ServerPlayer {
 	
 	private Map<String, Ship> shipMap = new HashMap();
 	
-	
+	private Map<String, Ship> lastShipPositions = new HashMap();
 	
 	public int getId() {
 		return id;
@@ -133,18 +133,15 @@ public class ServerPlayer {
 	}
 	
 	/**
-	 * Adds the playerID and shipID to each ship in a ship list
+	 * Sets the playerId for each ship in a ship list
 	 * Inserts the ships into the HashMap shipList
 	 * @param ships list of ships without playerIDs
 	 * @return updated list of ships with playerIDs
 	 */
 	public List<Ship> setShipIds(List<Ship> ships) {
-		int shipID;
 		for (Ship ship: ships) {
-			ship.setPlayerID(id);
-			ship.setShipID(shipID);
-			shipID++;
-			shipMap.put(ship.getIdentifier(), ship);
+			ship.setPlayerId(id);
+			shipMap.put(ship.getIdentifier().toString(), ship);
 		}
 		return ships;
 	}
@@ -170,7 +167,13 @@ public class ServerPlayer {
 	public List<Ship> moveShips(List<ShipAction> shipAction) {
 		for (ShipAction shipAct: shipAction) {
 			Ship s = shipMap.get(shipAct.getShipID());
-			s.setStartPosition(move(shipAct.getMoveDir(), s.getStartPosition()));
+			lastShipPositions.put(s.getIdentifier().toString(), s);
+
+			Coordinate newCoord = move(shipAct.getMoveDir(), s.getStartPosition());
+			if (newCoord.inBoundsInclusive(0, this.boardHeight-1, 0, boardWidth-1)) {
+				s.setStartPosition(newCoord);
+			}
+			
 		}
 		return null;
 	}

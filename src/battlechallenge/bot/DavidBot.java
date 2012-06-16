@@ -1,6 +1,4 @@
 package battlechallenge.bot;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,9 +8,9 @@ import java.util.Set;
 
 import battlechallenge.ActionResult;
 import battlechallenge.ActionResult.ShotResult;
-import battlechallenge.Ship.Direction;
 import battlechallenge.Coordinate;
-import battlechallenge.Ship;
+import battlechallenge.ship.Ship;
+import battlechallenge.ship.Ship.Direction;
 
 
 public class DavidBot extends ClientPlayer {

@@ -8,9 +8,9 @@ import java.util.List;
 
 import battlechallenge.ActionResult;
 import battlechallenge.ActionResult.ShotResult;
-import battlechallenge.server.ServerPlayer;
 import battlechallenge.Coordinate;
-import battlechallenge.Ship;
+import battlechallenge.server.ServerPlayer;
+import battlechallenge.ship.Ship;
 
 /**
  * The Class BoardExporter.
@@ -85,8 +85,9 @@ public class BoardExporter {
 			} else {
 				for (String c : s.getCoordinateStrings())
 					fillSpot(board, 'B', c);
-				for (String c : s.getHitStrings())
-					fillSpot(board, 'O', c);
+				// TODO: draw health
+//				for (String c : s.getHitStrings())
+//					fillSpot(board, 'O', c);
 			}
 		}
 		return board;

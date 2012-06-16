@@ -29,7 +29,7 @@ public class ShipIdentifier implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return "[" + playerID + ": " + shipID+ "]";
+		return "[" + playerID + " : " + shipID + "]";
 	}
 
 }
