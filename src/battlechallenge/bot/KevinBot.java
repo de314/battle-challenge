@@ -56,7 +56,10 @@ public class KevinBot extends ClientPlayer {
 				row = (int) (Math.random() * boardHeight);
 				col = (int) (Math.random() * (boardWidth-5));
 			}
+		
 			shipRow.add(row);
+			shipRow.add(row+1);
+			shipRow.add(row-1);
 			ship.setStartPosition(new Coordinate(row,col));
 			ship.setDirection(Ship.Direction.EAST);
 		}
