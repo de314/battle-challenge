@@ -168,6 +168,10 @@ public class Game extends Thread {
 		} catch (InterruptedException e) {
 			// FIXME: handle thread failure
 		}
+		for(ServerPlayer p : players) {
+			// FIXME: take away the magic number
+			p.getPlaceShips(boardWidth * 2, boardHeight);
+		}
 		System.out.println("All player ships placed");
 	}
 	

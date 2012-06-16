@@ -115,8 +115,13 @@ public class ClientPlayer {
 	public List<ShipAction> doTurn(List<Ship> myShips, Map<Integer, List<ActionResult>> actionResults) {
 		List<Coordinate> shotCoordinates = new ArrayList<Coordinate>();
 		shotCoordinates.add(new Coordinate((int) (Math.random() * (boardHeight -1)), (int) (Math.random() * (boardWidth - 1))));
+		List<Direction> moves = new LinkedList<Direction>();
+		if (Math.random() > 0.5)
+			moves.add(Direction.EAST);
+		else
+			moves.add(Direction.WEST);
 		List<ShipAction> actions = new LinkedList<ShipAction>();
-		actions.add(new ShipAction(myShips.get(0).getIdentifier(), shotCoordinates, new LinkedList<Direction>()));
+		actions.add(new ShipAction(myShips.get(0).getIdentifier(), shotCoordinates, moves));
 		return actions;
 	}
 }

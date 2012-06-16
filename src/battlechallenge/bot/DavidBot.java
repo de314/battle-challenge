@@ -9,6 +9,7 @@ import java.util.Set;
 import battlechallenge.ActionResult;
 import battlechallenge.ActionResult.ShotResult;
 import battlechallenge.Coordinate;
+import battlechallenge.ShipAction;
 import battlechallenge.ship.Ship;
 import battlechallenge.ship.Ship.Direction;
 
@@ -79,7 +80,7 @@ public class DavidBot extends ClientPlayer {
 		return shipList;
 	}
 
-	public List<Coordinate> doTurn(List<Ship> myShips, Map<Integer, List<ActionResult>> actionResults) {
+	public List<ShipAction> doTurn(List<Ship> myShips, Map<Integer, List<ActionResult>> actionResults) {
 		List<ActionResult> results = actionResults.get(super.networkID);
 		for (ActionResult ar : results) {
 			if (ar.getResult() == ShotResult.HIT) {
@@ -102,7 +103,8 @@ public class DavidBot extends ClientPlayer {
 		guessed.add(c.toString());
 		List<Coordinate> ret = new LinkedList<Coordinate>();
 		ret.add(c);
-		return ret;
+//		return ret;
+		return null;
 	}
 	
 	public void addAdjacent(int row, int col) {

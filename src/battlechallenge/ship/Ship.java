@@ -379,7 +379,11 @@ public class Ship implements Serializable {
 	 * @return true, if is hit
 	 */
 	public boolean isHit(Coordinate c, int damage) {
-		return !isSunken() && coords.contains(c.toString());
+		if (!isSunken() && coords.contains(c.toString())) {
+			health -= damage;
+			return true;
+		}
+		return false;
 	}
 	
 	/* (non-Javadoc)

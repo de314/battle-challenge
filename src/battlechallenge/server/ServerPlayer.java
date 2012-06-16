@@ -160,10 +160,6 @@ public class ServerPlayer {
 	 * @return updated list of ships with playerIDs
 	 */
 	public List<Ship> setShipIds(List<Ship> ships) {
-		for (Ship ship: ships) {
-			ship.setPlayerId(id);
-			shipMap.put(ship.getIdentifier().toString(), ship);
-		}
 		return ships;
 	}
 	
@@ -177,7 +173,7 @@ public class ServerPlayer {
 	 * @param boardHeight the board height
 	 * @return the list of ships with updated starting coordinates
 	 */
-	public List<Ship> getPlaceShips(List<Ship> ships, int boardWidth, int boardHeight) {
+	public List<Ship> getPlaceShips(int boardWidth, int boardHeight) {
 		List<Ship> temp = conn.getPlaceShips(boardWidth, boardHeight);
 		Set<String> coords = new HashSet<String>();
 		for(Ship s : temp) {
@@ -194,6 +190,10 @@ public class ServerPlayer {
 			}
 		}
 		this.ships = temp;
+		for (Ship ship: ships) {
+			ship.setPlayerId(id);
+			shipMap.put(ship.getIdentifier().toString(), ship);
+		}
 		return ships; // return instance ships for placement verification by game
 	}
 	
@@ -208,13 +208,16 @@ public class ServerPlayer {
 	private void moveShips(List<ShipAction> shipAction, int boardWidth, int boardHeight) {
 		for (ShipAction shipAct: shipAction) {
 			if (this.id != shipAct.getShipIdentifier().playerId) { // playerId does not match shipId
+				System.out.println("Same player");
 				continue;
 			}
 			Ship s = shipMap.get(shipAct.getShipIdentifier().toString());
-			if (s != null) {
+			if (s != null && shipAct.getMoveDir() != null) {
 				lastShipPositions.put(s.getIdentifier().toString(), s.getStartPosition());
 				Coordinate newCoord = move(shipAct.getMoveDir(), s.getStartPosition());
+				System.out.println("Moving ship from: " + s.getStartPosition().toString() + " to: " + newCoord.toString());
 				if (newCoord.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1)) {
+					System.out.println("ship in bounds");
 					s.setStartPosition(newCoord);
 				}
 			}

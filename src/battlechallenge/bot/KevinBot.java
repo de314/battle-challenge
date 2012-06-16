@@ -10,6 +10,7 @@ import java.util.Set;
 
 import battlechallenge.ActionResult;
 import battlechallenge.Coordinate;
+import battlechallenge.ShipAction;
 import battlechallenge.ship.Ship;
 
 /**
@@ -101,7 +102,7 @@ public class KevinBot extends ClientPlayer {
 	 * @param oppLastTurn List of actions and their results of your opponent
 	 * @return a List of coordinates corresponding to where you wish to fire
 	 */
-	public List<Coordinate> doTurn(List<Ship> myShips, Map<Integer, List<ActionResult>> actionResults) {
+	public List<ShipAction> doTurn(List<Ship> myShips, Map<Integer, List<ActionResult>> actionResults) {
 		//shotCoordinates.add(new Coordinate((int) (Math.random() * (boardHeight -1)), (int) (Math.random() * (mapWidth - 1))));
 		List<Coordinate> adjList = new ArrayList<Coordinate>();
 		ActionResult.ShotResult shotResult;
@@ -161,6 +162,7 @@ public class KevinBot extends ClientPlayer {
 			shotCoordinates.add(randShot);
 		}
 		shotList.add(shotCoordinates.get(0).toString());
-		return shotCoordinates;
+//		return shotCoordinates;
+		return null;
 	}
 }
