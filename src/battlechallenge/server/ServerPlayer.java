@@ -1,6 +1,7 @@
 package battlechallenge.server;
 
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -8,9 +9,11 @@ import java.util.Set;
 
 import battlechallenge.ActionResult;
 import battlechallenge.ActionResult.ShotResult;
-import battlechallenge.network.ConnectionLostException;
 import battlechallenge.Coordinate;
 import battlechallenge.Ship;
+import battlechallenge.Ship.Direction;
+import battlechallenge.ShipAction;
+import battlechallenge.network.ConnectionLostException;
 
 /**
  * The Class ServerPlayer.
@@ -40,6 +43,10 @@ public class ServerPlayer {
 
 	/** The has ships. */
 	private boolean hasShips = true;
+	
+	private Map<String, Ship> shipMap = new HashMap();
+	
+	
 	
 	public int getId() {
 		return id;
@@ -117,13 +124,30 @@ public class ServerPlayer {
 	public boolean requestPlaceShips(List<Ship> ships) {
 		try {
 			this.ships = ships;
+			setShipIds(ships); // Give the ships ids cooresponding to the player
 			return conn.requestPlaceShips(ships);
 		} catch (ConnectionLostException e) {
 			// TODO: handle lost connection
 		}
 		return false;
 	}
-
+	
+	/**
+	 * Adds the playerID and shipID to each ship in a ship list
+	 * Inserts the ships into the HashMap shipList
+	 * @param ships list of ships without playerIDs
+	 * @return updated list of ships with playerIDs
+	 */
+	public List<Ship> setShipIds(List<Ship> ships) {
+		int shipID;
+		for (Ship ship: ships) {
+			ship.setPlayerID(id);
+			ship.setShipID(shipID);
+			shipID++;
+			shipMap.put(ship.getIdentifier(), ship);
+		}
+		return ships;
+	}
 	/**
 	 * Will request the ships updated by the ClientPlayers placeShips 
 	 * method and update the default list of ships with the updated
@@ -142,6 +166,32 @@ public class ServerPlayer {
 		this.ships = temp;
 		return ships; // return instance ships for placement verification by game
 	}
+	
+	public List<Ship> moveShips(List<ShipAction> shipAction) {
+		for (ShipAction shipAct: shipAction) {
+			Ship s = shipMap.get(shipAct.getShipID());
+			s.setStartPosition(move(shipAct.getMoveDir(), s.getStartPosition()));
+		}
+		return null;
+	}
+	
+	public Coordinate move(Direction dir, Coordinate coor) {
+		switch (dir) {
+			case NORTH: {
+				return new Coordinate(coor.getRow()-1, coor.getCol());
+			}
+			case SOUTH: {
+				return new Coordinate(coor.getRow()+1, coor.getCol());
+			}
+			case EAST: {
+				return new Coordinate(coor.getRow(), coor.getCol() + 1);
+			}
+			case WEST: {
+				return new Coordinate(coor.getRow(), coor.getCol() - 1);
+			}
+		}
+		return null;
+	}
 
 	/**
 	 * Request turn.
@@ -154,18 +204,21 @@ public class ServerPlayer {
 	}
 
 	/**
-	 * Requests the result
+	 * Reads the socket
 	 * 
-	 * @return the list of coordinates returned by the ClientPlayer
+	 * @return a list of ship actions from the ClientPlayer
 	 */
 	public List<Coordinate> getTurn() {
 		try {
-			return conn.getTurn();
+			return conn.getTurn(); // get the ship action list from the client player
 		} catch (ConnectionLostException e) {
 			// TODO: handle lost connection
 		}
 		return null;
 	}
+
+	
+	
 
 	/**
 	 * Gets the score.
