@@ -110,7 +110,7 @@ public class ClientConnection {
 			socket.writeInt(id);
 			socket.writeInt(width);
 			socket.writeInt(height);
-			String client_name = (String)socket.readObject(true);
+			String client_name = (String)socket.readObject(1000);
 			return client_name;
 		} catch (ClassCastException e) {
 			// Someone is trying to break our server or, our code is really broken.
@@ -141,12 +141,13 @@ public class ClientConnection {
 	}
 	
 	/**
-	 * Gets the updated ship locations returned by the client
+	 * Gets the updated ship locations returned by the client then sends the 
+	 * final combined board dimensions.
 	 *
 	 * @return the list of ships passed back from the client
 	 * @throws ConnectionLostException the connection lost exception
 	 */
-	public List<Ship> getPlaceShips() {
+	public List<Ship> getPlaceShips(int totalWidth, int totalHeight) {
 		try {
 			/*
 			 * check to see if something is arrived in time. Otherwise, assume
@@ -154,6 +155,8 @@ public class ClientConnection {
 			 */
 			@SuppressWarnings("unchecked")
 			List<Ship> temp = (List<Ship>)socket.readObject(false);
+			socket.writeInt(totalWidth);
+			socket.writeInt(totalHeight);
 			// validate list is not null
 			if (temp == null)
 				return new LinkedList<Ship>();

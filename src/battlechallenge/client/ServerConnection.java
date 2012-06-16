@@ -129,10 +129,8 @@ public class ServerConnection {
 	public void setCredentials(String name) {
 		try {
 			id = socket.readInt(true);
-			int width = socket.readInt(true);
-			int height = socket.readInt(true);
-			bot.setBoardWidth(width);
-			bot.setBoardHeight(height);
+			bot.setBoardWidth(socket.readInt(true));
+			bot.setBoardHeight(socket.readInt(true));
 			bot.setNetworkID(id);
 			System.out.println("bot generated with network ID: " + id);
 			// send name to server
@@ -149,7 +147,7 @@ public class ServerConnection {
 
 	/**
 	 * Passes a list of ships to the player with a call to the client players
-	 * placeShips method
+	 * placeShips method.
 	 */
 	public void placeShips() {
 		try {
@@ -157,9 +155,9 @@ public class ServerConnection {
 			List<Ship> ships = (List<Ship>)socket.readObject(true);
 			// place ships and send resulting ships to server
 			List<Ship> shipsList = bot.placeShips(ships);
-			if (shipsList != null) {
-				socket.writeObject(shipsList);
-			}
+			socket.writeObject(shipsList);
+			bot.setBoardWidth(socket.readInt(true));
+			bot.setBoardHeight(socket.readInt(true));
 			return;
 		} catch (ClassCastException e) {
 			System.err.println("Network Exception: Unexpected game object from server. Check server version.");
