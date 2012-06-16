@@ -8,6 +8,7 @@ import java.util.Map;
 import battlechallenge.ActionResult;
 import battlechallenge.CommunicationConstants;
 import battlechallenge.Coordinate;
+import battlechallenge.ShipAction;
 import battlechallenge.network.ConnectionLostException;
 import battlechallenge.network.NetworkSocket;
 import battlechallenge.ship.Ship;
@@ -206,21 +207,21 @@ public class ClientConnection {
 	 * @return the list of coordinates returned by the ClientPlayer's doTurn method
 	 * @throws ConnectionLostException the connection lost exception
 	 */
-	public List<Coordinate> getTurn() throws ConnectionLostException {
+	public List<ShipAction> getTurn() throws ConnectionLostException {
 		try {
 			/*
 			 * check to see if something is arrived in time. Otherwise, assume
 			 * no input. 
 			 */
 			@SuppressWarnings("unchecked")
-			List<Coordinate> temp = (List<Coordinate>)socket.readObject(false);
+			List<ShipAction> temp = (List<ShipAction>)socket.readObject(false);
 			// check that list is not null
 			if (temp == null)
-				return new LinkedList<Coordinate>();
+				return new LinkedList<ShipAction>();
 			// validate that no ships in returned list are null
-			for (Coordinate c : temp) {
+			for (ShipAction c : temp) {
 				if (c == null)
-					return new LinkedList<Coordinate>();
+					return new LinkedList<ShipAction>();
 			}
 			return temp;
 			
@@ -230,6 +231,6 @@ public class ClientConnection {
 		} catch (ConnectionLostException e) {			
 			// TODO: handle invalid input
 		}
-		return new LinkedList<Coordinate>();
+		return new LinkedList<ShipAction>();
 	}
 }

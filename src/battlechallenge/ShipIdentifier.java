@@ -8,10 +8,10 @@ public class ShipIdentifier implements Serializable {
 	private static final long serialVersionUID = 0L;
 
 	/** The ship id. */
-	public final int shipID;
+	public final int shipId;
 	
 	/** The player id. */
-	public final int playerID;
+	public final int playerId;
 	
 	/**
 	 * Instantiates a new ship identifier.
@@ -19,9 +19,9 @@ public class ShipIdentifier implements Serializable {
 	 * @param shipID the ship id
 	 * @param playerID the player id
 	 */
-	public ShipIdentifier(int shipID, int playerID) {
-		this.shipID = shipID;
-		this.playerID = playerID;
+	public ShipIdentifier(int shipId, int playerId) {
+		this.shipId = shipId;
+		this.playerId = playerId;
 	}
 
 	/* (non-Javadoc)
@@ -29,7 +29,7 @@ public class ShipIdentifier implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return "[" + playerID + " : " + shipID + "]";
+		return "[" + playerId + " : " + shipId + "]";
 	}
 
 }

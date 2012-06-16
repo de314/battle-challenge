@@ -2,6 +2,7 @@ package battlechallenge.server;
 
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -44,14 +45,26 @@ public class ServerPlayer {
 	/** The has ships. */
 	private boolean hasShips = true;
 	
+	/** The ship map. */
 	private Map<String, Ship> shipMap = new HashMap();
 	
+	/** The last ship positions. */
 	private Map<String, Ship> lastShipPositions = new HashMap();
 	
+	/**
+	 * Gets the id.
+	 *
+	 * @return the id
+	 */
 	public int getId() {
 		return id;
 	}
 	
+	/**
+	 * Gets the name.
+	 *
+	 * @return the name
+	 */
 	public String getName() {
 		return name;
 	}
@@ -66,7 +79,8 @@ public class ServerPlayer {
 	}
 	
 	/**
-	 * 
+	 * Gets the action log.
+	 *
 	 * @return a list of action results returned over the
 	 * period of a game
 	 */
@@ -91,6 +105,11 @@ public class ServerPlayer {
 		this.actionLog = new LinkedList<ActionResult>();
 	}
 	
+	/**
+	 * End game.
+	 *
+	 * @param result the result
+	 */
 	public void endGame(String result) {
 		conn.endGame(result);
 	}
@@ -109,6 +128,7 @@ public class ServerPlayer {
 	 *
 	 * @param boardWidth the board width
 	 * @param boardHeight the board height
+	 * @return true, if successful
 	 */
 	public boolean setCredentials(int boardWidth, int boardHeight) {
 		this.name = conn.setCredentials(id, boardWidth, boardHeight);
@@ -116,7 +136,7 @@ public class ServerPlayer {
 	}
 
 	/**
-	 * Requests ships from the ClientPlayer through the ClientConnection
+	 * Requests ships from the ClientPlayer through the ClientConnection.
 	 *
 	 * @param ships the original ships to be updated by the ClientPlayer's
 	 * @return true, if successful
@@ -134,7 +154,8 @@ public class ServerPlayer {
 	
 	/**
 	 * Sets the playerId for each ship in a ship list
-	 * Inserts the ships into the HashMap shipList
+	 * Inserts the ships into the HashMap shipList.
+	 *
 	 * @param ships list of ships without playerIDs
 	 * @return updated list of ships with playerIDs
 	 */
@@ -145,39 +166,66 @@ public class ServerPlayer {
 		}
 		return ships;
 	}
+	
 	/**
-	 * Will request the ships updated by the ClientPlayers placeShips 
+	 * Will request the ships updated by the ClientPlayers placeShips
 	 * method and update the default list of ships with the updated
-	 * player ships
-	 * 
+	 * player ships.
+	 *
+	 * @param ships the ships
+	 * @param boardWidth the board width
+	 * @param boardHeight the board height
 	 * @return the list of ships with updated starting coordinates
 	 */
-	public List<Ship> getPlaceShips(List<Ship> ships) {
-		List<Ship> temp = conn.getPlaceShips();
+	public List<Ship> getPlaceShips(List<Ship> ships, int boardWidth, int boardHeight) {
+		List<Ship> temp = conn.getPlaceShips(boardWidth, boardHeight);
+		Set<String> coords = new HashSet<String>();
 		for(Ship s : temp) {
-			//ships.get(counter).setStartPosition(s.getStartPosition());
-			//ships.get(counter).setDirection(s.getDirection());
-			// FIXME: save new ship info into instance variables
-			// DO NOT TRUST THE USER
+			if (!s.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1)) {
+				// TODO: handle invalid ship placement (out of bounds)
+			}
+			Set<String> coordStrings = s.getCoordinateStrings();
+			for(String c : coordStrings) {
+				if (coords.contains(c)) {
+					// TODO: handle invalid ship placement (overlap)
+				} else {
+					coords.add(c);
+				}
+			}
 		}
 		this.ships = temp;
 		return ships; // return instance ships for placement verification by game
 	}
 	
-	public List<Ship> moveShips(List<ShipAction> shipAction) {
+	/**
+	 * Move ships.
+	 *
+	 * @param shipAction the ship action
+	 * @param boardWidth the board width
+	 * @param boardHeight the board height
+	 * @return the list
+	 */
+	private void moveShips(List<ShipAction> shipAction, int boardWidth, int boardHeight) {
 		for (ShipAction shipAct: shipAction) {
+			if (this.id != shipAct.getShipID().playerId) { // playerId does not match shipId
+				continue;
+			}
 			Ship s = shipMap.get(shipAct.getShipID());
 			lastShipPositions.put(s.getIdentifier().toString(), s);
-
 			Coordinate newCoord = move(shipAct.getMoveDir(), s.getStartPosition());
-			if (newCoord.inBoundsInclusive(0, this.boardHeight-1, 0, boardWidth-1)) {
+			if (newCoord.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1)) {
 				s.setStartPosition(newCoord);
 			}
-			
 		}
-		return null;
 	}
 	
+	/**
+	 * Move.
+	 *
+	 * @param dir the dir
+	 * @param coor the coor
+	 * @return the coordinate
+	 */
 	public Coordinate move(Direction dir, Coordinate coor) {
 		switch (dir) {
 			case NORTH: {
@@ -198,7 +246,8 @@ public class ServerPlayer {
 
 	/**
 	 * Request turn.
-	 * 
+	 *
+	 * @param actionResults the action results
 	 * @return true, if successful
 	 */
 	public boolean requestTurn(Map<Integer, List<ActionResult>> actionResults) {
@@ -207,13 +256,17 @@ public class ServerPlayer {
 	}
 
 	/**
-	 * Reads the socket
-	 * 
+	 * Reads the socket.
+	 *
+	 * @param boardWidth the game board width
+	 * @param boardHeight the game board height
 	 * @return a list of ship actions from the ClientPlayer
 	 */
-	public List<Coordinate> getTurn() {
+	public List<ShipAction> getTurn(int boardWidth, int boardHeight) {
 		try {
-			return conn.getTurn(); // get the ship action list from the client player
+			List<ShipAction> shipActions;
+			shipActions = conn.getTurn(); // get the ship action list from the client player
+			moveShips(shipActions, boardWidth, boardHeight);
 		} catch (ConnectionLostException e) {
 			// TODO: handle lost connection
 		}
@@ -242,7 +295,7 @@ public class ServerPlayer {
 
 	
 	/**
-	 * Checks to see if the player has any ships not sunk
+	 * Checks to see if the player has any ships not sunk.
 	 *
 	 * @return true, if player has ships left
 	 */
@@ -270,7 +323,7 @@ public class ServerPlayer {
 	
 	
 	/**
-	 * Checks if the ship is hit as a result of an action
+	 * Checks if the ship is hit as a result of an action.
 	 *
 	 * @param c the coordinate affected by the action
 	 * @param damage the damage incurred as a result of the action
@@ -287,6 +340,9 @@ public class ServerPlayer {
 		return new ActionResult(c, ShotResult.MISS, -1, id);
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder(this.id+"");
