@@ -47,8 +47,8 @@ public class BoardExporter {
 	 * @param height the board height
 	 */
 	public static void exportBoards(String filename, ServerPlayer p1, ServerPlayer p2, int width, int height) {
-		char[][] b1 = getBoard(p1.getShips(), p2.getActionLog(), width, height);
-		char[][] b2 = getBoard(p2.getShips(), p1.getActionLog(), width, height);
+		char[][] b1 = getBoard(p1.getShips(), p2.getLastActionResults(), width, height);
+		char[][] b2 = getBoard(p2.getShips(), p1.getLastActionResults(), width, height);
 		exportBoards(filename, b1, b2, p1.getName(), p2.getName());
 	}
 	
@@ -81,6 +81,12 @@ public class BoardExporter {
 				for (String c : s.getCoordinateStrings())
 					fillSpot(board, (char)('0'+s.getHealth()), c);
 			}
+		}
+		for (ActionResult a : actionResults) {
+			if (a.getResult() == ShotResult.HIT)
+				fillSpot(board, 'O', a.getCoordinate());
+			if (a.getResult() == ShotResult.MISS)
+				fillSpot(board, 'X', a.getCoordinate());
 		}
 		return board;
 	}

@@ -36,6 +36,9 @@ public class ServerPlayer {
 	/** The action log. */
 	private List<ActionResult> actionLog;
 
+	/** The action log. */
+	private List<ActionResult> lastActionResults;
+
 	/** The hit log. */
 	private Set<String> hitLog;
 	
@@ -88,6 +91,10 @@ public class ServerPlayer {
 		return actionLog;
 	}
 	
+	public List<ActionResult> getLastActionResults() {
+		return lastActionResults;
+	}
+	
 	/**
 	 * Instantiates a new server player.
 	 *
@@ -103,6 +110,7 @@ public class ServerPlayer {
 			throw new IllegalArgumentException();
 		}
 		this.actionLog = new LinkedList<ActionResult>();
+		this.lastActionResults = new LinkedList<ActionResult>();
 	}
 	
 	/**
@@ -208,18 +216,15 @@ public class ServerPlayer {
 	private void moveShips(List<ShipAction> shipAction, int boardWidth, int boardHeight) {
 		for (ShipAction shipAct: shipAction) {
 			if (this.id != shipAct.getShipIdentifier().playerId) { // playerId does not match shipId
-				System.out.println("Same players");
 				continue;
 			}
 			Ship s = shipMap.get(shipAct.getShipIdentifier().toString());
-			if (s != null && shipAct.getMoveDir() != null) {
+			if (s != null && shipAct.getMoveDir() != null && !s.isSunken()) {
 				lastShipPositions.put(s.getIdentifier().toString(), s.getStartPosition());
 				Coordinate newCoord = move(shipAct.getMoveDir(), s.getStartPosition());
-				System.out.println("Moving ship from: " + s.getStartPosition().toString() + " to: " + newCoord.toString());
 				s.setStartPosition(newCoord);
 				if (!s.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1)) {
 					s.setStartPosition(lastShipPositions.get(s.getIdentifier().toString()));
-					System.out.println("ship out of bounds");
 				}
 			}
 		}
@@ -257,6 +262,7 @@ public class ServerPlayer {
 	 * @return true, if successful
 	 */
 	public boolean requestTurn(Map<Integer, List<ActionResult>> actionResults) {
+		lastActionResults = actionResults.get(id);
 		this.actionLog.addAll(actionResults.get(this.id));
 		return conn.requestTurn(this.ships, actionResults);
 	}

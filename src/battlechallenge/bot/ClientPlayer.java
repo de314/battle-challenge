@@ -100,7 +100,7 @@ public class ClientPlayer {
 			ship.setDirection(Ship.Direction.EAST);
 		}
 		System.out.println("placed ships");
-		return shipList;		
+		return shipList;
 	}
 	
 	/**
@@ -113,15 +113,17 @@ public class ClientPlayer {
 	 * @return a List of coordinates corresponding to where you wish to fire
 	 */
 	public List<ShipAction> doTurn(List<Ship> myShips, Map<Integer, List<ActionResult>> actionResults) {
-		List<Coordinate> shotCoordinates = new ArrayList<Coordinate>();
-		shotCoordinates.add(new Coordinate((int) (Math.random() * (boardHeight -1)), (int) (Math.random() * (boardWidth - 1))));
-		List<Direction> moves = new LinkedList<Direction>();
-		if (Math.random() > 0.5)
-			moves.add(Direction.EAST);
-		else
-			moves.add(Direction.WEST);
 		List<ShipAction> actions = new LinkedList<ShipAction>();
-		actions.add(new ShipAction(myShips.get(0).getIdentifier(), shotCoordinates, moves));
+		for (Ship s : myShips) {
+			List<Coordinate> shotCoordinates = new ArrayList<Coordinate>();
+			List<Direction> moves = new LinkedList<Direction>();
+			shotCoordinates.add(new Coordinate((int) (Math.random() * (boardHeight -1)), (int) (Math.random() * (boardWidth - 1))));
+			if (Math.random() > 0.5)
+				moves.add(Direction.EAST);
+			else
+				moves.add(Direction.WEST);
+			actions.add(new ShipAction(s.getIdentifier(), shotCoordinates, moves));
+		}
 		return actions;
 	}
 }

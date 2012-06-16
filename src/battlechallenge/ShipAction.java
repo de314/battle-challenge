@@ -100,4 +100,9 @@ public class ShipAction implements Serializable {
 		return moves.size() > i ? moves.get(i) : null;
 	}
 	
+	@Override
+	public String toString() {
+		return getShotCoord() == null ? "()" : getShotCoord().toString();
+	}
+	
 }

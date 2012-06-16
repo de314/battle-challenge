@@ -213,6 +213,7 @@ public class Game extends Thread {
 			List<ShipAction> shipActions = p.getTurn(boardWidth, boardHeight);
 			// reset action results for current user
 			actionResults.get(p.getId()).clear();
+			System.out.println(shipActions);
 			// FIXME: remove magic number for allowed shots: "1"
 			for(int i=0;i<shipActions.size() && i < 1;i++) {
 				// check if shot is within game boundries
@@ -282,7 +283,7 @@ public class Game extends Thread {
 		ships.add(new Ship(5,new Coordinate(-1, -1), Direction.NORTH));
 		// Setting the original ship Ids
 		for (int i = 0; i < ships.size(); i++) {
-			ships.get(0).setShipId(i);
+			ships.get(i).setShipId(i);
 		}
 		return ships;
 	}
