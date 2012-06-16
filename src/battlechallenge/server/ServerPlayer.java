@@ -49,7 +49,7 @@ public class ServerPlayer {
 	private Map<String, Ship> shipMap = new HashMap();
 	
 	/** The last ship positions. */
-	private Map<String, Ship> lastShipPositions = new HashMap();
+	private Map<String, Coordinate> lastShipPositions = new HashMap();
 	
 	/**
 	 * Gets the id.
@@ -207,14 +207,16 @@ public class ServerPlayer {
 	 */
 	private void moveShips(List<ShipAction> shipAction, int boardWidth, int boardHeight) {
 		for (ShipAction shipAct: shipAction) {
-			if (this.id != shipAct.getShipID().playerId) { // playerId does not match shipId
+			if (this.id != shipAct.getShipIdentifier().playerId) { // playerId does not match shipId
 				continue;
 			}
-			Ship s = shipMap.get(shipAct.getShipID());
-			lastShipPositions.put(s.getIdentifier().toString(), s);
-			Coordinate newCoord = move(shipAct.getMoveDir(), s.getStartPosition());
-			if (newCoord.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1)) {
-				s.setStartPosition(newCoord);
+			Ship s = shipMap.get(shipAct.getShipIdentifier().toString());
+			if (s != null) {
+				lastShipPositions.put(s.getIdentifier().toString(), s);
+				Coordinate newCoord = move(shipAct.getMoveDir(), s.getStartPosition());
+				if (newCoord.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1)) {
+					s.setStartPosition(newCoord);
+				}
 			}
 		}
 	}
