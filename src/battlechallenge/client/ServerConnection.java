@@ -12,21 +12,32 @@ import battlechallenge.bot.DavidBot;
 import battlechallenge.network.ConnectionLostException;
 import battlechallenge.network.NetworkSocket;
 
+/**
+ * The Class ServerConnection.
+ */
 public class ServerConnection {
 
+	/** The id. */
 	private int id;
+	
+	/** The socket. */
 	private NetworkSocket socket;
+	
+	/** The bot. */
 	private ClientPlayer bot;
+	
+	/** The name. */
 	private String name;
 	
 	/**
 	 * Constructor that creates a client socket and request and set
-	 * the name of the ClientPlayer. The server connection will then 
+	 * the name of the ClientPlayer. The server connection will then
 	 * call the run method
-	 * 
+	 *
 	 * @param port The port to connect to the server
 	 * @param ip The ip address of the server
 	 * @param name The name to identify the player
+	 * @param bot the bot
 	 */
 
 	public ServerConnection(int port, String ip, String name, ClientPlayer bot) {
@@ -36,10 +47,18 @@ public class ServerConnection {
 		this.run();
 	}
 
+	/**
+	 * Ends the socket connection.
+	 * @see battlechallenge.client.ServerConnection.kill
+	 */
 	public void kill() {
 		socket.kill();
 	}
 
+	/**
+	 * Goes into an infinite loop waiting for server to give command. Each 
+	 * command puts ServerConnection into a different state.
+	 */
 	public void run() {
 		String req;
 		while (true) {
@@ -83,6 +102,9 @@ public class ServerConnection {
 		this.kill();
 	}
 
+	/**
+	 * Setup hand shake. Confirms that server and client versions are compatible.
+	 */
 	public void setupHandShake() {
 		try {
 			// check that server version is supported
@@ -101,6 +123,11 @@ public class ServerConnection {
 		System.exit(0);
 	}
 
+	/**
+	 * Sets the credentials.
+	 *
+	 * @param name the new credentials
+	 */
 	public void setCredentials(String name) {
 		try {
 			id = socket.readInt(true);
@@ -122,6 +149,9 @@ public class ServerConnection {
 		System.exit(0);
 	}
 
+	/**
+	 * Place ships.
+	 */
 	public void placeShips() {
 		try {
 			@SuppressWarnings("unchecked")
@@ -143,6 +173,9 @@ public class ServerConnection {
 		System.exit(0);
 	}
 
+	/**
+	 * Do turn.
+	 */
 	public void doTurn() {
 		try {
 			@SuppressWarnings("unchecked")

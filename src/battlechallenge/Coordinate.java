@@ -2,6 +2,7 @@ package battlechallenge;
 
 import java.io.Serializable;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class Coordinate.
  */
@@ -99,6 +100,9 @@ public class Coordinate implements Serializable {
 		return (this.row + "," + this.col).hashCode();
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		boolean result = false;
