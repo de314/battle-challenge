@@ -127,6 +127,29 @@ public class NetworkSocket {
 		return false;
 	}
 	
+	public boolean writeObject(Object o, int timeout) throws ConnectionLostException {
+		if (socket == null)
+			throw new ConnectionLostException();
+		if (o != null) {
+			try {
+				// clear object cache
+				oos.reset();
+				oos.writeObject(o);
+				// Ensure objects are sent.
+				oos.flush();
+				Thread.sleep(timeout);
+				return true;
+			} catch (IOException e) {
+				System.err.println("Socket Exception: Cannot write to socket.");
+				socket = null;
+				throw new ConnectionLostException("Socket Exception: Cannot write to socket.");
+			} catch (InterruptedException e) {
+				/* Ignore. Message was sent. */
+			}
+		}
+		return false;
+	}
+	
 	/**
 	 * Write int to socket. Handles socket exceptions by closing socket.
 	 * After exception this network socket cannot be used for communication.
@@ -194,9 +217,13 @@ public class NetworkSocket {
 			 * check to see if something is arrived in time. Otherwise, assume
 			 * no input. 
 			 */
-			if (bis.available() > 0)
-				return ois.readObject();
-			Thread.sleep(timeout);
+			int count = 0;
+			int pause = timeout / 10;
+			while(count * pause < timeout) {
+				if (bis.available() > 0)
+					return ois.readObject();
+				Thread.sleep(pause);
+			}
 			return bis.available() > 0 ? ois.readObject() : null;
 		} catch (IOException e) {
 			System.err.println("Socket Exception: Cannot read from socket.");
