@@ -18,7 +18,7 @@ public class ClientPlayer {
 	
 	/** The id to identify the player */
 	protected int networkID;
-	
+
 	/** The board width. */
 	protected int boardWidth;
 
@@ -39,6 +39,10 @@ public class ClientPlayer {
 	 */
 	public void setBoardHeight(int boardHeight) {
 		this.boardHeight = boardHeight;
+	}
+	
+	public void setNetworkID(int networkID) {
+		this.networkID = networkID;
 	}
 	
 	public ClientPlayer(final String playerName) {
