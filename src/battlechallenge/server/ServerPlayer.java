@@ -212,7 +212,7 @@ public class ServerPlayer {
 			}
 			Ship s = shipMap.get(shipAct.getShipIdentifier().toString());
 			if (s != null) {
-				lastShipPositions.put(s.getIdentifier().toString(), s);
+				lastShipPositions.put(s.getIdentifier().toString(), s.getStartPosition());
 				Coordinate newCoord = move(shipAct.getMoveDir(), s.getStartPosition());
 				if (newCoord.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1)) {
 					s.setStartPosition(newCoord);
@@ -265,14 +265,15 @@ public class ServerPlayer {
 	 * @return a list of ship actions from the ClientPlayer
 	 */
 	public List<ShipAction> getTurn(int boardWidth, int boardHeight) {
+		List<ShipAction> shipActions = new LinkedList();
 		try {
-			List<ShipAction> shipActions;
 			shipActions = conn.getTurn(); // get the ship action list from the client player
 			moveShips(shipActions, boardWidth, boardHeight);
+			return shipActions;
 		} catch (ConnectionLostException e) {
 			// TODO: handle lost connection
 		}
-		return null;
+		return shipActions;
 	}
 
 	
