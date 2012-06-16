@@ -6,7 +6,7 @@ import java.util.Map;
 
 import battlechallenge.ActionResult;
 import battlechallenge.Coordinate;
-import battlechallenge.Ship;
+import battlechallenge.ship.Ship;
 
 /**
  * The Class ClientPlayer.

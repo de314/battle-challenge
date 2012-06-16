@@ -1,9 +1,5 @@
 package battlechallenge.server;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,9 +8,9 @@ import java.util.Map;
 import battlechallenge.ActionResult;
 import battlechallenge.CommunicationConstants;
 import battlechallenge.Coordinate;
-import battlechallenge.Ship;
 import battlechallenge.network.ConnectionLostException;
 import battlechallenge.network.NetworkSocket;
+import battlechallenge.ship.Ship;
 
 /**
  * The Class ClientConnection.

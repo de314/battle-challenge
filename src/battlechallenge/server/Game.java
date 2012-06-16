@@ -13,8 +13,8 @@ import battlechallenge.ActionResult;
 import battlechallenge.ActionResult.ShotResult;
 import battlechallenge.CommunicationConstants;
 import battlechallenge.Coordinate;
-import battlechallenge.Ship;
-import battlechallenge.Ship.Direction;
+import battlechallenge.ship.Ship;
+import battlechallenge.ship.Ship.Direction;
 import battlechallenge.visual.BoardExporter;
 
 /**

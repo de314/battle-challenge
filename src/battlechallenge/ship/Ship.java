@@ -2,9 +2,12 @@ package battlechallenge.ship;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import battlechallenge.Coordinate;
+import battlechallenge.ShipAction;
+import battlechallenge.ShipIdentifier;
 
 
 // TODO: Auto-generated Javadoc
@@ -12,7 +15,7 @@ import battlechallenge.Coordinate;
  * The Class Ship. A data holder representing ships from the original game
  * battleship.
  */
-public abstract class Ship implements Serializable {
+public class Ship implements Serializable {
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 0L;
@@ -288,6 +291,10 @@ public abstract class Ship implements Serializable {
 	}
 	
 	public ShipAction getShipAction(Direction move, Coordinate shot) {
-		return null;
+		return new ShipAction(new ShipIdentifier(shipId, playerId), shot, move);
+	}
+	
+	public ShipAction getShipAction(List<Direction> moves, List<Coordinate> shots) {
+		return new ShipAction(new ShipIdentifier(shipId, playerId), shots, moves);
 	}
 }

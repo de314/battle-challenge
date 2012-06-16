@@ -8,9 +8,9 @@ import java.util.Set;
 
 import battlechallenge.ActionResult;
 import battlechallenge.ActionResult.ShotResult;
-import battlechallenge.network.ConnectionLostException;
 import battlechallenge.Coordinate;
-import battlechallenge.Ship;
+import battlechallenge.network.ConnectionLostException;
+import battlechallenge.ship.Ship;
 
 /**
  * The Class ServerPlayer.

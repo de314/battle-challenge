@@ -10,7 +10,7 @@ import java.util.Set;
 
 import battlechallenge.ActionResult;
 import battlechallenge.Coordinate;
-import battlechallenge.Ship;
+import battlechallenge.ship.Ship;
 
 /**
  * The Class ClientPlayer.
