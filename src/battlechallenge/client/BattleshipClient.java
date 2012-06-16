@@ -4,11 +4,23 @@ import battlechallenge.bot.ClientPlayer;
 import battlechallenge.bot.DavidBot;
 import battlechallenge.bot.KevinBot;
 
+/**
+ * The Class BattleshipClient.
+ */
 public class BattleshipClient {
 	
+	/** The Constant IP. */
 	public static final String IP = "127.0.0.1";
+	
+	/** The Constant PORT. */
 	public static final int PORT = 3000;
 	
+	/**
+	 * Bot to play. Allows user to develop multiple AI bots.
+	 *
+	 * @param botName the bot name
+	 * @return the client player
+	 */
 	public static ClientPlayer botToPlay(String botName) {
 		if (botName.equals("DavidBot")) {
 			return new DavidBot(botName, 0, 0, 0);
@@ -22,6 +34,11 @@ public class BattleshipClient {
 	}
 	
 	
+	/**
+	 * The main method.
+	 *
+	 * @param args the arguments
+	 */
 	public static void main(String[] args) {
 		String name;
 		ClientPlayer bot;
