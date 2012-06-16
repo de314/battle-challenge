@@ -1,14 +1,18 @@
-package battlechallenge;
+package battlechallenge.ship;
 
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import battlechallenge.Coordinate;
+
+
+// TODO: Auto-generated Javadoc
 /**
  * The Class Ship. A data holder representing ships from the original game
  * battleship.
  */
-public class Ship implements Serializable {
+public abstract class Ship implements Serializable {
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 0L;
@@ -27,30 +31,51 @@ public class Ship implements Serializable {
 		WEST
 	}
 
+	/** The damage. */
+	private int damage;
+
+	/** The health. Number of hits left before the ship is sunk. */
+	private int health;
+	
 	/**
 	 * The length. How many spaces the ship extends from the start position in
 	 * the specified direction.
 	 */
 	private int length;
 
-	/** The health. Number of hits left before the ship is sunk. */
-	private int health;
-
 	/** The start position. */
 	private Coordinate startPosition;
 
+	/** The range. */
+	private int range;
+	
+	/** The movement. */
+	private int movement;
+	
+	/** The player id. */
+	private int playerId;
+
+	/** The ship id. */
+	private int shipId;
+	
 	/**
 	 * The direction. Which direction from the starting position the ship will
 	 * be extended.
 	 */
 	private Direction direction;
 	
-	/** The hits. */
-	private Set<String> hits;
-	
-	/** The coordinates */
+	/** The coordinates. */
 	private Set<String> coords;
 
+	/**
+	 * Instantiates a new ship.
+	 *
+	 * @param length the length
+	 */
+	public Ship(int length) {
+		this(length, new Coordinate(-1, -1), Direction.NORTH);
+	}
+	
 	/**
 	 * Instantiates a new ship.
 	 * 
@@ -62,11 +87,28 @@ public class Ship implements Serializable {
 	 *            the direction
 	 */
 	public Ship(int length, Coordinate startPosition, Direction direction) {
+		this(1, length, length, 3, 1, startPosition, direction);
+	}
+	
+	/**
+	 * Instantiates a new ship.
+	 *
+	 * @param damage the damage
+	 * @param health the health
+	 * @param length the length
+	 * @param range the range
+	 * @param movement the movement
+	 * @param startPosition the start position
+	 * @param direction the direction
+	 */
+	public Ship(int damage, int health, int length, int range, int movement, Coordinate startPosition, Direction direction) {
+		this.damage = damage;
+		this.health = health;
 		this.length = length;
-		this.health = length;
+		this.range = range;
+		this.movement = movement;
 		this.startPosition = startPosition;
 		this.direction = direction;
-		this.hits = new HashSet<String>();
 		this.coords = getCoordinateStrings();
 	}
 
@@ -162,20 +204,20 @@ public class Ship implements Serializable {
 	
 				switch (direction) {
 				case NORTH: {
-					coords.add((this.startPosition.row - i) + ","
-							+ this.startPosition.col);
+					coords.add((this.startPosition.getRow() - i) + ","
+							+ this.startPosition.getCol());
 				} break;
 				case SOUTH: {
-					coords.add((this.startPosition.row + i) + ","
-							+ this.startPosition.col);
+					coords.add((this.startPosition.getRow() + i) + ","
+							+ this.startPosition.getCol());
 				} break;
 				case EAST: {
-					coords.add(this.startPosition.row + ","
-							+ (this.startPosition.col + i));
+					coords.add(this.startPosition.getRow() + ","
+							+ (this.startPosition.getCol() + i));
 				} break;
 				case WEST: {
-					coords.add(this.startPosition.row + ","
-							+ (this.startPosition.col - i));
+					coords.add(this.startPosition.getRow() + ","
+							+ (this.startPosition.getCol() - i));
 				} break;
 				}
 			}
@@ -183,7 +225,7 @@ public class Ship implements Serializable {
 	}
 	
 	/**
-	 * Checks to see if any part of the ship is within the specified bounds
+	 * Checks to see if any part of the ship is within the specified bounds.
 	 *
 	 * @param rowMin the row min
 	 * @param rowMax the row max
@@ -192,16 +234,15 @@ public class Ship implements Serializable {
 	 * @return true, if successful
 	 */
 	public boolean inBoundsInclusive(int rowMin, int rowMax, int colMin, int colMax) {
-		// TODO: double check "in bound" logic
 		switch (direction) {
 		case NORTH:
-			return this.startPosition.col >= colMin && this.startPosition.col <= colMax && this.startPosition.row <= rowMax && this.startPosition.row >= (rowMin-length);
+			return this.startPosition.getCol() >= colMin && this.startPosition.getCol() <= colMax && this.startPosition.getRow() <= rowMax && this.startPosition.getRow() >= (rowMin-length);
 		case SOUTH:
-			return this.startPosition.col >= colMin && this.startPosition.col <= colMax && this.startPosition.row <= (rowMax+length) && this.startPosition.row >= rowMin;
+			return this.startPosition.getCol() >= colMin && this.startPosition.getCol() <= colMax && this.startPosition.getRow() <= (rowMax+length) && this.startPosition.getRow() >= rowMin;
 		case EAST:
-			return this.startPosition.col >= colMin && this.startPosition.col <= (colMax-length) && this.startPosition.row <= rowMax && this.startPosition.row >= rowMin;
+			return this.startPosition.getCol() >= colMin && this.startPosition.getCol() <= (colMax-length) && this.startPosition.getRow() <= rowMax && this.startPosition.getRow() >= rowMin;
 		case WEST:
-			return this.startPosition.col >= (colMin+length) && this.startPosition.col <= colMax && this.startPosition.row <= rowMax && this.startPosition.row >= rowMin;
+			return this.startPosition.getCol() >= (colMin+length) && this.startPosition.getCol() <= colMax && this.startPosition.getRow() <= rowMax && this.startPosition.getRow() >= rowMin;
 		}
 		return false;
 	}
@@ -233,42 +274,20 @@ public class Ship implements Serializable {
 	 * @return true, if is hit
 	 */
 	public boolean isHit(Coordinate c, int damage) {
-		// TODO: handle case where player hits same spot twice (force unique
-		// shot locations)
-		
-		if (isSunken()) {
-			return false;
-		}
-		
-		if (coords.contains(c.toString())) {
-			if (!hits.contains(c.toString())) {
-				health -= damage; // reduce health on ship by damage
-				hits.add(c.toString());
-			}
-			return true; // Is a hit
-		}
-		
-		return false;
-	}
-
-	/**
-	 * Deep copy of the shipObject so that the player can use the ship object as
-	 * necessary while the server has keeps its own copy.
-	 * 
-	 * @return the ship
-	 */
-	public Ship deepCopy() {
-		return new Ship(length, startPosition, direction);
+		return !isSunken() && coords.contains(c.toString());
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder("Ship: ");
 		sb.append(this.startPosition).append(" ").append(this.direction);
 		return sb.toString();
 	}
-
-	public Set<String> getHitStrings() {
-		return hits;
+	
+	public ShipAction getShipAction(Direction move, Coordinate shot) {
+		return null;
 	}
 }
