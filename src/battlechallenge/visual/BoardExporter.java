@@ -73,21 +73,13 @@ public class BoardExporter {
 		for (int i=0;i<board.length;i++)
 			for(int j=0;j<board[i].length;j++)
 				board[i][j] = 'l';
-		for (ActionResult ar : actionResults) {
-			if (ar.getResult() == ShotResult.MISS) {
-				fillSpot(board, 'X', ar.getCoordinate());
-			}
-		}
 		for (Ship s : ships) {
 			if (s.isSunken()) {
 				for (String c : s.getCoordinateStrings())
 					fillSpot(board, 'S', c);
 			} else {
 				for (String c : s.getCoordinateStrings())
-					fillSpot(board, 'B', c);
-				// TODO: draw health
-//				for (String c : s.getHitStrings())
-//					fillSpot(board, 'O', c);
+					fillSpot(board, (char)('0'+s.getHealth()), c);
 			}
 		}
 		return board;

@@ -212,7 +212,7 @@ public class ServerPlayer {
 			}
 			Ship s = shipMap.get(shipAct.getShipIdentifier().toString());
 			if (s != null) {
-				lastShipPositions.put(s.getIdentifier().toString(), s);
+				lastShipPositions.put(shipAct.toString(), s.getStartPosition());
 				Coordinate newCoord = move(shipAct.getMoveDir(), s.getStartPosition());
 				if (newCoord.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1)) {
 					s.setStartPosition(newCoord);
