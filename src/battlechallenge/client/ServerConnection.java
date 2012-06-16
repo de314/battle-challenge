@@ -28,8 +28,10 @@ public class ServerConnection {
 	 * @param ip The ip address of the server
 	 * @param name The name to identify the player
 	 */
-	public ServerConnection(int port, String ip, String name) {
+
+	public ServerConnection(int port, String ip, String name, ClientPlayer bot) {
 		socket = new NetworkSocket(ip, port);
+		this.bot = bot;
 		this.name = name;
 		this.run();
 	}
@@ -104,7 +106,9 @@ public class ServerConnection {
 			id = socket.readInt(true);
 			int width = socket.readInt(true);
 			int height = socket.readInt(true);
-			bot = new DavidBot(name, width, height, id);
+			bot.setBoardWidth(width);
+			bot.setBoardHeight(height);
+			bot.setNetworkID(id);
 			System.out.println("bot generated with network ID: " + id);
 			// send name to server
 			socket.writeObject(name);

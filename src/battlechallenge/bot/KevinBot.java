@@ -19,7 +19,7 @@ public class KevinBot extends ClientPlayer {
 	
 	private Set<String> hitList;
 	
-	private Set<String> missList;
+	private Set<String> missList = new HashSet<String>();
 	
 	private Set<String> sunkList;
 	
@@ -27,7 +27,7 @@ public class KevinBot extends ClientPlayer {
 	
 	private Queue<Coordinate> shotQueue = new LinkedList<Coordinate>();
 	
-	List<Coordinate> shotCoordinates = new ArrayList<Coordinate>();
+	List<Coordinate> shotCoordinates;
 	/**
 	 * Instantiates a new client player.
 	 *
@@ -102,8 +102,10 @@ public class KevinBot extends ClientPlayer {
 		//shotCoordinates.add(new Coordinate((int) (Math.random() * (boardHeight -1)), (int) (Math.random() * (mapWidth - 1))));
 		List<Coordinate> adjList = new ArrayList<Coordinate>();
 		ActionResult.ShotResult shotResult;
+		shotCoordinates = new ArrayList<Coordinate>();
 		Coordinate coordinateResult;
 		List<ActionResult> myResults = actionResults.get(this.networkID);
+		System.out.println(myResults);
 //		for (ActionResult action: myResults) {
 		if  (myResults.size() > 0) {
 			shotResult = myResults.get(0).getResult();
@@ -112,11 +114,11 @@ public class KevinBot extends ClientPlayer {
 			switch (shotResult) {
 			case HIT:
 				shotList.add(coordinateResult.toString());
-				hitList.add(coordinateResult.toString());
+				//hitList.add(coordinateResult.toString());
 				break;
 			case MISS:
 				shotList.add(coordinateResult.toString());
-//				missList.add(coordinateResult.toString());
+				missList.add(coordinateResult.toString());
 				break;
 			case SUNK:
 				shotList.add(coordinateResult.toString());
@@ -155,7 +157,6 @@ public class KevinBot extends ClientPlayer {
 			
 			shotCoordinates.add(randShot);
 		}
-		System.out.println(shotList.toString());
 		shotList.add(shotCoordinates.get(0).toString());
 		return shotCoordinates;
 	}
