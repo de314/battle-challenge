@@ -69,6 +69,128 @@ public class Ship implements Serializable {
 	
 	/** The coordinates. */
 	private Set<String> coords;
+	
+	/**
+	 * Gets the damage.
+	 *
+	 * @return the damage
+	 */
+	public int getDamage() {
+		return damage;
+	}
+
+	/**
+	 * Sets the damage.
+	 *
+	 * @param damage the new damage
+	 */
+	public void setDamage(int damage) {
+		this.damage = damage;
+	}
+
+	/**
+	 * Sets the health.
+	 *
+	 * @param health the new health
+	 */
+	public void setHealth(int health) {
+		this.health = health;
+	}
+
+	/**
+	 * Gets the length.
+	 * 
+	 * @return the length
+	 */
+	public int getLength() {
+		return length;
+	}
+
+	/**
+	 * Sets the length.
+	 * 
+	 * @param length
+	 *            the new length
+	 */
+	public void setLength(int length) {
+		this.length = length;
+	}
+	
+	/**
+	 * Gets the range.
+	 *
+	 * @return the range
+	 */
+	public int getRange() {
+		return range;
+	}
+
+	/**
+	 * Sets the range.
+	 *
+	 * @param range the new range
+	 */
+	public void setRange(int range) {
+		this.range = range;
+	}
+
+	/**
+	 * Gets the movement.
+	 *
+	 * @return the movement
+	 */
+	public int getMovement() {
+		return movement;
+	}
+
+	/**
+	 * Sets the movement.
+	 *
+	 * @param movement the new movement
+	 */
+	public void setMovement(int movement) {
+		this.movement = movement;
+	}
+
+	/**
+	 * Gets the player id.
+	 *
+	 * @return the player id
+	 */
+	public int getPlayerId() {
+		return playerId;
+	}
+
+	/**
+	 * Sets the player id.
+	 *
+	 * @param playerId the new player id
+	 */
+	public void setPlayerId(int playerId) {
+		this.playerId = playerId;
+	}
+
+	/**
+	 * Gets the ship id.
+	 *
+	 * @return the ship id
+	 */
+	public int getShipId() {
+		return shipId;
+	}
+
+	/**
+	 * Sets the ship id.
+	 *
+	 * @param shipId the new ship id
+	 */
+	public void setShipId(int shipId) {
+		this.shipId = shipId;
+	}
+	
+	public ShipIdentifier getIdentifier() {
+		return new ShipIdentifier(shipId, playerId);
+	}
 
 	/**
 	 * Instantiates a new ship.
@@ -113,25 +235,6 @@ public class Ship implements Serializable {
 		this.startPosition = startPosition;
 		this.direction = direction;
 		this.coords = getCoordinateStrings();
-	}
-
-	/**
-	 * Gets the length.
-	 * 
-	 * @return the length
-	 */
-	public int getLength() {
-		return length;
-	}
-
-	/**
-	 * Sets the length.
-	 * 
-	 * @param length
-	 *            the new length
-	 */
-	public void setLength(int length) {
-		this.length = length;
 	}
 
 	/**
@@ -290,10 +393,24 @@ public class Ship implements Serializable {
 		return sb.toString();
 	}
 	
+	/**
+	 * Gets the ship action.
+	 *
+	 * @param move the move
+	 * @param shot the shot
+	 * @return the ship action
+	 */
 	public ShipAction getShipAction(Direction move, Coordinate shot) {
 		return new ShipAction(new ShipIdentifier(shipId, playerId), shot, move);
 	}
 	
+	/**
+	 * Gets the ship action.
+	 *
+	 * @param moves the moves
+	 * @param shots the shots
+	 * @return the ship action
+	 */
 	public ShipAction getShipAction(List<Direction> moves, List<Coordinate> shots) {
 		return new ShipAction(new ShipIdentifier(shipId, playerId), shots, moves);
 	}

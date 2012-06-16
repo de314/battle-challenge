@@ -6,7 +6,6 @@ import java.util.List;
 import battlechallenge.ship.Ship;
 import battlechallenge.ship.Ship.Direction;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class ShipAction.
  */
