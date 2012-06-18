@@ -12,6 +12,7 @@ import battlechallenge.ActionResult;
 import battlechallenge.ActionResult.ShotResult;
 import battlechallenge.Coordinate;
 import battlechallenge.ShipAction;
+import battlechallenge.ShipIdentifier;
 import battlechallenge.network.ConnectionLostException;
 import battlechallenge.ship.Ship;
 import battlechallenge.ship.Ship.Direction;
@@ -54,6 +55,9 @@ public class ServerPlayer {
 	/** The last ship positions. */
 	private Map<String, Coordinate> lastShipPositions = new HashMap();
 	
+	private int rowOffset = 0;
+	private int colOffset = 0;
+	
 	/**
 	 * Gets the id.
 	 *
@@ -95,6 +99,26 @@ public class ServerPlayer {
 		return lastActionResults;
 	}
 	
+	public int getRowOffset() {
+		return rowOffset;
+	}
+
+	public void setRowOffset(int rowOffset) {
+		this.rowOffset = rowOffset;
+	}
+
+	public int getColOffset() {
+		return colOffset;
+	}
+
+	public void setColOffset(int colOffset) {
+		this.colOffset = colOffset;
+	}
+	
+	public Ship getShip(ShipIdentifier si) {
+		return shipMap.get(si.toString());
+	}
+
 	/**
 	 * Instantiates a new server player.
 	 *
@@ -152,23 +176,14 @@ public class ServerPlayer {
 	public boolean requestPlaceShips(List<Ship> ships) {
 		try {
 			this.ships = ships;
-			setShipIds(ships); // Give the ships ids cooresponding to the player
+			for (Ship ship: ships) {
+				ship.setPlayerId(id);
+			}
 			return conn.requestPlaceShips(ships);
 		} catch (ConnectionLostException e) {
 			// TODO: handle lost connection
 		}
 		return false;
-	}
-	
-	/**
-	 * Sets the playerId for each ship in a ship list
-	 * Inserts the ships into the HashMap shipList.
-	 *
-	 * @param ships list of ships without playerIDs
-	 * @return updated list of ships with playerIDs
-	 */
-	public List<Ship> setShipIds(List<Ship> ships) {
-		return ships;
 	}
 	
 	/**
@@ -182,24 +197,51 @@ public class ServerPlayer {
 	 * @return the list of ships with updated starting coordinates
 	 */
 	public List<Ship> getPlaceShips(int boardWidth, int boardHeight) {
+		Map<String, Ship> shipSet = new HashMap<String, Ship>();
+		for (Ship s : ships)
+			shipSet.put(s.getIdentifier().toString(), s);
 		List<Ship> temp = conn.getPlaceShips(boardWidth, boardHeight);
-		Set<String> coords = new HashSet<String>();
+		Map<String, Ship> coords = new HashMap<String, Ship>();
 		for(Ship s : temp) {
-			if (!s.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1)) {
-				// TODO: handle invalid ship placement (out of bounds)
+			// check that client did not change ship attributes e.g. id, length, health...
+			if (shipSet.get(s.getIdentifier().toString()) == null) {
+				// client changed ship id or player id
+				s.setHealth(-1);
+				continue;
+			} else {
+				// id's are the same, now checking ship attributes
+				Ship serverShip = shipSet.get(s.getIdentifier().toString());
+				if (!(serverShip.getDamage() == s.getDamage() && serverShip.getHealth() == s.getHealth() && 
+						serverShip.getLength() == s.getLength() && serverShip.getMovement() == s.getMovement() && 
+						serverShip.getRange() == s.getRange())) {
+					// client changed ship attributes
+					s.setHealth(-1); // 
+					continue;
+				}
 			}
+			// check on board
+			if (!s.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1)) {
+				// sink invalid placed ship
+				s.setHealth(-1);
+				continue;
+			}
+			// check overlap
 			Set<String> coordStrings = s.getCoordinateStrings();
 			for(String c : coordStrings) {
-				if (coords.contains(c)) {
-					// TODO: handle invalid ship placement (overlap)
-				} else {
-					coords.add(c);
+				if (coords.get(c) != null) {
+					// handle invalid ship placement (overlap)
+					s.setHealth(-1);
+					coords.get(c).setHealth(-1);
 				}
+				// add all coordinates to ensure all overlapped ships are sunk
+				coords.put(c, s);
 			}
 		}
 		this.ships = temp;
 		for (Ship ship: ships) {
-			ship.setPlayerId(id);
+			// calculate new start position with offset
+			Coordinate newStart = new Coordinate(ship.getStartPosition().getCol() + colOffset, ship.getStartPosition().getRow() + rowOffset);
+			ship.setStartPosition(newStart);
 			shipMap.put(ship.getIdentifier().toString(), ship);
 		}
 		return ships; // return instance ships for placement verification by game
@@ -275,7 +317,7 @@ public class ServerPlayer {
 	 * @return a list of ship actions from the ClientPlayer
 	 */
 	public List<ShipAction> getTurn(int boardWidth, int boardHeight) {
-		List<ShipAction> shipActions = new LinkedList();
+		List<ShipAction> shipActions = new LinkedList<ShipAction>();
 		try {
 			shipActions = conn.getTurn(); // get the ship action list from the client player
 			moveShips(shipActions, boardWidth, boardHeight);

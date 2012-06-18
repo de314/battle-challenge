@@ -113,4 +113,13 @@ public class Coordinate implements Serializable {
  		return result;	
 	}
 	
+	/**
+	 * The euclidian distance between two coordinates
+	 * @param coord the coordinate to get the euclidian distance to
+	 * @return the euclidian distance between two coordinates
+	 */
+	public double distanceTo(Coordinate coord) {
+		return Math.sqrt(Math.pow(this.getRow() - coord.getRow(), 2) + Math.pow(this.getCol() - coord.getCol(), 2));
+	}
+	
 } // End Coordinate Class

@@ -71,6 +71,10 @@ public class ShipAction implements Serializable {
 		return shots.size() > 0 ? shots.get(0) : null;
 	}
 
+	public List<Coordinate> getShotCoordList() {
+		return shots;
+	}
+
 	/**
 	 * Gets the i-th shot.
 	 *
@@ -88,6 +92,10 @@ public class ShipAction implements Serializable {
 	 */
 	public Ship.Direction getMoveDir() {
 		return moves.size() > 0 ? moves.get(0) : null;
+	}
+	
+	public List<Direction> getMoveDirList() {
+		return moves;
 	}
 	
 	/**

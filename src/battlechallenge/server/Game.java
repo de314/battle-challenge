@@ -168,9 +168,49 @@ public class Game extends Thread {
 		} catch (InterruptedException e) {
 			// FIXME: handle thread failure
 		}
+		// set players offsets
+		// so many magic numbers...
+		int i=0;
+		switch (players.size()) {
+		case 2:
+			players.get(1).setColOffset(boardWidth);
+			boardWidth *= 2;
+			break;
+		case 4:
+			players.get(1).setColOffset(boardWidth);
+			players.get(2).setRowOffset(boardHeight);
+			players.get(3).setColOffset(boardWidth);
+			players.get(3).setRowOffset(boardHeight);
+			boardWidth *= 2;
+			boardHeight *= 2;
+			break;
+		case 8:
+			players.get(0).setColOffset(boardWidth * 1);
+			players.get(1).setColOffset(boardWidth * 3);
+			players.get(2).setRowOffset(boardHeight * 1);
+			players.get(3).setColOffset(boardWidth * 4);
+			players.get(3).setRowOffset(boardHeight * 1);
+			players.get(4).setRowOffset(boardHeight * 3);
+			players.get(5).setColOffset(boardWidth * 4);
+			players.get(5).setRowOffset(boardHeight * 3);
+			players.get(6).setColOffset(boardWidth * 1);
+			players.get(6).setRowOffset(boardHeight * 4);
+			players.get(7).setColOffset(boardWidth * 3);
+			players.get(7).setRowOffset(boardHeight * 4);
+			boardWidth *= 5;
+			boardHeight *= 5;
+			break;
+			default: throw new IllegalArgumentException("Number of players must be 2,4 or 8");
+		}
+		// save client responses to place ships i.e. read socket, send the size of the
+		// new board
 		for(ServerPlayer p : players) {
 			// FIXME: take away the magic number
-			p.getPlaceShips(boardWidth * 2, boardHeight);
+			p.getPlaceShips(boardWidth, boardHeight);
+			if (!p.isAlive()) {
+				p.endGame(CommunicationConstants.RESULT_DISQUALIFIED);
+				p.kill();
+			}
 		}
 		System.out.println("All player ships placed");
 	}
@@ -183,9 +223,9 @@ public class Game extends Thread {
 		// DEGBUG INFO: print each users guess
 		StringBuilder sb = new StringBuilder();
 		for (Entry<Integer, List<ActionResult>> e : actionResults.entrySet()) {
-			sb.append("\t{ ").append(e.getKey()).append(" size:").append(e.getValue().size());
+			sb.append("\t{ ").append(e.getKey()).append(" ");
 			for (ActionResult a : e.getValue())
-				sb.append(a).append(" ");
+				sb.append(a.getResult().toString()).append(" ");
 			sb.append(" }\n");
 		}
 		System.out.println(sb.toString());
@@ -213,29 +253,23 @@ public class Game extends Thread {
 			List<ShipAction> shipActions = p.getTurn(boardWidth, boardHeight);
 			// reset action results for current user
 			actionResults.get(p.getId()).clear();
-			System.out.println(shipActions);
-			// FIXME: remove magic number for allowed shots: "1"
-			for(int i=0;i<shipActions.size() && i < 1;i++) {
+			for(ShipAction sa : shipActions) {
+				// NOTE: moves are processed in: ServerPlayer.getTurn(...);
 				// check if shot is within game boundries
-				if (!shipActions.get(i).getShotCoord().inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1)) { 
-					// TODO: handle shot out of bounds. ignore?
-				} else {
-					// valid shot location received
-					for(ServerPlayer opp : players) {
-						if (opp != p) {
-							// FIXME: get rid of magic number for damage
-							// This is done for multiple opponents, recording multiple hits
-							// on multiple opponents if necessary, otherwise recording
-							// a single miss
-							ActionResult ar = opp.isHit(shipActions.get(i).getShotCoord(), 1);
-							if (ar.getResult() == ShotResult.HIT) {
-								actionResults.get(p.getId()).add(ar);
+				for (Coordinate c : sa.getShotCoordList()) {
+					Ship s = p.getShip(sa.getShipIdentifier());
+					if (!(s.distanceTo(c) < s.getRange()) || !c.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1)) { 
+						// ignore shot out of bounds or invalid shot range
+						continue;
+					} else {
+						// valid shot location received
+						for(ServerPlayer opp : players) {
+							if (opp != p) {
+								// add all action results
+								actionResults.get(p.getId()).add(opp.isHit(c, s.getDamage()));
 							}
 						}
 					}
-					// If shot did not hit any enemies, then record a miss
-					if (actionResults.get(p.getId()).isEmpty())
-						actionResults.get(p.getId()).add(new ActionResult(shipActions.get(i).getShotCoord(), ShotResult.MISS, -1, j));
 				}
 			}
 		}

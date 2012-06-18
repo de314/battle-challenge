@@ -417,9 +417,27 @@ public class Ship implements Serializable {
 	public ShipAction getShipAction(List<Direction> moves, List<Coordinate> shots) {
 		return new ShipAction(new ShipIdentifier(shipId, playerId), shots, moves);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return this.getIdentifier().toString().hashCode();
+	}
+
+	/**
+	 * Used to determine the center coordinate of a ship
+	 * @return The center coordinate of a ship
+	 */
+	public Coordinate getCenter() {
+		return new Coordinate ((int)Math.ceil((this.getStartPosition().getRow() + this.getEndPosition().getRow()) / 2.0),
+				(int)Math.ceil((this.getStartPosition().getCol() + this.getEndPosition().getCol()) / 2.0));
+	}
+	
+	/**
+	 * Used to determine the distance from the center of the ship to a coordinate
+	 * @param coord The coordinate to get the distance to
+	 * @return The distance between a ships center and a coordinate
+	 */
+	public double distanceTo(Coordinate coord) {
+		return this.getCenter().distanceTo(coord);
 	}
 }
