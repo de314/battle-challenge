@@ -178,7 +178,7 @@ public class ServerConnection {
 	public void doTurn() {
 		try {
 			@SuppressWarnings("unchecked")
-			List<Ship> myShips = (List<Ship>)socket.readObject(true);
+			Map<Integer, List<Ship>> myShips = (Map<Integer,List<Ship>>)socket.readObject(true);
 			@SuppressWarnings("unchecked")
 			Map<Integer, List<ActionResult>> actionResults = (Map<Integer, List<ActionResult>>)socket.readObject(true);
 			// doTurn and send resulting coordinates to server

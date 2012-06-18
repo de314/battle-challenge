@@ -112,8 +112,9 @@ public class ClientPlayer {
 	 * @param actionResults the action results
 	 * @return a List of coordinates corresponding to where you wish to fire
 	 */
-	public List<ShipAction> doTurn(List<Ship> myShips, Map<Integer, List<ActionResult>> actionResults) {
+	public List<ShipAction> doTurn(Map<Integer, List<Ship>> ships, Map<Integer, List<ActionResult>> actionResults) {
 		List<ShipAction> actions = new LinkedList<ShipAction>();
+		List<Ship> myShips = ships.get(networkID);
 		for (Ship s : myShips) {
 			List<Coordinate> shotCoordinates = new ArrayList<Coordinate>();
 			List<Direction> moves = new LinkedList<Direction>();

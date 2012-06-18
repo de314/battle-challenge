@@ -2,15 +2,12 @@ package battlechallenge.server;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import battlechallenge.ActionResult;
-import battlechallenge.ActionResult.ShotResult;
 import battlechallenge.CommunicationConstants;
 import battlechallenge.Coordinate;
 import battlechallenge.ShipAction;
@@ -22,6 +19,8 @@ import battlechallenge.visual.BoardExporter;
  * The Class Game.
  */
 public class Game extends Thread {
+	
+	public static final boolean DEBUG = true;
 	
 	public static final int DEFAULT_WIDTH;
 	public static final int DEFAULT_HEIGHT;
@@ -220,20 +219,26 @@ public class Game extends Thread {
 	 * @param actionResults The results of last turns actions
 	 */
 	private void doTurn(Map<Integer, List<ActionResult>> actionResults) {
-		// DEGBUG INFO: print each users guess
-		StringBuilder sb = new StringBuilder();
-		for (Entry<Integer, List<ActionResult>> e : actionResults.entrySet()) {
-			sb.append("\t{ ").append(e.getKey()).append(" ");
-			for (ActionResult a : e.getValue())
-				sb.append(a.getResult().toString()).append(" ");
-			sb.append(" }\n");
+		if (DEBUG) {
+			// DEGBUG INFO: print each users guess
+			StringBuilder sb = new StringBuilder();
+			for (Entry<Integer, List<ActionResult>> e : actionResults.entrySet()) {
+				sb.append("\t{ ").append(e.getKey()).append(" ");
+				for (ActionResult a : e.getValue())
+					sb.append(a.getResult().toString()).append(" ");
+				sb.append(" }\n");
+			}
+			System.out.println(sb.toString());
 		}
-		System.out.println(sb.toString());
-				
+		// hash map of ships to  reveal entire map
+		// TODO: alter for fog of war
+		Map<Integer, List<Ship>> allPlayersShips = new HashMap<Integer, List<Ship>>();
+		for (ServerPlayer p : players)
+			allPlayersShips.put(p.getId(), p.getShipsOpponnent(p));
 		for(ServerPlayer p : players) {
 			if (!p.isAlive()) // Player is dead, don't request their turn
 				continue;
-			if (!p.requestTurn(actionResults)) {
+			if (!p.requestTurn(allPlayersShips, actionResults)) {
 				// TODO: handle lost socket connection
 			}
 		}
@@ -244,7 +249,6 @@ public class Game extends Thread {
 		} catch (InterruptedException e) {
 			// TODO: handle thread failure
 		}
-		
 		for(int j=0;j<players.size();j++) {
 			ServerPlayer p = players.get(j);
 			if (!p.isAlive()) // Player is dead no need to get actions when they cannot act
@@ -255,7 +259,7 @@ public class Game extends Thread {
 			actionResults.get(p.getId()).clear();
 			for(ShipAction sa : shipActions) {
 				// NOTE: moves are processed in: ServerPlayer.getTurn(...);
-				// check if shot is within game boundries
+				// check if shot is within game boundaries
 				for (Coordinate c : sa.getShotCoordList()) {
 					Ship s = p.getShip(sa.getShipIdentifier());
 					if (!(s.distanceTo(c) < s.getRange()) || !c.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1)) { 

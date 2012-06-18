@@ -185,7 +185,7 @@ public class ClientConnection {
 	 * @return true, if successful
 	 * @throws ConnectionLostException a lost connection exception
 	 */
-	public boolean requestTurn(List<Ship> ships, Map<Integer, List<ActionResult>> actionResults) {
+	public boolean requestTurn(Map<Integer, List<Ship>> ships, Map<Integer, List<ActionResult>> actionResults) {
 		try {
 			// send command
 			socket.writeObject(CommunicationConstants.REQUEST_DO_TURN);

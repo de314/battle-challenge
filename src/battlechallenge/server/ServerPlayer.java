@@ -313,10 +313,10 @@ public class ServerPlayer {
 	 * @param actionResults the action results
 	 * @return true, if successful
 	 */
-	public boolean requestTurn(Map<Integer, List<ActionResult>> actionResults) {
+	public boolean requestTurn(Map<Integer, List<Ship>> allPlayersShips, Map<Integer, List<ActionResult>> actionResults) {
 		lastActionResults = actionResults.get(id);
 		this.actionLog.addAll(actionResults.get(this.id));
-		return conn.requestTurn(this.ships, actionResults);
+		return conn.requestTurn(allPlayersShips, actionResults);
 	}
 
 	/**
@@ -413,5 +413,10 @@ public class ServerPlayer {
 		StringBuilder sb = new StringBuilder(this.id+"");
 		sb.append(":").append(this.name).append("(");
 		return sb.append(this.score+"").append(")").toString();
+	}
+	
+	public List<Ship> getShipsOpponnent(ServerPlayer opp) {
+		// TODO: return not all ships
+		return ships;
 	}
 }
