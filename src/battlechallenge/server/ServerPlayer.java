@@ -273,6 +273,16 @@ public class ServerPlayer {
 	}
 	
 	/**
+	 * Will revert the movement of a ship to where the ship was
+	 * before it moved
+	 * @param shipId The Id of the ship
+	 */
+	public void revertMovement(ShipIdentifier shipId) {
+		Ship s = shipMap.get(shipId.toString());
+		s.setStartPosition(lastShipPositions.get(s.getIdentifier().toString()));
+	}
+	
+	/**
 	 * Move.
 	 *
 	 * @param dir the dir
