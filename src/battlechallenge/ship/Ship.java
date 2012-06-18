@@ -417,4 +417,9 @@ public class Ship implements Serializable {
 	public ShipAction getShipAction(List<Direction> moves, List<Coordinate> shots) {
 		return new ShipAction(new ShipIdentifier(shipId, playerId), shots, moves);
 	}
+	
+	@Override
+	public int hashCode() {
+		return this.getIdentifier().toString().hashCode();
+	}
 }
