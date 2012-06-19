@@ -98,8 +98,10 @@ public class ClientPlayer {
 			shipRow.add(row);
 			ship.setStartPosition(new Coordinate(row,0));
 			ship.setDirection(Ship.Direction.EAST);
+			System.out.println("Ship : " + ship.getStartPosition());
 		}
 		System.out.println("placed ships");
+		
 		return shipList;
 	}
 	
@@ -119,12 +121,19 @@ public class ClientPlayer {
 			List<Coordinate> shotCoordinates = new ArrayList<Coordinate>();
 			List<Direction> moves = new LinkedList<Direction>();
 			shotCoordinates.add(new Coordinate((int) (Math.random() * (boardHeight -1)), (int) (Math.random() * (boardWidth - 1))));
+			while (s.distanceTo(shotCoordinates.get(0)) > s.getRange()) {
+				shotCoordinates.remove(0);
+				shotCoordinates.add(new Coordinate((int) (Math.random() * (boardHeight -1)), (int) (Math.random() * (boardWidth - 1))));
+			}
+				
 			if (Math.random() > 0.5)
 				moves.add(Direction.EAST);
 			else
 				moves.add(Direction.WEST);
 			actions.add(new ShipAction(s.getIdentifier(), shotCoordinates, moves));
 		}
+		System.out.println("Actions : " + actions);
+		System.out.println("Ships : " + ships);
 		return actions;
 	}
 }

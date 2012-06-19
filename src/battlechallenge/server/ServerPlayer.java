@@ -240,8 +240,9 @@ public class ServerPlayer {
 		this.ships = temp;
 		for (Ship ship: ships) {
 			// calculate new start position with offset
-			Coordinate newStart = new Coordinate(ship.getStartPosition().getCol() + colOffset, ship.getStartPosition().getRow() + rowOffset);
+			Coordinate newStart = new Coordinate(ship.getStartPosition().getRow() + rowOffset, ship.getStartPosition().getCol() + colOffset);
 			ship.setStartPosition(newStart);
+			ship.getCoordinateStrings();
 			shipMap.put(ship.getIdentifier().toString(), ship);
 		}
 		return ships; // return instance ships for placement verification by game
@@ -268,6 +269,7 @@ public class ServerPlayer {
 				if (!s.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1)) {
 					s.setStartPosition(lastShipPositions.get(s.getIdentifier().toString()));
 				}
+				s.getCoordinateStrings();
 			}
 		}
 	}
@@ -280,6 +282,7 @@ public class ServerPlayer {
 	public void revertMovement(ShipIdentifier shipId) {
 		Ship s = shipMap.get(shipId.toString());
 		s.setStartPosition(lastShipPositions.get(s.getIdentifier().toString()));
+		s.getCoordinateStrings();
 	}
 	
 	/**
@@ -417,6 +420,11 @@ public class ServerPlayer {
 	
 	public List<Ship> getShipsOpponnent(ServerPlayer opp) {
 		// TODO: return not all ships
-		return ships;
+		// currently returns all unsunken ships
+		List<Ship> unsunkShips = new LinkedList();
+		for (Ship ship: ships)
+			if (!ship.isSunken())
+				unsunkShips.add(ship);
+		return unsunkShips;
 	}
 }

@@ -211,7 +211,7 @@ public class Ship implements Serializable {
 	 *            the direction
 	 */
 	public Ship(int length, Coordinate startPosition, Direction direction) {
-		this(1, length, length, 3, 1, startPosition, direction);
+		this(1, length, length, 10, 1, startPosition, direction);
 	}
 	
 	/**
@@ -281,17 +281,17 @@ public class Ship implements Serializable {
 	public Coordinate getEndPosition() {
 		switch (direction) {
 		case NORTH:
-			return new Coordinate(startPosition.getRow(),
-					startPosition.getCol() - length);
-		case SOUTH:
-			return new Coordinate(startPosition.getRow(),
-					startPosition.getCol() + length);
-		case EAST:
-			return new Coordinate(startPosition.getRow() + length,
-					startPosition.getCol());
-		case WEST:
 			return new Coordinate(startPosition.getRow() - length,
 					startPosition.getCol());
+		case SOUTH:
+			return new Coordinate(startPosition.getRow() + length,
+					startPosition.getCol());
+		case EAST:
+			return new Coordinate(startPosition.getRow(),
+					startPosition.getCol() + length);
+		case WEST:
+			return new Coordinate(startPosition.getRow(),
+					startPosition.getCol() - length);
 		}
 		return null; // Should not reach here, will only be true if the ship
 						// direction is invalid
@@ -392,7 +392,7 @@ public class Ship implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder("Ship: ");
-		sb.append(this.startPosition).append(" ").append(this.direction);
+		sb.append(this.startPosition).append(" ").append(" Health ").append(health).append(this.direction);
 		return sb.toString();
 	}
 	

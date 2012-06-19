@@ -119,7 +119,7 @@ public class Game extends Thread {
 					livePlayers++;
 				}
 			}
-			BoardExporter.exportBoards(players.get(0), players.get(1), boardWidth, boardHeight);
+			//BoardExporter.exportBoards(players.get(0), players.get(1), boardWidth, boardHeight);
 		}
 		
 		
@@ -262,7 +262,7 @@ public class Game extends Thread {
 				// check if shot is within game boundaries
 				for (Coordinate c : sa.getShotCoordList()) {
 					Ship s = p.getShip(sa.getShipIdentifier());
-					if (!(s.distanceTo(c) < s.getRange()) || !c.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1)) { 
+					if ((s.distanceTo(c) > s.getRange()) || !c.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1) || s.isSunken()) { 
 						// ignore shot out of bounds or invalid shot range
 						continue;
 					} else {
@@ -314,10 +314,10 @@ public class Game extends Thread {
 	 */
 	public static List<Ship> getShips() {
 		List<Ship> ships = new ArrayList<Ship>();
-		ships.add(new Ship(2,new Coordinate(-1, -1), Direction.NORTH));
 		ships.add(new Ship(3,new Coordinate(-1, -1), Direction.NORTH));
 		ships.add(new Ship(3,new Coordinate(-1, -1), Direction.NORTH));
-		ships.add(new Ship(4,new Coordinate(-1, -1), Direction.NORTH));
+		ships.add(new Ship(3,new Coordinate(-1, -1), Direction.NORTH));
+		ships.add(new Ship(5,new Coordinate(-1, -1), Direction.NORTH));
 		ships.add(new Ship(5,new Coordinate(-1, -1), Direction.NORTH));
 		// Setting the original ship Ids
 		for (int i = 0; i < ships.size(); i++) {

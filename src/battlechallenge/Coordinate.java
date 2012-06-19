@@ -119,7 +119,7 @@ public class Coordinate implements Serializable {
 	 * @return the euclidian distance between two coordinates
 	 */
 	public double distanceTo(Coordinate coord) {
-		return Math.sqrt(Math.pow(this.getRow() - coord.getRow(), 2) + Math.pow(this.getCol() - coord.getCol(), 2));
+		return Math.floor(Math.sqrt(Math.pow(this.getRow() - coord.getRow(), 2) + Math.pow(this.getCol() - coord.getCol(), 2)));
 	}
 	
 } // End Coordinate Class
