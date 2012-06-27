@@ -85,6 +85,15 @@ public class ServerPlayer {
 		return ships;
 	}
 	
+	public List<Ship> getShipsCopy() {
+		List<Ship> temp = new LinkedList<Ship>();
+		synchronized(ships) {
+			for(Ship s : ships)
+				temp.add(s.deepCopy());
+			return temp;
+		}
+	}
+	
 	/**
 	 * Gets the action log.
 	 *
@@ -97,6 +106,18 @@ public class ServerPlayer {
 	
 	public List<ActionResult> getLastActionResults() {
 		return lastActionResults;
+	}
+	
+	public List<ActionResult> getLastActionResultsCopy() {
+		List<ActionResult> temp = new LinkedList<ActionResult>();
+		temp.addAll(lastActionResults);
+		return temp;
+	}
+	
+	public void setLastActionResults(List<ActionResult> actionResults) {
+		synchronized(actionResults) {
+			lastActionResults = actionResults;
+		}
 	}
 	
 	public int getRowOffset() {
@@ -317,6 +338,7 @@ public class ServerPlayer {
 	 * @return true, if successful
 	 */
 	public boolean requestTurn(Map<Integer, List<Ship>> allPlayersShips, Map<Integer, List<ActionResult>> actionResults) {
+		
 		lastActionResults = actionResults.get(id);
 		this.actionLog.addAll(actionResults.get(this.id));
 		return conn.requestTurn(allPlayersShips, actionResults);

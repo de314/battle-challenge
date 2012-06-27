@@ -13,7 +13,7 @@ import battlechallenge.Coordinate;
 import battlechallenge.ShipAction;
 import battlechallenge.ship.Ship;
 import battlechallenge.ship.Ship.Direction;
-import battlechallenge.visual.BoardExporter;
+import battlechallenge.visual.BCViz;
 
 /**
  * The Class Game.
@@ -29,7 +29,7 @@ public class Game extends Thread {
 	static {
 		DEFAULT_WIDTH = 10;
 		DEFAULT_HEIGHT = 10;
-		DEFAULT_SPEED = 400;
+		DEFAULT_SPEED = 100; // number of milliseconds to sleep between turns
 	}
 	
 	/** The board width. */
@@ -42,6 +42,8 @@ public class Game extends Thread {
 	private List<ServerPlayer> players;
 	
 	private GameManager manager;
+	
+	private BCViz viz;
 	
 	/**
 	 * Used to check how many players are in the game
@@ -113,6 +115,7 @@ public class Game extends Thread {
 		}
 		while (livePlayers > 1) {
 			doTurn(actionResults);
+			viz.updateGraphics();
 			livePlayers = 0;
 			for (ServerPlayer player: players) {
 				if (player.isAlive()) {
@@ -174,6 +177,7 @@ public class Game extends Thread {
 		case 2:
 			players.get(1).setColOffset(boardWidth);
 			boardWidth *= 2;
+			viz = new BCViz(players.get(0), players.get(1), boardWidth, boardHeight);
 			break;
 		case 4:
 			players.get(1).setColOffset(boardWidth);
@@ -244,11 +248,14 @@ public class Game extends Thread {
 		}
 		try {
 			// FIXME: Change speed depending on how fast players return results from calls
-			// to their doTurn method.
+			// to their doTurn method. Or game specific value (slower time, harder game)
 			Thread.sleep(DEFAULT_SPEED);
 		} catch (InterruptedException e) {
 			// TODO: handle thread failure
 		}
+		// Get all player actions and save them into a hash map by network id
+		// This is where all the ships are moved.
+		Map<Integer, List<ShipAction>> playerActions = new HashMap<Integer, List<ShipAction>>();
 		for(int j=0;j<players.size();j++) {
 			ServerPlayer p = players.get(j);
 			if (!p.isAlive()) // Player is dead no need to get actions when they cannot act
@@ -256,22 +263,32 @@ public class Game extends Thread {
 			// shot coordinates
 			List<ShipAction> shipActions = p.getTurn(boardWidth, boardHeight);
 			// reset action results for current user
-			actionResults.get(p.getId()).clear();
-			for(ShipAction sa : shipActions) {
+			if (actionResults.get(j) != null)
+				actionResults.get(j).clear();
+			playerActions.put(j, shipActions);
+		}
+		// Now that all ships are moved, evaluate shots for each player
+		for(int j=0;j<players.size();j++) {
+			ServerPlayer p = players.get(j);
+			if (!p.isAlive() || playerActions.get(p.getId()) == null) // Player is dead no need to get actions when they cannot act
+				continue;
+			for(ShipAction sa : playerActions.get(p.getId())) {
 				// NOTE: moves are processed in: ServerPlayer.getTurn(...);
+				// TODO: check for collisions
 				// check if shot is within game boundaries
 				for (Coordinate c : sa.getShotCoordList()) {
 					Ship s = p.getShip(sa.getShipIdentifier());
-					if ((s.distanceTo(c) > s.getRange()) || !c.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1) || s.isSunken()) { 
+					if ((s.distanceTo(c) > s.getRange()) || 
+							!c.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1) || 
+							s.isSunken()) { 
 						// ignore shot out of bounds or invalid shot range
 						continue;
 					} else {
 						// valid shot location received
 						for(ServerPlayer opp : players) {
-							if (opp != p) {
-								// add all action results
-								actionResults.get(p.getId()).add(opp.isHit(c, s.getDamage()));
-							}
+							// add all action results
+							// beware of friendly fire
+							actionResults.get(p.getId()).add(opp.isHit(c, s.getDamage()));
 						}
 					}
 				}

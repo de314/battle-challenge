@@ -437,7 +437,13 @@ public class Ship implements Serializable {
 	 * @param coord The coordinate to get the distance to
 	 * @return The distance between a ships center and a coordinate
 	 */
-	public double distanceTo(Coordinate coord) {
+	public int distanceTo(Coordinate coord) {
 		return this.getCenter().distanceTo(coord);
+	}
+	
+	public Ship deepCopy() {
+		//int damage, int health, int length, int range, int movement, Coordinate startPosition, Direction direction
+		Ship temp = new Ship(damage, health, length, range, movement, startPosition, direction);
+		return temp;
 	}
 }
