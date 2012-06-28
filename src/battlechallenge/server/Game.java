@@ -263,14 +263,13 @@ public class Game extends Thread {
 			// shot coordinates
 			List<ShipAction> shipActions = p.getTurn(boardWidth, boardHeight);
 			// reset action results for current user
-			if (actionResults.get(j) != null)
-				actionResults.get(j).clear();
+			actionResults.get(j).clear();
 			playerActions.put(j, shipActions);
 		}
 		// Now that all ships are moved, evaluate shots for each player
 		for(int j=0;j<players.size();j++) {
 			ServerPlayer p = players.get(j);
-			if (!p.isAlive() || playerActions.get(p.getId()) == null) // Player is dead no need to get actions when they cannot act
+			if (!p.isAlive()) // Player is dead no need to get actions when they cannot act
 				continue;
 			for(ShipAction sa : playerActions.get(p.getId())) {
 				// NOTE: moves are processed in: ServerPlayer.getTurn(...);
