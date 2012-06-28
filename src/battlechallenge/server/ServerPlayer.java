@@ -33,6 +33,10 @@ public class ServerPlayer {
 
 	/** The score. */
 	private int score;
+	
+	private int hits;
+	
+	private int totalShots;
 
 	/** The action log. */
 	private List<ActionResult> actionLog;
@@ -115,9 +119,28 @@ public class ServerPlayer {
 	}
 	
 	public void setLastActionResults(List<ActionResult> actionResults) {
-		synchronized(actionResults) {
-			lastActionResults = actionResults;
+		// FIXME: this might need to be fixed with more than two players
+		for (ActionResult result : actionResults) {
+			if (result.getResult() != ShotResult.MISS) {
+				this.hits++;
+				if (result.getResult() == ShotResult.SUNK)
+					this.score++;
+			}
+			this.totalShots++;
 		}
+		lastActionResults = actionResults;
+	}
+	
+	public double getShotAccuracy() {
+		return (double)hits/(double)totalShots;
+	}
+	
+	public int getNumLiveShips() {
+		int count = 0;
+		for (Ship s : ships)
+			if (!s.isSunken())
+				count++;
+		return count;
 	}
 	
 	public int getRowOffset() {
@@ -338,8 +361,7 @@ public class ServerPlayer {
 	 * @return true, if successful
 	 */
 	public boolean requestTurn(Map<Integer, List<Ship>> allPlayersShips, Map<Integer, List<ActionResult>> actionResults) {
-		
-		lastActionResults = actionResults.get(id);
+		setLastActionResults(actionResults.get(id));
 		this.actionLog.addAll(actionResults.get(this.id));
 		return conn.requestTurn(allPlayersShips, actionResults);
 	}

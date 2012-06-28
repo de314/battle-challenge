@@ -29,7 +29,7 @@ public class Game extends Thread {
 	static {
 		DEFAULT_WIDTH = 10;
 		DEFAULT_HEIGHT = 10;
-		DEFAULT_SPEED = 100; // number of milliseconds to sleep between turns
+		DEFAULT_SPEED = 750; // number of milliseconds to sleep between turns
 	}
 	
 	/** The board width. */
@@ -177,7 +177,7 @@ public class Game extends Thread {
 		case 2:
 			players.get(1).setColOffset(boardWidth);
 			boardWidth *= 2;
-			viz = new BCViz(players.get(0), players.get(1), boardWidth, boardHeight);
+			viz = new BCViz(players, boardWidth, boardHeight);
 			break;
 		case 4:
 			players.get(1).setColOffset(boardWidth);
