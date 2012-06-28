@@ -2,6 +2,7 @@ package battlechallenge.server;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -122,7 +123,6 @@ public class Game extends Thread {
 					livePlayers++;
 				}
 			}
-			//BoardExporter.exportBoards(players.get(0), players.get(1), boardWidth, boardHeight);
 		}
 		
 		
@@ -152,6 +152,29 @@ public class Game extends Thread {
 			else {
 				// TODO: remove player and pause game if necessary
 			}
+		}
+	}
+	
+	/**
+	 * Will sink all ships that are overlapping after moving
+	 */
+	public void handleCollisions() {
+		Map<String, Ship> allShipCoords = new HashMap<String, Ship>(); // Stores coords of all players ships
+		HashSet<Ship> shipsToSink = new HashSet<Ship>();
+		for(int j=0;j<players.size();j++) {
+			ServerPlayer p = players.get(j);
+			for (Ship s: p.getShips()) {
+				for (String coord: s.getCoordinateStrings()) {
+					if (allShipCoords.get(coord) != null) {
+						shipsToSink.add(allShipCoords.get(coord)); // sink ship that had coordinates in allShipCoords
+						shipsToSink.add(s); // sink ship colliding with another ship
+					}
+					allShipCoords.put(coord, s);
+			}
+		}
+		}
+		for (Ship s: shipsToSink) {
+			s.setHealth(0); // Sink ship as it has collided with another ship
 		}
 	}
 	
@@ -237,8 +260,9 @@ public class Game extends Thread {
 		// hash map of ships to  reveal entire map
 		// TODO: alter for fog of war
 		Map<Integer, List<Ship>> allPlayersShips = new HashMap<Integer, List<Ship>>();
-		for (ServerPlayer p : players)
-			allPlayersShips.put(p.getId(), p.getShipsOpponnent(p));
+		for (ServerPlayer p : players) {
+			allPlayersShips.put(p.getId(), p.getShipsOpponnent(p)); // List of all players ships to send to each player	
+		}
 		for(ServerPlayer p : players) {
 			if (!p.isAlive()) // Player is dead, don't request their turn
 				continue;
@@ -260,12 +284,13 @@ public class Game extends Thread {
 			ServerPlayer p = players.get(j);
 			if (!p.isAlive()) // Player is dead no need to get actions when they cannot act
 				continue;
-			// shot coordinates
+			// shot coordinates and moves ships
 			List<ShipAction> shipActions = p.getTurn(boardWidth, boardHeight);
 			// reset action results for current user
 			actionResults.get(j).clear();
 			playerActions.put(j, shipActions);
 		}
+		handleCollisions(); // if ships are overlapping after moving
 		// Now that all ships are moved, evaluate shots for each player
 		for(int j=0;j<players.size();j++) {
 			ServerPlayer p = players.get(j);
@@ -273,7 +298,6 @@ public class Game extends Thread {
 				continue;
 			for(ShipAction sa : playerActions.get(p.getId())) {
 				// NOTE: moves are processed in: ServerPlayer.getTurn(...);
-				// TODO: check for collisions
 				// check if shot is within game boundaries
 				for (Coordinate c : sa.getShotCoordList()) {
 					Ship s = p.getShip(sa.getShipIdentifier());

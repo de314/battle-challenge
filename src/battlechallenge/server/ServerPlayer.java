@@ -310,7 +310,7 @@ public class ServerPlayer {
 				lastShipPositions.put(s.getIdentifier().toString(), s.getStartPosition());
 				Coordinate newCoord = move(shipAct.getMoveDir(), s.getStartPosition());
 				s.setStartPosition(newCoord);
-				if (!s.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1)) {
+				if (!s.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1)) { // Check if ship remains on map
 					s.setStartPosition(lastShipPositions.get(s.getIdentifier().toString()));
 				}
 				s.getCoordinateStrings();
