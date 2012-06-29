@@ -408,6 +408,13 @@ public class ServerPlayer {
 		// TODO: decide how to score a win
 		score++;
 	}
+	
+	/**
+	 * Increments the players score for sinking an enemy ship
+	 */
+	public void incrementScore() {
+		score++;
+	}
 
 	
 	/**

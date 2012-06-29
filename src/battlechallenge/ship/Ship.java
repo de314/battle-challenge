@@ -330,6 +330,39 @@ public class Ship implements Serializable {
 	}
 	
 	/**
+	 * Gets a list of coordinates that comprises the ship 
+	 *
+	 * @return a Set of coordinates that comprises the ship
+	 */
+	public Set<Coordinate> getCoordinates() {
+			
+			HashSet<Coordinate> coordSet = new HashSet<Coordinate>();
+			
+			for (int i = 0; i < length; i++) {
+	
+				switch (direction) {
+				case NORTH: {
+					coordSet.add(new Coordinate(this.startPosition.getRow() - i,
+							this.startPosition.getCol()));
+				} break;
+				case SOUTH: {
+					coordSet.add(new Coordinate(this.startPosition.getRow() + i,
+							this.startPosition.getCol()));
+				} break;
+				case EAST: {
+					coordSet.add(new Coordinate(this.startPosition.getRow(),
+							this.startPosition.getCol() + i));
+				} break;
+				case WEST: {
+					coordSet.add(new Coordinate(this.startPosition.getRow(),
+							this.startPosition.getCol() - i));
+				} break;
+				}
+			}
+		return coordSet;
+	}
+	
+	/**
 	 * Checks to see if any part of the ship is within the specified bounds.
 	 *
 	 * @param rowMin the row min
