@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import battlechallenge.ActionResult;
+import battlechallenge.ActionResult.ShotResult;
 import battlechallenge.CommunicationConstants;
 import battlechallenge.Coordinate;
 import battlechallenge.ShipAction;
@@ -28,8 +29,8 @@ public class Game extends Thread {
 	public static final int DEFAULT_SPEED;
 	
 	static {
-		DEFAULT_WIDTH = 10;
-		DEFAULT_HEIGHT = 10;
+		DEFAULT_WIDTH = 15;
+		DEFAULT_HEIGHT = 15;
 		DEFAULT_SPEED = 750; // number of milliseconds to sleep between turns
 	}
 	
@@ -94,6 +95,7 @@ public class Game extends Thread {
 	 * @see java.lang.Thread#run()
 	 */
 	public void run() {
+		System.out.println("Starting game");
 		// TODO: Start playing game
 		// FIXME: Do not allow other players to be added.
 		/*
@@ -143,6 +145,7 @@ public class Game extends Thread {
 			}
 		}
 		manager.removeGame(this);
+		System.out.println("Game Ended");
 	}
 	
 	private void setPlayerCredentials() {
@@ -287,8 +290,8 @@ public class Game extends Thread {
 			// shot coordinates and moves ships
 			List<ShipAction> shipActions = p.getTurn(boardWidth, boardHeight);
 			// reset action results for current user
-			actionResults.get(j).clear();
-			playerActions.put(j, shipActions);
+			actionResults.get(p.getId()).clear();
+			playerActions.put(p.getId(), shipActions);
 		}
 		handleCollisions(); // if ships are overlapping after moving
 		// Now that all ships are moved, evaluate shots for each player
@@ -307,12 +310,17 @@ public class Game extends Thread {
 						// ignore shot out of bounds or invalid shot range
 						continue;
 					} else {
+						ActionResult hit = null;
+						ActionResult temp = null;
 						// valid shot location received
 						for(ServerPlayer opp : players) {
 							// add all action results
-							// beware of friendly fire
-							actionResults.get(p.getId()).add(opp.isHit(c, s.getDamage()));
+							// beware of friendly fire				
+							temp = (opp.isHit(c, s.getDamage()));
+							if (temp.getResult() == ShotResult.HIT)
+								hit = temp;
 						}
+						actionResults.get(p.getId()).add(hit == null ? temp : hit);
 					}
 				}
 			}
