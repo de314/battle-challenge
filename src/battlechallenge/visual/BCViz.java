@@ -77,6 +77,7 @@ public class BCViz extends JFrame {
 		this.add(cp, BorderLayout.SOUTH);
 		
 		this.setSize(DEFAULT_WIDTH_PX, DEFAULT_HEIGHT_PX);
+		this.setResizable(false);
 		this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		this.setVisible(true);
 		
