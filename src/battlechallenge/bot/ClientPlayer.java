@@ -134,6 +134,9 @@ public class ClientPlayer {
 		}
 		System.out.println("Actions : " + actions);
 		System.out.println("Ships : " + ships);
+		try {
+		Thread.sleep(1500);
+		} catch (InterruptedException e) {}
 		return actions;
 	}
 }

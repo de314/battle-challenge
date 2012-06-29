@@ -78,7 +78,7 @@ public class BoardPanel extends Panel {
 			ShipPainter.paintSunkenShips(this, ships);
 		// draw ocean grids
 		g.setColor(Color.black);
-		for (int i=1;i<this.widthSpaces;i++)
+		for (int i=1;i<=this.widthSpaces;i++)
 			g.drawLine(i * colPx, 0, i*colPx, heightPx);
 		for (int i=1;i<this.heightSpaces;i++)
 			g.drawLine(0, i*rowPx, widthPx, i*rowPx);
