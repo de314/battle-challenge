@@ -35,6 +35,7 @@ public class StatPanel extends Panel {
 		g.drawString(p.getName(), PADDING_HORZ, PADDING_VERT);
 		g.drawString("Score: " + p.getScore(), PADDING_HORZ, PADDING_VERT + ts);
 		g.drawString("Ships: " + p.getNumLiveShips(), PADDING_HORZ, PADDING_VERT + (ts * 2));
-		g.drawString(String.format("Acc: %.3g%n", p.getShotAccuracy()), PADDING_HORZ, PADDING_VERT + (ts * 3));
+		g.drawString("Hits: " + p.getHitCount(), PADDING_HORZ, PADDING_VERT + (ts * 3));
+		g.drawString(String.format("Acc: %.3g%n", p.getShotAccuracy()), PADDING_HORZ, PADDING_VERT + (ts * 4));
 	}
 }

@@ -135,6 +135,10 @@ public class ServerPlayer {
 		return (double)hits/(double)totalShots;
 	}
 	
+	public int getHitCount() {
+		return hits;
+	}
+	
 	public int getNumLiveShips() {
 		int count = 0;
 		for (Ship s : ships)

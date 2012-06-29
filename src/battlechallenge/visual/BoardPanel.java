@@ -67,14 +67,21 @@ public class BoardPanel extends Panel {
 	@Override
 	public void paint(Graphics g) {
 		updateSizeVariables();
+		// draw ocean
 		g.setColor(OCEAN);
 		g.fillRect(0, 0, widthPx, heightPx);
+		// draw sunken ships under grid		
 		List<List<Ship>> shipsCollection = new ArrayList<List<Ship>>();
 		for (ServerPlayer p : players)
 			shipsCollection.add(p.getShipsCopy());
-		// draw sunken ships
 		for (List<Ship> ships : shipsCollection)
 			ShipPainter.paintSunkenShips(this, ships);
+		// draw ocean grids
+		g.setColor(Color.black);
+		for (int i=1;i<this.widthSpaces;i++)
+			g.drawLine(i * colPx, 0, i*colPx, heightPx);
+		for (int i=1;i<this.heightSpaces;i++)
+			g.drawLine(0, i*rowPx, widthPx, i*rowPx);
 		// draw ships with health
 		for (int i = 0; i < players.size(); i++)
 			ShipPainter.paintShips(this, shipsCollection.get(i),
