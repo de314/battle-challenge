@@ -319,6 +319,12 @@ public class Game extends Thread {
 							temp = (opp.isHit(c, s.getDamage()));
 							if (temp.getResult() == ShotResult.HIT)
 								hit = temp;
+							else if (temp.getResult() == ShotResult.SUNK) {
+								hit = temp;
+								if (opp != p) {
+									p.incrementScore();
+								}
+							}
 						}
 						actionResults.get(p.getId()).add(hit == null ? temp : hit);
 					}
@@ -366,7 +372,7 @@ public class Game extends Thread {
 		ships.add(new Ship(3,new Coordinate(-1, -1), Direction.NORTH));
 		ships.add(new Ship(3,new Coordinate(-1, -1), Direction.NORTH));
 		ships.add(new Ship(5,new Coordinate(-1, -1), Direction.NORTH));
-		ships.add(new Ship(5,new Coordinate(-1, -1), Direction.NORTH));
+		ships.add(new Ship(7,new Coordinate(-1, -1), Direction.NORTH));
 		// Setting the original ship Ids
 		for (int i = 0; i < ships.size(); i++) {
 			ships.get(i).setShipId(i);

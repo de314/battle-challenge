@@ -12,6 +12,7 @@ import battlechallenge.ActionResult;
 import battlechallenge.Coordinate;
 import battlechallenge.ShipAction;
 import battlechallenge.ship.Ship;
+import battlechallenge.ship.Ship.Direction;
 
 /**
  * The Class ClientPlayer.
@@ -29,6 +30,8 @@ public class KevinBot extends ClientPlayer {
 	private Queue<Coordinate> shotQueue = new LinkedList<Coordinate>();
 	
 	List<Coordinate> shotCoordinates;
+	
+	List<Ship> enemyShips;
 	/**
 	 * Instantiates a new client player.
 	 *
@@ -91,78 +94,51 @@ public class KevinBot extends ClientPlayer {
 		return true;
 	}
 	
-	/**
-	 * This class will be filled in by the player. All logic regarding in game decisions to be
-	 * made by your bot should be put in here. This class will be called every turn until the
-	 * end of the game
-	 * 
-	 * @param myShips List of ships belonging to player
-	 * @param oppShips List of ships belonging to opponent
-	 * @param myLastTurn List of action results from the last turn
-	 * @param oppLastTurn List of actions and their results of your opponent
-	 * @return a List of coordinates corresponding to where you wish to fire
-	 */
-	public List<ShipAction> doTurn(List<Ship> myShips, Map<Integer, List<ActionResult>> actionResults) {
-		//shotCoordinates.add(new Coordinate((int) (Math.random() * (boardHeight -1)), (int) (Math.random() * (mapWidth - 1))));
-		List<Coordinate> adjList = new ArrayList<Coordinate>();
-		ActionResult.ShotResult shotResult;
-		shotCoordinates = new ArrayList<Coordinate>();
-		Coordinate coordinateResult;
-		List<ActionResult> myResults = actionResults.get(this.networkID);
-		System.out.println(myResults);
-//		for (ActionResult action: myResults) {
-		if  (myResults.size() > 0) {
-			shotResult = myResults.get(0).getResult();
-			coordinateResult = myResults.get(0).getCoordinate();
-		
-			switch (shotResult) {
-			case HIT:
-				shotList.add(coordinateResult.toString());
-				//hitList.add(coordinateResult.toString());
-				break;
-			case MISS:
-				shotList.add(coordinateResult.toString());
-				missList.add(coordinateResult.toString());
-				break;
-			case SUNK:
-				shotList.add(coordinateResult.toString());
-				sunkList.add(coordinateResult.toString());
-				break;
+	public List<Ship> getEnemyShipList(Map<Integer, List<Ship>> ships) {
+	for (int i = 0; i < ships.size(); i++) {
+		enemyShips = new LinkedList<Ship>();
+		if (i == networkID)
+			continue;
+		for (Ship s : ships.get(i)) {
+			enemyShips.add(s);
+		}	
+	}
+	return enemyShips;
+	}
+	
+	public List<Coordinate> getEnemyCoordinates(List<Ship> eShips) {
+		List<Coordinate> enemyShipCoord = new LinkedList<Coordinate>();
+		for (Ship eShip : enemyShips) 
+		{
+			for (Coordinate coord: eShip.getCoordinates()) {
+				enemyShipCoord.add(coord);
 			}
-			shotList.add(coordinateResult.toString());
-			adjList = genAdjCoords(coordinateResult);
-			
-		if (shotResult == ActionResult.ShotResult.HIT) {
-			for (Coordinate adjCoord: adjList) {
-				if (!shotList.contains(adjCoord.toString())) {
-					shotQueue.add(adjCoord);
+		}
+		return enemyShipCoord;
+	}
+	
+
+	public List<ShipAction> doTurn(Map<Integer, List<Ship>> ships, Map<Integer, List<ActionResult>> actionResults) {
+		
+		List<ShipAction> actions = new LinkedList<ShipAction>();
+		List<Ship> myShips = ships.get(networkID);
+		List<Ship> enemyShips = getEnemyShipList(ships);
+		List<Coordinate> shotCoordinates = new ArrayList<Coordinate>();
+		List<Coordinate> enemyShipCoord = getEnemyCoordinates(enemyShips);
+		
+		
+		for (Ship s : myShips) {
+			List<Direction> moves = new LinkedList<Direction>();
+			for (Coordinate coord: enemyShipCoord) {
+				if (s.distanceTo(coord) <= s.getRange()) {
+					shotCoordinates.add(coord);
+					continue;
 				}
 			}
-		}	
-		if (!shotQueue.isEmpty()) {
-			Coordinate head = shotQueue.poll();
-			while (!shotQueue.isEmpty()) {
-				if (!shotList.contains(head.toString()))
-					break;
-				head = shotQueue.poll();
-			}
-			shotCoordinates.add(head);
-		}
-		
-		}
-		
-		if (shotCoordinates.isEmpty()) {
-			Coordinate randShot = new Coordinate((int) (Math.random() * (boardHeight)), (int) (Math.random() * (boardWidth)));
-			while (!shotList.isEmpty()) {
-				randShot = new Coordinate((int) (Math.random() * boardHeight), (int) (Math.random() * boardWidth));
-				if (!shotList.contains(randShot.toString()))
-					break;
-			}
 			
-			shotCoordinates.add(randShot);
+		
+			actions.add(new ShipAction(s.getIdentifier(), shotCoordinates, moves));
 		}
-		shotList.add(shotCoordinates.get(0).toString());
-//		return shotCoordinates;
 		return null;
 	}
 }
