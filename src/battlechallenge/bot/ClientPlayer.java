@@ -121,7 +121,7 @@ public class ClientPlayer {
 			List<Coordinate> shotCoordinates = new ArrayList<Coordinate>();
 			List<Direction> moves = new LinkedList<Direction>();
 			shotCoordinates.add(new Coordinate((int) (Math.random() * (boardHeight -1)), (int) (Math.random() * (boardWidth - 1))));
-			while (s.distanceTo(shotCoordinates.get(0)) > s.getRange()) {
+			while (s.distanceFromCenter(shotCoordinates.get(0)) > s.getRange()) {
 				shotCoordinates.remove(0);
 				shotCoordinates.add(new Coordinate((int) (Math.random() * (boardHeight -1)), (int) (Math.random() * (boardWidth - 1))));
 			}

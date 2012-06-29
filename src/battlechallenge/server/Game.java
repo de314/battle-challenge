@@ -304,7 +304,7 @@ public class Game extends Thread {
 				// check if shot is within game boundaries
 				for (Coordinate c : sa.getShotCoordList()) {
 					Ship s = p.getShip(sa.getShipIdentifier());
-					if ((s.distanceTo(c) > s.getRange()) || 
+					if ((s.distanceFromCenter(c) > s.getRange()) || 
 							!c.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1) || 
 							s.isSunken()) { 
 						// ignore shot out of bounds or invalid shot range

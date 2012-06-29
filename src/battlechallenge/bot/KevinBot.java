@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
 
@@ -29,9 +30,18 @@ public class KevinBot extends ClientPlayer {
 	
 	private Queue<Coordinate> shotQueue = new LinkedList<Coordinate>();
 	
-	List<Coordinate> shotCoordinates;
+	private List<Coordinate> shotCoordinates;
 	
-	List<Ship> enemyShips;
+	private List<Ship> enemyShips;
+	
+	private List<Direction> directionList = new LinkedList<Direction>();
+	
+	public void fillDirectionList() {
+		directionList.add(Direction.NORTH);
+		directionList.add(Direction.SOUTH);
+		directionList.add(Direction.EAST);
+		directionList.add(Direction.WEST);
+	}
 	/**
 	 * Instantiates a new client player.
 	 *
@@ -52,6 +62,7 @@ public class KevinBot extends ClientPlayer {
 	 * and direction the ship is facing
 	 */
 	public List<Ship> placeShips(List<Ship> shipList) {
+		//fillDirectionList(); // so direction list has N,E,S,W
 		List<Integer> shipRow = new ArrayList<Integer>();
 		int row = 0;
 		int col = 0;
@@ -69,6 +80,24 @@ public class KevinBot extends ClientPlayer {
 		}
 		System.out.println("placed ships");
 		return shipList;		
+	}
+	
+	public Coordinate move(Direction dir, Coordinate coor) {
+		switch (dir) {
+			case NORTH: {
+				return new Coordinate(coor.getRow()-1, coor.getCol());
+			}
+			case SOUTH: {
+				return new Coordinate(coor.getRow()+1, coor.getCol());
+			}
+			case EAST: {
+				return new Coordinate(coor.getRow(), coor.getCol() + 1);
+			}
+			case WEST: {
+				return new Coordinate(coor.getRow(), coor.getCol() - 1);
+			}
+		}
+		return null;
 	}
 	
 	public List<Coordinate> genAdjCoords(Coordinate coord) {
@@ -95,11 +124,12 @@ public class KevinBot extends ClientPlayer {
 	}
 	
 	public List<Ship> getEnemyShipList(Map<Integer, List<Ship>> ships) {
-	for (int i = 0; i < ships.size(); i++) {
-		enemyShips = new LinkedList<Ship>();
-		if (i == networkID)
+
+	enemyShips = new LinkedList<Ship>();
+	for (Entry<Integer, List<Ship>> e: ships.entrySet()) { 
+		if (e.getKey() == networkID)
 			continue;
-		for (Ship s : ships.get(i)) {
+		for (Ship s : ships.get(e.getKey())) {
 			enemyShips.add(s);
 		}	
 	}
@@ -117,6 +147,16 @@ public class KevinBot extends ClientPlayer {
 		return enemyShipCoord;
 	}
 	
+	public Direction moveTowardsShip(Ship s1, Ship s2) {
+//		for (Direction d : directionList) {
+			Coordinate newCoord; 
+			newCoord = new Coordinate(s1.getCenter().getRow(), s1.getCenter().getCol()-1);
+			if (s2.distanceFromCenter(newCoord) < s2.distanceFromCenter(s1.getCenter())) {
+				return Direction.WEST;
+			}
+		return null;
+	}
+	
 
 	public List<ShipAction> doTurn(Map<Integer, List<Ship>> ships, Map<Integer, List<ActionResult>> actionResults) {
 		
@@ -125,20 +165,31 @@ public class KevinBot extends ClientPlayer {
 		List<Ship> enemyShips = getEnemyShipList(ships);
 		List<Coordinate> shotCoordinates = new ArrayList<Coordinate>();
 		List<Coordinate> enemyShipCoord = getEnemyCoordinates(enemyShips);
-		
+//		System.out.println(enemyShips);
+//		System.out.println(enemyShipCoord);
 		
 		for (Ship s : myShips) {
 			List<Direction> moves = new LinkedList<Direction>();
-			for (Coordinate coord: enemyShipCoord) {
-				if (s.distanceTo(coord) <= s.getRange()) {
-					shotCoordinates.add(coord);
-					continue;
+			Direction toMove = null;
+			for (Ship eShip: enemyShips) {
+				toMove = moveTowardsShip(s, eShip);
+				if (toMove != null) {
+					moves.add(toMove);
+					Coordinate newCoord = move(toMove, s.getStartPosition());
+					s.setStartPosition(newCoord);
+					break;
 				}
 			}
 			
-		
-			actions.add(new ShipAction(s.getIdentifier(), shotCoordinates, moves));
+			for (Coordinate coord: enemyShipCoord) {
+//				if (s.distanceFromCenter(coord) <= s.getRange()) {
+				if (s.inRange(coord)) {
+					shotCoordinates.add(coord);
+					actions.add(new ShipAction(s.getIdentifier(), shotCoordinates, moves));
+					break;
+				}
+			}
 		}
-		return null;
+		return actions;
 	}
 }
