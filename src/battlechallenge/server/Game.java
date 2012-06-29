@@ -166,15 +166,15 @@ public class Game extends Thread {
 		HashSet<Ship> shipsToSink = new HashSet<Ship>();
 		for(int j=0;j<players.size();j++) {
 			ServerPlayer p = players.get(j);
-			for (Ship s: p.getShips()) {
+			for (Ship s: p.getShipsOpponnent(p)) {
 				for (String coord: s.getCoordinateStrings()) {
 					if (allShipCoords.get(coord) != null) {
 						shipsToSink.add(allShipCoords.get(coord)); // sink ship that had coordinates in allShipCoords
 						shipsToSink.add(s); // sink ship colliding with another ship
 					}
 					allShipCoords.put(coord, s);
+				}
 			}
-		}
 		}
 		for (Ship s: shipsToSink) {
 			s.setHealth(0); // Sink ship as it has collided with another ship
