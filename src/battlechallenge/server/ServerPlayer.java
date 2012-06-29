@@ -121,11 +121,8 @@ public class ServerPlayer {
 	public void setLastActionResults(List<ActionResult> actionResults) {
 		// FIXME: this might need to be fixed with more than two players
 		for (ActionResult result : actionResults) {
-			if (result.getResult() != ShotResult.MISS) {
+			if (result.getResult() != ShotResult.MISS)
 				this.hits++;
-				if (result.getResult() == ShotResult.SUNK)
-					this.score++;
-			}
 			this.totalShots++;
 		}
 		lastActionResults = actionResults;
@@ -137,6 +134,10 @@ public class ServerPlayer {
 	
 	public int getHitCount() {
 		return hits;
+	}
+	
+	public int getTotalShotCount() {
+		return totalShots;
 	}
 	
 	public int getNumLiveShips() {

@@ -8,6 +8,9 @@ import battlechallenge.ship.Ship;
 
 public class ShipPainter {
 
+	public static final int FONT_OFFSET_X = -5;
+	public static final int FONT_OFFSET_Y = 5;
+	
 	public static void paintShips(BoardPanel bp, List<Ship> ships,
 			Color teamColor) {
 		for (Ship s : ships)
@@ -48,8 +51,8 @@ public class ShipPainter {
 				bp.getRowPx());
 		// write health
 		g.setColor(Color.black);
-		g.drawString("" + s.getHealth(), bp.getColPx(col) - bp.getColPx() / 2,
-				bp.getRowPx(row) + bp.getRowPx() / 2);
+		g.drawString("" + s.getHealth(), bp.getColPx(col) - bp.getColPx() / 2 + FONT_OFFSET_X,
+				bp.getRowPx(row) + bp.getRowPx() / 2 + FONT_OFFSET_Y);
 		// draw boarder last
 		g.setColor(BoardPanel.SHIP_BORDER);
 		g.drawRect(bp.getColPx(minCol), bp.getRowPx(minRow),

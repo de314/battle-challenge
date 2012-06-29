@@ -53,6 +53,8 @@ public class Ship implements Serializable {
 	
 	/** The movement. */
 	private int movement;
+
+	private int numShots;
 	
 	/** The player id. */
 	private int playerId;
@@ -191,6 +193,10 @@ public class Ship implements Serializable {
 		return new ShipIdentifier(shipId, playerId);
 	}
 
+	public int getNumShots() {
+		return numShots;
+	}
+	
 	/**
 	 * Instantiates a new ship.
 	 *
@@ -234,6 +240,8 @@ public class Ship implements Serializable {
 		this.startPosition = startPosition;
 		this.direction = direction;
 		this.coords = getCoordinateStrings();
+		// FIXME: take in as a parameter
+		this.numShots = 1;
 	}
 
 	/**

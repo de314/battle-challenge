@@ -83,6 +83,10 @@ public class BCViz extends JFrame {
 		
 		this.validate();
 	}
+	
+	public void kill() {
+		this.dispose();
+	}
 
 	public void updateGraphics() {
 		this.repaint();

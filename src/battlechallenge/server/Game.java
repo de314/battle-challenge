@@ -95,7 +95,6 @@ public class Game extends Thread {
 	 * @see java.lang.Thread#run()
 	 */
 	public void run() {
-		System.out.println("Starting game");
 		// TODO: Start playing game
 		// FIXME: Do not allow other players to be added.
 		/*
@@ -145,7 +144,6 @@ public class Game extends Thread {
 			}
 		}
 		manager.removeGame(this);
-		System.out.println("Game Ended");
 	}
 	
 	private void setPlayerCredentials() {
@@ -302,11 +300,12 @@ public class Game extends Thread {
 			for(ShipAction sa : playerActions.get(p.getId())) {
 				// NOTE: moves are processed in: ServerPlayer.getTurn(...);
 				// check if shot is within game boundaries
-				for (Coordinate c : sa.getShotCoordList()) {
+				for (int k=0;k<p.getShip(sa.getShipIdentifier()).getNumShots();k++) {
+					Coordinate c = sa.getShotCoordList().get(k);
 					Ship s = p.getShip(sa.getShipIdentifier());
 					if ((s.distanceTo(c) > s.getRange()) || 
 							!c.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1) || 
-							s.isSunken()) { 
+							s.isSunken()) {
 						// ignore shot out of bounds or invalid shot range
 						continue;
 					} else {

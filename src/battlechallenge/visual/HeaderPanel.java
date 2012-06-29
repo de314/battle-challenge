@@ -29,7 +29,7 @@ public class HeaderPanel extends Panel {
 		int spacing = BCViz.DEFAULT_WIDTH_PX / players.size();
 		for (int i =0;i<players.size();i++) {
 			g.setColor(BoardPanel.PLAYER_COLORS[i]);
-			g.drawString(players.get(i).getName(), (i * spacing) + (spacing/4), 20);
+			g.drawString(players.get(i).getName() == null ? "**DEAD**" : players.get(i).getName(), (i * spacing) + (spacing/4), 20);
 		}
 	}
 	
