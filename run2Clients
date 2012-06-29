@@ -1,0 +1,9 @@
+#!/bin/bash
+
+cd bin/
+
+clear
+
+java battlechallenge.client.BattleshipClient $1 $2 $3 $4 &
+
+java battlechallenge.client.BattleshipClient $1 $2 $3 $4 &
