@@ -215,87 +215,6 @@ public class ServerPlayer {
 		this.name = conn.setCredentials(id, boardWidth, boardHeight);
 		return this.name != null;
 	}
-
-	/**
-	 * Requests ships from the ClientPlayer through the ClientConnection.
-	 *
-	 * @param ships the original ships to be updated by the ClientPlayer's
-	 * @return true, if successful
-	 */
-	public boolean requestPlaceShips(List<Ship> ships) {
-		try {
-			this.ships = ships;
-			for (Ship ship: ships) {
-				ship.setPlayerId(id);
-			}
-			return conn.requestPlaceShips(ships);
-		} catch (ConnectionLostException e) {
-			// TODO: handle lost connection
-		}
-		return false;
-	}
-	
-	/**
-	 * Will request the ships updated by the ClientPlayers placeShips
-	 * method and update the default list of ships with the updated
-	 * player ships.
-	 *
-	 * @param ships the ships
-	 * @param boardWidth the board width
-	 * @param boardHeight the board height
-	 * @return the list of ships with updated starting coordinates
-	 */
-	public List<Ship> getPlaceShips(int boardWidth, int boardHeight) {
-		Map<String, Ship> shipSet = new HashMap<String, Ship>();
-		for (Ship s : ships)
-			shipSet.put(s.getIdentifier().toString(), s);
-		List<Ship> temp = conn.getPlaceShips(boardWidth, boardHeight);
-		Map<String, Ship> coords = new HashMap<String, Ship>();
-		for(Ship s : temp) {
-			// check that client did not change ship attributes e.g. id, length, health...
-			if (shipSet.get(s.getIdentifier().toString()) == null) {
-				// client changed ship id or player id
-				s.setHealth(-1);
-				continue;
-			} else {
-				// id's are the same, now checking ship attributes
-				Ship serverShip = shipSet.get(s.getIdentifier().toString());
-				if (!(serverShip.getDamage() == s.getDamage() && serverShip.getHealth() == s.getHealth() && 
-						serverShip.getLength() == s.getLength() && serverShip.getMovement() == s.getMovement() && 
-						serverShip.getRange() == s.getRange())) {
-					// client changed ship attributes
-					s.setHealth(-1); // 
-					continue;
-				}
-			}
-			// check on board
-			if (!s.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1)) {
-				// sink invalid placed ship
-				s.setHealth(-1);
-				continue;
-			}
-			// check overlap
-			Set<String> coordStrings = s.getCoordinateStrings();
-			for(String c : coordStrings) {
-				if (coords.get(c) != null) {
-					// handle invalid ship placement (overlap)
-					s.setHealth(-1);
-					coords.get(c).setHealth(-1);
-				}
-				// add all coordinates to ensure all overlapped ships are sunk
-				coords.put(c, s);
-			}
-		}
-		this.ships = temp;
-		for (Ship ship: ships) {
-			// calculate new start position with offset
-			Coordinate newStart = new Coordinate(ship.getStartPosition().getRow() + rowOffset, ship.getStartPosition().getCol() + colOffset);
-			ship.setStartPosition(newStart);
-			ship.getCoordinateStrings();
-			shipMap.put(ship.getIdentifier().toString(), ship);
-		}
-		return ships; // return instance ships for placement verification by game
-	}
 	
 	/**
 	 * Move ships.
@@ -313,12 +232,11 @@ public class ServerPlayer {
 			Ship s = shipMap.get(shipAct.getShipIdentifier().toString());
 			if (s != null && shipAct.getMoveDir() != null && !s.isSunken()) {
 				lastShipPositions.put(s.getIdentifier().toString(), s.getStartPosition());
-				Coordinate newCoord = move(shipAct.getMoveDir(), s.getStartPosition());
-				s.setStartPosition(newCoord);
+				Coordinate newCoord = move(shipAct.getMoveDir(), s.getLocation());
+				s.setLocation(newCoord);
 				if (!s.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1)) { // Check if ship remains on map
-					s.setStartPosition(lastShipPositions.get(s.getIdentifier().toString()));
+					s.setLocation(lastShipPositions.get(s.getIdentifier().toString()));
 				}
-				s.getCoordinateStrings();
 			}
 		}
 	}
@@ -330,16 +248,15 @@ public class ServerPlayer {
 	 */
 	public void revertMovement(ShipIdentifier shipId) {
 		Ship s = shipMap.get(shipId.toString());
-		s.setStartPosition(lastShipPositions.get(s.getIdentifier().toString()));
-		s.getCoordinateStrings();
+		s.setLocation(lastShipPositions.get(s.getIdentifier().toString()));
 	}
 	
 	/**
 	 * Move.
 	 *
-	 * @param dir the dir
-	 * @param coor the coor
-	 * @return the coordinate
+	 * @param dir the direction to move
+	 * @param coor the ship location
+	 * @return the new ship coordinate
 	 */
 	public Coordinate move(Direction dir, Coordinate coor) {
 		switch (dir) {

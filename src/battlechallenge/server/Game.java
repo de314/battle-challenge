@@ -160,12 +160,12 @@ public class Game extends Thread {
 	 * Will sink all ships that are overlapping after moving
 	 */
 	public void handleCollisions() {
-		Map<String, Ship> allShipCoords = new HashMap<String, Ship>(); // Stores coords of all players ships
+		Map<Coordinate, Ship> allShipCoords = new HashMap<Coordinate, Ship>(); // Stores coords of all players ships
 		HashSet<Ship> shipsToSink = new HashSet<Ship>();
 		for(int j=0;j<players.size();j++) {
 			ServerPlayer p = players.get(j);
 			for (Ship s: p.getShipsOpponnent(p)) {
-				for (String coord: s.getCoordinateStrings()) {
+					Coordinate coord = s.getLocation();
 					if (allShipCoords.get(coord) != null) {
 						shipsToSink.add(allShipCoords.get(coord)); // sink ship that had coordinates in allShipCoords
 						shipsToSink.add(s); // sink ship colliding with another ship
@@ -173,74 +173,11 @@ public class Game extends Thread {
 					allShipCoords.put(coord, s);
 				}
 			}
-		}
 		for (Ship s: shipsToSink) {
 			s.setHealth(0); // Sink ship as it has collided with another ship
 		}
 	}
-	
-	/**
-	 * The method will pass the initial ships to be updated by each player's
-	 * placeShip method. The method then checks for invalid placements of 
-	 * ships for each player
-	 */
-	private void placeShips() {
-		for(ServerPlayer p : players) {
-			p.requestPlaceShips(Game.getShips());
-		}
-		try {
-			// FIXME: remove magic number
-			Thread.sleep(CommunicationConstants.SOCKET_WAIT_TIME);
-		} catch (InterruptedException e) {
-			// FIXME: handle thread failure
-		}
-		// set players offsets
-		// so many magic numbers...
-		int i=0;
-		switch (players.size()) {
-		case 2:
-			players.get(1).setColOffset(boardWidth);
-			boardWidth *= 2;
-			viz = new BCViz(players, boardWidth, boardHeight);
-			break;
-		case 4:
-			players.get(1).setColOffset(boardWidth);
-			players.get(2).setRowOffset(boardHeight);
-			players.get(3).setColOffset(boardWidth);
-			players.get(3).setRowOffset(boardHeight);
-			boardWidth *= 2;
-			boardHeight *= 2;
-			break;
-		case 8:
-			players.get(0).setColOffset(boardWidth * 1);
-			players.get(1).setColOffset(boardWidth * 3);
-			players.get(2).setRowOffset(boardHeight * 1);
-			players.get(3).setColOffset(boardWidth * 4);
-			players.get(3).setRowOffset(boardHeight * 1);
-			players.get(4).setRowOffset(boardHeight * 3);
-			players.get(5).setColOffset(boardWidth * 4);
-			players.get(5).setRowOffset(boardHeight * 3);
-			players.get(6).setColOffset(boardWidth * 1);
-			players.get(6).setRowOffset(boardHeight * 4);
-			players.get(7).setColOffset(boardWidth * 3);
-			players.get(7).setRowOffset(boardHeight * 4);
-			boardWidth *= 5;
-			boardHeight *= 5;
-			break;
-			default: throw new IllegalArgumentException("Number of players must be 2,4 or 8");
-		}
-		// save client responses to place ships i.e. read socket, send the size of the
-		// new board
-		for(ServerPlayer p : players) {
-			// FIXME: take away the magic number
-			p.getPlaceShips(boardWidth, boardHeight);
-			if (!p.isAlive()) {
-				p.endGame(CommunicationConstants.RESULT_DISQUALIFIED);
-				p.kill();
-			}
-		}
-		System.out.println("All player ships placed");
-	}
+
 	
 	/**
 	 * 
@@ -367,11 +304,7 @@ public class Game extends Thread {
 	 */
 	public static List<Ship> getShips() {
 		List<Ship> ships = new ArrayList<Ship>();
-		ships.add(new Ship(3,new Coordinate(-1, -1), Direction.NORTH));
-		ships.add(new Ship(3,new Coordinate(-1, -1), Direction.NORTH));
-		ships.add(new Ship(3,new Coordinate(-1, -1), Direction.NORTH));
-		ships.add(new Ship(5,new Coordinate(-1, -1), Direction.NORTH));
-		ships.add(new Ship(7,new Coordinate(-1, -1), Direction.NORTH));
+		ships.add(new Ship(1,new Coordinate(-1, -1), Direction.NORTH));
 		// Setting the original ship Ids
 		for (int i = 0; i < ships.size(); i++) {
 			ships.get(i).setShipId(i);
