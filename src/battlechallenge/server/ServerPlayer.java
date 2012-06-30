@@ -2,7 +2,6 @@ package battlechallenge.server;
 
 import java.net.Socket;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +15,7 @@ import battlechallenge.ShipIdentifier;
 import battlechallenge.network.ConnectionLostException;
 import battlechallenge.ship.Ship;
 import battlechallenge.ship.Ship.Direction;
+import battlechallenge.structures.City;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -317,10 +317,10 @@ public class ServerPlayer {
 	 * @param actionResults the action results
 	 * @return true, if successful
 	 */
-	public boolean requestTurn(Map<Integer, List<Ship>> allPlayersShips, Map<Integer, List<ActionResult>> actionResults) {
+	public boolean requestTurn(Map<Integer, List<Ship>> allPlayersShips, Map<Integer, List<ActionResult>> actionResults, List<City> structures) {
 		setLastActionResults(actionResults.get(id));
 		this.actionLog.addAll(actionResults.get(this.id));
-		return conn.requestTurn(allPlayersShips, actionResults);
+		return conn.requestTurn(allPlayersShips, actionResults, structures);
 	}
 
 	/**

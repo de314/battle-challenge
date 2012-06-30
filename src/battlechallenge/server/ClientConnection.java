@@ -7,11 +7,11 @@ import java.util.Map;
 
 import battlechallenge.ActionResult;
 import battlechallenge.CommunicationConstants;
-import battlechallenge.Coordinate;
 import battlechallenge.ShipAction;
 import battlechallenge.network.ConnectionLostException;
 import battlechallenge.network.NetworkSocket;
 import battlechallenge.ship.Ship;
+import battlechallenge.structures.City;
 
 /**
  * The Class ClientConnection.
@@ -122,60 +122,6 @@ public class ClientConnection {
 		}
 		return null;
 	}
-	
-	/**
-	 * Request place ships.
-	 *
-	 * @param ships the ships
-	 * @return true, if successful
-	 * @throws ConnectionLostException the connection lost exception
-	 */
-	public boolean requestPlaceShips(List<Ship> ships) throws ConnectionLostException {
-		try {
-			socket.writeObject(CommunicationConstants.REQUEST_PLACE_SHIPS);
-			socket.writeObject(ships);
-			return true;
-		} catch (ConnectionLostException e) {
-			// TODO: bad client connection. Drop bad player and add another
-		}
-		return false;
-	}
-	
-	/**
-	 * Gets the updated ship locations returned by the client then sends the 
-	 * final combined board dimensions.
-	 *
-	 * @return the list of ships passed back from the client
-	 * @throws ConnectionLostException the connection lost exception
-	 */
-	public List<Ship> getPlaceShips(int totalWidth, int totalHeight) {
-		try {
-			/*
-			 * check to see if something is arrived in time. Otherwise, assume
-			 * no input. 
-			 */
-			@SuppressWarnings("unchecked")
-			List<Ship> temp = (List<Ship>)socket.readObject(false);
-			socket.writeInt(totalWidth);
-			socket.writeInt(totalHeight);
-			// validate list is not null
-			if (temp == null)
-				return new LinkedList<Ship>();
-			// validate that no ships in returned list are null
-			for (Ship s : temp) {
-				if (s == null)
-					return new LinkedList<Ship>();
-			}
-			return temp;
-		} catch (ClassCastException e) {
-			// Someone is trying to break our server or, our code is really broken.
-			// TODO: handle invalid input
-			e.printStackTrace();
-		} catch (ConnectionLostException e) {
-			// TODO: bad client connection. Drop bad player and add another
-		}
-		return new LinkedList<Ship>();
-	}
 
 	/**
 	 * Tells the client to expect turn parameters then passes 
@@ -185,7 +131,7 @@ public class ClientConnection {
 	 * @return true, if successful
 	 * @throws ConnectionLostException a lost connection exception
 	 */
-	public boolean requestTurn(Map<Integer, List<Ship>> ships, Map<Integer, List<ActionResult>> actionResults) {
+	public boolean requestTurn(Map<Integer, List<Ship>> ships, Map<Integer, List<ActionResult>> actionResults, List<City> structures) {
 		try {
 			// send command
 			socket.writeObject(CommunicationConstants.REQUEST_DO_TURN);
@@ -193,9 +139,10 @@ public class ClientConnection {
 			socket.writeObject(ships);
 			// send action results hash table
 			socket.writeObject(actionResults);
+			// send list of structures
+			socket.writeObject(structures);
 			return true;
 		} catch (ConnectionLostException e) {
-			// TODO: disqualify player
 			System.err.println("Socket Exception: Client disconnected. Disqualifying player and ending game.");
 		}
 		return false;

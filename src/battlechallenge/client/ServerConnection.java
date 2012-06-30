@@ -10,6 +10,7 @@ import battlechallenge.bot.ClientPlayer;
 import battlechallenge.network.ConnectionLostException;
 import battlechallenge.network.NetworkSocket;
 import battlechallenge.ship.Ship;
+import battlechallenge.structures.City;
 
 /**
  * The Class ServerConnection.
@@ -28,6 +29,8 @@ public class ServerConnection {
 	/** The name. */
 	private String name;
 	
+	private ClientGame game;
+	
 	/**
 	 * Constructor that creates a client socket and request and set
 	 * the name of the ClientPlayer. The server connection will then
@@ -40,6 +43,7 @@ public class ServerConnection {
 	 */
 	public ServerConnection(int port, String ip, String name, ClientPlayer bot) {
 		socket = new NetworkSocket(ip, port);
+		game = new ClientGame();
 		this.bot = bot;
 		this.name = name;
 		this.run();
@@ -69,8 +73,6 @@ public class ServerConnection {
 					setupHandShake();
 				if (req.equals(CommunicationConstants.REQUEST_CREDENTIALS))
 					setCredentials(name);
-				if (req.equals(CommunicationConstants.REQUEST_PLACE_SHIPS))
-					placeShips();
 				if (req.equals(CommunicationConstants.REQUEST_DO_TURN))
 					doTurn();
 				/*
@@ -146,43 +148,18 @@ public class ServerConnection {
 	}
 
 	/**
-	 * Passes a list of ships to the player with a call to the client players
-	 * placeShips method.
-	 */
-	public void placeShips() {
-		try {
-			@SuppressWarnings("unchecked")
-			List<Ship> ships = (List<Ship>)socket.readObject(true);
-			// place ships and send resulting ships to server
-			List<Ship> shipsList = bot.placeShips(ships);
-			socket.writeObject(shipsList);
-			bot.setBoardWidth(socket.readInt(true));
-			bot.setBoardHeight(socket.readInt(true));
-			return;
-		} catch (ClassCastException e) {
-			System.err.println("Network Exception: Unexpected game object from server. Check server version.");
-		} catch (ConnectionLostException e) {
-			System.err.println("Socket Exception: Connection lost, disconnecting.");
-			this.kill();
-		}
-		System.err.println("Lost socket connection during placeShips");
-		this.kill();
-		System.exit(0);
-	}
-
-	/**
 	 * Will pass the ship list and action results list in a call 
 	 * to the client players doTurn method
 	 * Kill the connection if a call to the doTurn method fails
 	 */
 	public void doTurn() {
 		try {
-			@SuppressWarnings("unchecked")
-			Map<Integer, List<Ship>> myShips = (Map<Integer,List<Ship>>)socket.readObject(true);
-			@SuppressWarnings("unchecked")
-			Map<Integer, List<ActionResult>> actionResults = (Map<Integer, List<ActionResult>>)socket.readObject(true);
+			game.setShipMap((Map<Integer,List<Ship>>)socket.readObject(true));
+			game.setActionResults((Map<Integer, List<ActionResult>>)socket.readObject(true));
+			game.setStructures((List<City>)socket.readObject(true));
+			
 			// doTurn and send resulting coordinates to server
-			List<ShipAction> coords = bot.doTurn(myShips, actionResults);
+			List<ShipAction> coords = bot.doTurn();
 			if (coords != null)
 				socket.writeObject(coords);
 			return;

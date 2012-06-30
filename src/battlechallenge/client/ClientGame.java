@@ -16,6 +16,38 @@ public class ClientGame {
 	private Map<Integer, List<ActionResult>> actionResults;
 	private List<City> structures;
 	
+	public int getNetworkID() {
+		return networkID;
+	}
+
+	public void setNetworkID(int networkID) {
+		this.networkID = networkID;
+	}
+
+	public Map<Integer, List<Ship>> getShipMap() {
+		return shipMap;
+	}
+
+	public void setShipMap(Map<Integer, List<Ship>> shipMap) {
+		this.shipMap = shipMap;
+	}
+
+	public Map<Integer, List<ActionResult>> getActionResults() {
+		return actionResults;
+	}
+
+	public void setActionResults(Map<Integer, List<ActionResult>> actionResults) {
+		this.actionResults = actionResults;
+	}
+
+	public List<City> getStructures() {
+		return structures;
+	}
+
+	public void setStructures(List<City> structures) {
+		this.structures = structures;
+	}
+
 	public List<Ship> getMyShips() {
 		return null;
 	}

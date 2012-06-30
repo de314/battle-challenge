@@ -14,7 +14,8 @@ import battlechallenge.CommunicationConstants;
 import battlechallenge.Coordinate;
 import battlechallenge.ShipAction;
 import battlechallenge.ship.Ship;
-import battlechallenge.ship.Ship.Direction;
+import battlechallenge.structures.Base;
+import battlechallenge.structures.City;
 import battlechallenge.visual.BCViz;
 
 /**
@@ -106,6 +107,8 @@ public class Game extends Thread {
 		 * 			[[ PLAY GAME ]]
 		 */
 		Map<Integer, List<ActionResult>> actionResults = new HashMap<Integer, List<ActionResult>>();
+		List<City> structures = Game.getStructures(players.size());
+		// TODO: set structures to players and vice-versa
 		for(ServerPlayer p : players)
 			actionResults.put(p.getId(), new LinkedList<ActionResult>());
 		int livePlayers = 0;
@@ -115,7 +118,7 @@ public class Game extends Thread {
 			}
 		}
 		while (livePlayers > 1) {
-			doTurn(actionResults);
+			doTurn(actionResults, structures);
 			viz.updateGraphics();
 			livePlayers = 0;
 			for (ServerPlayer player: players) {
@@ -182,7 +185,7 @@ public class Game extends Thread {
 	 * 
 	 * @param actionResults The results of last turns actions
 	 */
-	private void doTurn(Map<Integer, List<ActionResult>> actionResults) {
+	private void doTurn(Map<Integer, List<ActionResult>> actionResults, List<City> structures) {
 		if (DEBUG) {
 			// DEGBUG INFO: print each users guess
 			StringBuilder sb = new StringBuilder();
@@ -203,7 +206,7 @@ public class Game extends Thread {
 		for(ServerPlayer p : players) {
 			if (!p.isAlive()) // Player is dead, don't request their turn
 				continue;
-			if (!p.requestTurn(allPlayersShips, actionResults)) {
+			if (!p.requestTurn(allPlayersShips, actionResults, structures)) {
 				// TODO: handle lost socket connection
 			}
 		}
@@ -309,5 +312,23 @@ public class Game extends Thread {
 			ships.get(i).setShipId(i);
 		}
 		return ships;
+	}
+	
+	/**
+	 * Creates a base for each player then the default cities per number of players.
+	 *
+	 * @return the ships
+	 */
+	public static List<City> getStructures(int numPlayers) {
+		// TODO: not even close to done
+		List<City> structures = new ArrayList<City>();
+		// init bases
+		for(int i=0;i<numPlayers;i++)
+			structures.add(new Base());
+		// init neutral cities
+		for (int i = 0; i < 6; i++) {
+			structures.add(new City());
+		}
+		return structures;
 	}
 }
