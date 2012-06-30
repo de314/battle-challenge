@@ -17,6 +17,7 @@ import battlechallenge.network.ConnectionLostException;
 import battlechallenge.ship.Ship;
 import battlechallenge.ship.Ship.Direction;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class ServerPlayer.
  */
@@ -34,8 +35,10 @@ public class ServerPlayer {
 	/** The score. */
 	private int score;
 	
+	/** The hits. */
 	private int hits;
 	
+	/** The total shots. */
 	private int totalShots;
 
 	/** The action log. */
@@ -59,8 +62,8 @@ public class ServerPlayer {
 	/** The last ship positions. */
 	private Map<String, Coordinate> lastShipPositions = new HashMap();
 	
-	private int rowOffset = 0;
-	private int colOffset = 0;
+	/** The minerals. */
+	private int minerals;
 	
 	/**
 	 * Gets the id.
@@ -89,6 +92,11 @@ public class ServerPlayer {
 		return ships;
 	}
 	
+	/**
+	 * Gets the ships copy.
+	 *
+	 * @return the ships copy
+	 */
 	public List<Ship> getShipsCopy() {
 		List<Ship> temp = new LinkedList<Ship>();
 		synchronized(ships) {
@@ -108,16 +116,31 @@ public class ServerPlayer {
 		return actionLog;
 	}
 	
+	/**
+	 * Gets the last action results.
+	 *
+	 * @return the last action results
+	 */
 	public List<ActionResult> getLastActionResults() {
 		return lastActionResults;
 	}
 	
+	/**
+	 * Gets the last action results copy.
+	 *
+	 * @return the last action results copy
+	 */
 	public List<ActionResult> getLastActionResultsCopy() {
 		List<ActionResult> temp = new LinkedList<ActionResult>();
 		temp.addAll(lastActionResults);
 		return temp;
 	}
 	
+	/**
+	 * Sets the last action results.
+	 *
+	 * @param actionResults the new last action results
+	 */
 	public void setLastActionResults(List<ActionResult> actionResults) {
 		// FIXME: this might need to be fixed with more than two players
 		for (ActionResult result : actionResults) {
@@ -128,18 +151,38 @@ public class ServerPlayer {
 		lastActionResults = actionResults;
 	}
 	
+	/**
+	 * Gets the shot accuracy.
+	 *
+	 * @return the shot accuracy
+	 */
 	public double getShotAccuracy() {
 		return (double)hits/(double)totalShots;
 	}
 	
+	/**
+	 * Gets the hit count.
+	 *
+	 * @return the hit count
+	 */
 	public int getHitCount() {
 		return hits;
 	}
 	
+	/**
+	 * Gets the total shot count.
+	 *
+	 * @return the total shot count
+	 */
 	public int getTotalShotCount() {
 		return totalShots;
 	}
 	
+	/**
+	 * Gets the num live ships.
+	 *
+	 * @return the num live ships
+	 */
 	public int getNumLiveShips() {
 		int count = 0;
 		for (Ship s : ships)
@@ -148,22 +191,12 @@ public class ServerPlayer {
 		return count;
 	}
 	
-	public int getRowOffset() {
-		return rowOffset;
-	}
-
-	public void setRowOffset(int rowOffset) {
-		this.rowOffset = rowOffset;
-	}
-
-	public int getColOffset() {
-		return colOffset;
-	}
-
-	public void setColOffset(int colOffset) {
-		this.colOffset = colOffset;
-	}
-	
+	/**
+	 * Gets the ship.
+	 *
+	 * @param si the si
+	 * @return the ship
+	 */
 	public Ship getShip(ShipIdentifier si) {
 		return shipMap.get(si.toString());
 	}
@@ -243,7 +276,8 @@ public class ServerPlayer {
 	
 	/**
 	 * Will revert the movement of a ship to where the ship was
-	 * before it moved
+	 * before it moved.
+	 *
 	 * @param shipId The Id of the ship
 	 */
 	public void revertMovement(ShipIdentifier shipId) {
@@ -279,6 +313,7 @@ public class ServerPlayer {
 	/**
 	 * Request turn.
 	 *
+	 * @param allPlayersShips the all players ships
 	 * @param actionResults the action results
 	 * @return true, if successful
 	 */
@@ -307,9 +342,6 @@ public class ServerPlayer {
 		return shipActions;
 	}
 
-	
-	
-
 	/**
 	 * Gets the score.
 	 * 
@@ -328,7 +360,7 @@ public class ServerPlayer {
 	}
 	
 	/**
-	 * Increments the players score for sinking an enemy ship
+	 * Increments the players score for sinking an enemy ship.
 	 */
 	public void incrementScore() {
 		score++;
@@ -391,6 +423,12 @@ public class ServerPlayer {
 		return sb.append(this.score+"").append(")").toString();
 	}
 	
+	/**
+	 * Gets the ships opponnent.
+	 *
+	 * @param opp the opp
+	 * @return the ships opponnent
+	 */
 	public List<Ship> getShipsOpponnent(ServerPlayer opp) {
 		// TODO: return not all ships
 		// currently returns all unsunken ships
@@ -400,4 +438,32 @@ public class ServerPlayer {
 				unsunkShips.add(ship);
 		return unsunkShips;
 	}
+
+	/**
+	 * Gets the minerals.
+	 *
+	 * @return the minerals
+	 */
+	public int getMinerals() {
+		return minerals;
+	}
+
+	/**
+	 * Sets the minerals.
+	 *
+	 * @param minerals the new minerals
+	 */
+	public void setMinerals(int minerals) {
+		this.minerals = minerals;
+	}
+	
+	/**
+	 * Increment minerals.
+	 *
+	 * @param income the income
+	 */
+	public void incrementMinerals(int income) {
+		this.minerals += income;	
+	}
+	
 }
