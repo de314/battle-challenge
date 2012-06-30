@@ -231,7 +231,7 @@ public class ServerPlayer {
 			}
 			Ship s = shipMap.get(shipAct.getShipIdentifier().toString());
 			if (s != null && shipAct.getMoveDir() != null && !s.isSunken()) {
-				lastShipPositions.put(s.getIdentifier().toString(), s.getStartPosition());
+				lastShipPositions.put(s.getIdentifier().toString(), s.getLocation());
 				Coordinate newCoord = move(shipAct.getMoveDir(), s.getLocation());
 				s.setLocation(newCoord);
 				if (!s.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1)) { // Check if ship remains on map

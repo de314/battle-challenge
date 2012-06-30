@@ -101,7 +101,6 @@ public class Game extends Thread {
 		 * 			[[ INITIALIZE GAME ]]
 		 */
 		setPlayerCredentials();
-		placeShips();
 		
 		/*
 		 * 			[[ PLAY GAME ]]
@@ -304,7 +303,7 @@ public class Game extends Thread {
 	 */
 	public static List<Ship> getShips() {
 		List<Ship> ships = new ArrayList<Ship>();
-		ships.add(new Ship(1,new Coordinate(-1, -1), Direction.NORTH));
+		ships.add(new Ship());
 		// Setting the original ship Ids
 		for (int i = 0; i < ships.size(); i++) {
 			ships.get(i).setShipId(i);
