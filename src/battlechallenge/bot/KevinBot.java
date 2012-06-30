@@ -63,22 +63,22 @@ public class KevinBot extends ClientPlayer {
 	 */
 	public List<Ship> placeShips(List<Ship> shipList) {
 		//fillDirectionList(); // so direction list has N,E,S,W
-		List<Integer> shipRow = new ArrayList<Integer>();
-		int row = 0;
-		int col = 0;
-		for (Ship ship: shipList) {
-			while (shipRow.contains(row)) {
-				row = (int) (Math.random() * boardHeight);
-				col = (int) (Math.random() * (boardWidth-5));
-			}
-		
-			shipRow.add(row);
-			shipRow.add(row+1);
-			shipRow.add(row-1);
-			ship.setStartPosition(new Coordinate(row,col));
-			ship.setDirection(Ship.Direction.EAST);
-		}
-		System.out.println("placed ships");
+//		List<Integer> shipRow = new ArrayList<Integer>();
+//		int row = 0;
+//		int col = 0;
+//		for (Ship ship: shipList) {
+//			while (shipRow.contains(row)) {
+//				row = (int) (Math.random() * boardHeight);
+//				col = (int) (Math.random() * (boardWidth-5));
+//			}
+//		
+//			shipRow.add(row);
+//			shipRow.add(row+1);
+//			shipRow.add(row-1);
+//			ship.setStartPosition(new Coordinate(row,col));
+//			ship.setDirection(Ship.Direction.EAST);
+//		}
+//		System.out.println("placed ships");
 		return shipList;		
 	}
 	
@@ -140,9 +140,9 @@ public class KevinBot extends ClientPlayer {
 		List<Coordinate> enemyShipCoord = new LinkedList<Coordinate>();
 		for (Ship eShip : enemyShips) 
 		{
-			for (Coordinate coord: eShip.getCoordinates()) {
-				enemyShipCoord.add(coord);
-			}
+//			for (Coordinate coord: eShip.getCoordinates()) {
+//				enemyShipCoord.add(coord);
+//			}
 		}
 		return enemyShipCoord;
 	}
@@ -152,28 +152,28 @@ public class KevinBot extends ClientPlayer {
 			Coordinate newCoord; 
 			switch (d) {
 			case NORTH: {
-				newCoord = new Coordinate(s1.getCenter().getRow()-1, s1.getCenter().getCol());
-				if (s2.distanceFromCenter(newCoord) < s2.distanceFromCenter(s1.getCenter())) {
-					return Direction.NORTH;
-				} 
+//				newCoord = new Coordinate(s1.getCenter().getRow()-1, s1.getCenter().getCol());
+//				if (s2.distanceFromCenter(newCoord) < s2.distanceFromCenter(s1.getCenter())) {
+//					return Direction.NORTH;
+//				} 
 			}
 			case SOUTH: {
-				newCoord = new Coordinate(s1.getCenter().getRow()+1, s1.getCenter().getCol());
-				if (s2.distanceFromCenter(newCoord) < s2.distanceFromCenter(s1.getCenter())) {
-					return Direction.SOUTH;
-				} 
+//				newCoord = new Coordinate(s1.getCenter().getRow()+1, s1.getCenter().getCol());
+//				if (s2.distanceFromCenter(newCoord) < s2.distanceFromCenter(s1.getCenter())) {
+//					return Direction.SOUTH;
+//				} 
 			}
 			case EAST: {
-				newCoord = new Coordinate(s1.getCenter().getRow(), s1.getCenter().getCol()+1);
-				if (s2.distanceFromCenter(newCoord) < s2.distanceFromCenter(s1.getCenter())) {
-					return Direction.EAST;
-				} 
+//				newCoord = new Coordinate(s1.getCenter().getRow(), s1.getCenter().getCol()+1);
+//				if (s2.distanceFromCenter(newCoord) < s2.distanceFromCenter(s1.getCenter())) {
+//					return Direction.EAST;
+//				} 
 			}
 			case WEST: {
-				newCoord = new Coordinate(s1.getCenter().getRow(), s1.getCenter().getCol()-1);
-				if (s2.distanceFromCenter(newCoord) < s2.distanceFromCenter(s1.getCenter())) {
-					return Direction.WEST;
-				} 
+//				newCoord = new Coordinate(s1.getCenter().getRow(), s1.getCenter().getCol()-1);
+//				if (s2.distanceFromCenter(newCoord) < s2.distanceFromCenter(s1.getCenter())) {
+//					return Direction.WEST;
+//				} 
 			}
 			}
 		}
@@ -185,11 +185,11 @@ public class KevinBot extends ClientPlayer {
 		double currDist;
 		double minDist = Double.MAX_VALUE;
 		for (Ship eShip: enemyShips) {
-			currDist = myShip.distanceFromCenter(eShip.getCenter());
-			if (currDist < minDist) {
-				closestShip = eShip;
-				minDist = currDist;
-			}
+//			currDist = myShip.distanceFromCenter(eShip.getCenter());
+//			if (currDist < minDist) {
+//				closestShip = eShip;
+//				minDist = currDist;
+//			}
 		}
 		return closestShip;
 	}
@@ -215,8 +215,8 @@ public class KevinBot extends ClientPlayer {
 				System.out.println(toMove);
 				if (toMove != null) {
 					moves.add(toMove);
-					Coordinate newCoord = move(toMove, s.getStartPosition());
-					s.setStartPosition(newCoord);
+//					Coordinate newCoord = move(toMove, s.getStartPosition());
+//					s.setStartPosition(newCoord);
 				}
 //			}
 			

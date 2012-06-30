@@ -30,38 +30,38 @@ public class DavidBot extends ClientPlayer {
 	@Override
 	public List<Ship> placeShips(List<Ship> shipList) {
 		
-		Set<String> boatCoords = new HashSet<String>();
-		for (Ship s : shipList) {
-			int row = -1;
-			int col = -1;
-			while (row < 0 || col < 0) {
-				Direction dir;
-				int rowLimit;
-				int colLimit;
-				if (Math.random() > 0.5) {
-					dir= Direction.NORTH;
-					rowLimit = s.getLength();
-					colLimit = 0;
-				} else {
-					dir = Direction.EAST;
-					rowLimit = 0;
-					colLimit = s.getLength();
-				}
-				row = (int)(Math.random() * (boardHeight - rowLimit)) + rowLimit;
-				col = (int)(Math.random() * (boardWidth - colLimit));
-				s.setStartPosition(new Coordinate(row, col));
-				s.setDirection(dir);
-				Set<String> temp = s.getCoordinateStrings();
-				for (String c : temp) {
-					if (boatCoords.contains(c)) {
-						row = -1;
-						col = -1;
-						break;
-					}
-				}
-				boatCoords.addAll(temp);
-			}
-		}
+//		Set<String> boatCoords = new HashSet<String>();
+//		for (Ship s : shipList) {
+//			int row = -1;
+//			int col = -1;
+//			while (row < 0 || col < 0) {
+//				Direction dir;
+//				int rowLimit;
+//				int colLimit;
+//				if (Math.random() > 0.5) {
+//					dir= Direction.NORTH;
+//					rowLimit = s.getLength();
+//					colLimit = 0;
+//				} else {
+//					dir = Direction.EAST;
+//					rowLimit = 0;
+//					colLimit = s.getLength();
+//				}
+//				row = (int)(Math.random() * (boardHeight - rowLimit)) + rowLimit;
+//				col = (int)(Math.random() * (boardWidth - colLimit));
+//				s.setStartPosition(new Coordinate(row, col));
+//				s.setDirection(dir);
+//				Set<String> temp = s.getCoordinateStrings();
+//				for (String c : temp) {
+//					if (boatCoords.contains(c)) {
+//						row = -1;
+//						col = -1;
+//						break;
+//					}
+//				}
+//				boatCoords.addAll(temp);
+//			}
+//		}
 		
 		
 //		List<Integer> shipRow = new ArrayList<Integer>();

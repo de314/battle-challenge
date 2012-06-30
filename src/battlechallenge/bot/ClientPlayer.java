@@ -15,6 +15,9 @@ import battlechallenge.ship.Ship.Direction;
  * The Class ClientPlayer.
  */
 public class ClientPlayer {
+
+	/** The minerals. */
+	protected int minerals;
 	
 	/** The player name. */
 	protected final String playerName;
@@ -28,6 +31,24 @@ public class ClientPlayer {
 	/** The board height. */
 	protected int boardHeight;
 	
+	/**
+	 * Gets the minerals.
+	 *
+	 * @return the minerals
+	 */
+	public int getMinerals() {
+		return minerals;
+	}
+
+	/**
+	 * Sets the minerals.
+	 *
+	 * @param minerals the new minerals
+	 */
+	public void setMinerals(int minerals) {
+		this.minerals = minerals;
+	}
+
 	/**
 	 * Save the width of the game board.
 	 *
@@ -96,9 +117,8 @@ public class ClientPlayer {
 				row = (int) (Math.random() * (boardHeight-1));
 			}
 			shipRow.add(row);
-			ship.setStartPosition(new Coordinate(row,0));
-			ship.setDirection(Ship.Direction.EAST);
-			System.out.println("Ship : " + ship.getStartPosition());
+			ship.setLocation(new Coordinate(row,0));
+			System.out.println("Ship : " + ship.getLocation());
 		}
 		System.out.println("placed ships");
 		
@@ -110,7 +130,7 @@ public class ClientPlayer {
 	 * made by your bot should be put in here. This class will be called every turn until the
 	 * end of the game
 	 *
-	 * @param myShips List of ships belonging to player
+	 * @param ships the ships
 	 * @param actionResults the action results
 	 * @return a List of coordinates corresponding to where you wish to fire
 	 */
