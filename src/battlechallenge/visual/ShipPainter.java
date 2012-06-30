@@ -10,7 +10,7 @@ public class ShipPainter {
 
 	public static final int FONT_OFFSET_X = -5;
 	public static final int FONT_OFFSET_Y = 5;
-	
+
 	public static void paintShips(BoardPanel bp, List<Ship> ships,
 			Color teamColor) {
 		for (Ship s : ships)
@@ -21,43 +21,29 @@ public class ShipPainter {
 		if (s.isSunken())
 			return;
 		Graphics g = bp.getGraphics();
-		int minRow = Integer.MAX_VALUE;
-		int minCol = Integer.MAX_VALUE;
-		int maxRow = -1;
-		int maxCol = -1;
-		for (String c : s.getCoordinateStrings()) {
-			String[] arr = c.split(",");
-			int row = Integer.parseInt(arr[0]);
-			int col = Integer.parseInt(arr[1]);
-			if (maxCol < col)
-				maxCol = col;
-			if (minCol > col)
-				minCol = col;
-			if (maxRow < row)
-				maxRow = row;
-			if (minRow > row)
-				minRow = row;
-		}
 		// fill in ship color
 		g.setColor(teamColor);
-		g.fillRect(bp.getColPx(minCol), bp.getRowPx(minRow),
-				(maxCol - minCol + 1) * bp.getColPx(), (maxRow - minRow + 1)
-						* bp.getRowPx());
+		g.fillRect(bp.getColPx(s.getLocation().getCol()),
+				bp.getRowPx(s.getLocation().getRow()), bp.getColPx(),
+				bp.getRowPx());
 		// draw health box
 		g.setColor(Color.white);
-		int col = s.getCenter().getCol();
-		int row = s.getCenter().getRow();
-		g.fillRect(bp.getColPx(col - 1), bp.getRowPx(row), bp.getColPx(),
-				bp.getRowPx());
+		int col = s.getLocation().getCol();
+		int row = s.getLocation().getRow();
+		g.fillRect(bp.getColPx(col + 2), bp.getRowPx(row + 2),
+				bp.getColPx() - 4, bp.getRowPx() - 4);
 		// write health
 		g.setColor(Color.black);
-		g.drawString("" + s.getHealth(), bp.getColPx(col) - bp.getColPx() / 2 + FONT_OFFSET_X,
-				bp.getRowPx(row) + bp.getRowPx() / 2 + FONT_OFFSET_Y);
+		g.drawString("" + s.getHealth(), bp.getColPx(col) - bp.getColPx() / 2
+				+ FONT_OFFSET_X, bp.getRowPx(row) + bp.getRowPx() / 2
+				+ FONT_OFFSET_Y);
 		// draw boarder last
-		g.setColor(BoardPanel.SHIP_BORDER);
-		g.drawRect(bp.getColPx(minCol), bp.getRowPx(minRow),
-				(maxCol - minCol + 1) * bp.getColPx(), (maxRow - minRow + 1)
-						* bp.getRowPx());
+		// try using outline from above
+		// g.setColor(BoardPanel.SHIP_BORDER);
+		// g.drawRect(bp.getColPx(s.getLocation().getRow()),
+		// bp.getRowPx(minRow),
+		// (maxCol - minCol + 1) * bp.getColPx(), (maxRow - minRow + 1)
+		// * bp.getRowPx());
 	}
 
 	public static void paintSunkenShips(BoardPanel bp, List<Ship> ships) {
@@ -70,31 +56,13 @@ public class ShipPainter {
 			return;
 		Graphics g = bp.getGraphics();
 		g.setColor(BoardPanel.SUNKEN);
-		int minRow = Integer.MAX_VALUE;
-		int minCol = Integer.MAX_VALUE;
-		int maxRow = -1;
-		int maxCol = -1;
-		for (String c : s.getCoordinateStrings()) {
-			String[] arr = c.split(",");
-			int row = Integer.parseInt(arr[0]);
-			int col = Integer.parseInt(arr[1]);
-			if (maxCol < col)
-				maxCol = col;
-			if (minCol > col)
-				minCol = col;
-			if (maxRow < row)
-				maxRow = row;
-			if (minRow > row)
-				minRow = row;
-		}
 		g.setColor(BoardPanel.SUNKEN);
-		g.fillRect(bp.getColPx(minCol), bp.getRowPx(minRow),
-				(maxCol - minCol + 1) * bp.getColPx(), (maxRow - minRow + 1)
-						* bp.getRowPx());
+		g.fillRect(bp.getColPx(s.getLocation().getCol()),
+				bp.getRowPx(s.getLocation().getRow()), bp.getColPx(),
+				bp.getRowPx());
 		g.setColor(BoardPanel.SHIP_BORDER);
-		g.drawRect(bp.getColPx(minCol), bp.getRowPx(minRow),
-				(maxCol - minCol + 1) * bp.getColPx(), (maxRow - minRow + 1)
-						* bp.getRowPx());
+		g.drawRect(bp.getColPx(s.getLocation().getCol()),
+				bp.getRowPx(s.getLocation().getRow()), bp.getColPx(),
+				bp.getRowPx());
 	}
-
 }

@@ -75,11 +75,9 @@ public class BoardExporter {
 				board[i][j] = 'l';
 		for (Ship s : ships) {
 			if (s.isSunken()) {
-				for (String c : s.getCoordinateStrings())
-					fillSpot(board, 'S', c);
+					fillSpot(board, 'S', s.getLocation().toString());
 			} else {
-				for (String c : s.getCoordinateStrings())
-					fillSpot(board, (char)('0'+s.getHealth()), c);
+					fillSpot(board, (char)('0'+s.getHealth()), s.getLocation().toString());
 			}
 		}
 		for (ActionResult a : actionResults) {

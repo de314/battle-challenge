@@ -105,12 +105,11 @@ public class Coordinate implements Serializable {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		boolean result = false;
 		if (obj instanceof Coordinate) {
 			Coordinate that = (Coordinate) obj;
-			result = (that.getRow() == this.getRow() && that.getCol() == this.getCol());
+			return that.row == row && that.col == col;
 		}	
- 		return result;	
+ 		return false;	
 	}
 	
 	/**
