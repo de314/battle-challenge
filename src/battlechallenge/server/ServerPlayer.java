@@ -1,6 +1,7 @@
 package battlechallenge.server;
 
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,7 +18,6 @@ import battlechallenge.ship.Ship;
 import battlechallenge.ship.Ship.Direction;
 import battlechallenge.structures.City;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class ServerPlayer.
  */
@@ -57,7 +57,7 @@ public class ServerPlayer {
 	private boolean hasShips = true;
 	
 	/** The ship map. */
-	private Map<String, Ship> shipMap = new HashMap();
+	private Map<ShipIdentifier, Ship> shipMap = new HashMap();
 	
 	/** The last ship positions. */
 	private Map<String, Coordinate> lastShipPositions = new HashMap();
@@ -194,7 +194,7 @@ public class ServerPlayer {
 	/**
 	 * Gets the ship.
 	 *
-	 * @param si the si
+	 * @param si the ShipIdentifier
 	 * @return the ship
 	 */
 	public Ship getShip(ShipIdentifier si) {
@@ -464,6 +464,33 @@ public class ServerPlayer {
 	 */
 	public void incrementMinerals(int income) {
 		this.minerals += income;	
+	}
+	
+	/**
+	 * Update ServerPlayer's list of ships from game
+	 * and sets the id of the ships to the network id
+	 * @param ships Games copy of ships
+	 */
+	public void placeShips(List<Ship> ships) {
+		this.ships = ships;
+		for (Ship ship: ships) {
+			ship.setPlayerId(id);
+		}	
+	}
+	
+	/**
+	 * Inserts ship into shipMap and shipList for server player
+	 * and sets the id of the ships to the network id
+	 * @param ship ship sent from Game
+	 */
+	public void placeShip(Ship ship) {
+			if (ships == null) {
+				ships = new ArrayList<Ship>();
+			}
+			ship.setPlayerId(id); // So ServerPlayer knows which ships belongs to it
+			//TODO: Decide where to keep ships, in hashmap or list
+			ships.add(ship);
+			shipMap.put(ship.getIdentifier(), ship);
 	}
 	
 }

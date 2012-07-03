@@ -211,6 +211,10 @@ public class Ship implements Serializable {
 		this.numShots = numShots;
 	}
 
+	public Ship(Coordinate location) {
+		this(1, 1, 10, 1, 1, location);	
+	}
+
 	/**
 	 * Gets the starting coordinate of the ship.
 	 * 

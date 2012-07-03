@@ -1,13 +1,15 @@
 package battlechallenge.structures;
 
+import java.io.Serializable;
+
 import battlechallenge.Coordinate;
 import battlechallenge.server.ServerPlayer;
 
 /**
  * The Class Base.
  */
-public class Base extends City {
-
+public class Base extends City implements Serializable {
+	private static final long serialVersionUID = 0L;
 	/** The health. */
 	private int health;
 	
@@ -36,6 +38,10 @@ public class Base extends City {
 		this(10, 1, null, null);
 	}
 	
+	public Base(ServerPlayer owner, Coordinate coord) {
+		this(10, 1, owner, coord);	
+	}
+	
 	/**
 	 * Instantiates a new base.
 	 *
@@ -48,5 +54,12 @@ public class Base extends City {
 			Coordinate location) {
 		super(mineralGenerationSpeed, owner, location);
 		this.health = health;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder("Base: ");
+		sb.append(getLocation());
+		return sb.toString();
 	}
 }

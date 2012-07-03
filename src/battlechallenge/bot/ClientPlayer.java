@@ -1,8 +1,13 @@
 package battlechallenge.bot;
 
+import java.util.LinkedList;
 import java.util.List;
 
+import battlechallenge.Coordinate;
 import battlechallenge.ShipAction;
+import battlechallenge.client.ClientGame;
+import battlechallenge.ship.Ship;
+import battlechallenge.ship.Ship.Direction;
 
 /**
  * The Class ClientPlayer.
@@ -92,7 +97,13 @@ public class ClientPlayer {
 	 * @return a List of coordinates corresponding to where you wish to fire
 	 */
 	public List<ShipAction> doTurn() {
-		return null;
+		List<ShipAction> actions = new LinkedList<ShipAction>();
+
+		for (Ship s: ClientGame.getMyShips()) {
+			System.out.println(s);
+			actions.add(new ShipAction(s.getIdentifier(), new Coordinate(0,5), Direction.NORTH));
+		}
+		return actions;
 	}
 }
 

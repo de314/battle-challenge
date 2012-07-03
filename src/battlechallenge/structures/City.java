@@ -1,9 +1,12 @@
 package battlechallenge.structures;
 
+import java.io.Serializable;
+
 import battlechallenge.Coordinate;
 import battlechallenge.server.ServerPlayer;
 
-public class City {
+public class City implements Serializable {
+	private static final long serialVersionUID = 0L;
 
 	/** The mineral generation speed. */
 	private int mineralGenerationSpeed;
@@ -71,6 +74,10 @@ public class City {
 	public City() {
 		this(1, null, null);
 	}
+	
+	public City(Coordinate coord) {
+		this(1, null, coord);
+	}
 
 	public City(int mineralGenerationSpeed, ServerPlayer owner,
 			Coordinate location) {
@@ -78,5 +85,12 @@ public class City {
 		this.mineralGenerationSpeed = mineralGenerationSpeed;
 		this.owner = owner;
 		this.location = location;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder("City: ");
+		sb.append(location);
+		return sb.toString();
 	}
 }

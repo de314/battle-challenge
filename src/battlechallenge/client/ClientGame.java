@@ -17,18 +17,18 @@ import battlechallenge.structures.City;
 public class ClientGame {
 	
 	/** The network id. */
-	private int networkId;
+	private static int networkId;
 	
 	/** The ship map. */
-	private Map<Integer, List<Ship>> shipMap;
+	private static Map<Integer, List<Ship>> shipMap;
 	
 	/** The action results. */
-	private Map<Integer, List<ActionResult>> actionResults;
+	private static Map<Integer, List<ActionResult>> actionResults;
 	
 	/** The structures. */
 	private List<City> structures;
 	
-	public int getNetworkID() {
+	public static int getNetworkID() {
 		return networkId;
 	}
 
@@ -65,7 +65,7 @@ public class ClientGame {
 	 *
 	 * @return the my ships
 	 */
-	public List<Ship> getMyShips() {
+	public static List<Ship> getMyShips() {
 		List<Ship> myShips = shipMap.get(networkId);
 		return myShips;
 	}

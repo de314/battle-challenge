@@ -1,5 +1,8 @@
 package battlechallenge.server;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Scanner;
 
 import battlechallenge.ActionResult;
 import battlechallenge.ActionResult.ShotResult;
@@ -47,6 +51,10 @@ public class Game extends Thread {
 	private GameManager manager;
 	
 	private BCViz viz;
+	
+	private File gameMap = new File("Maps/Map_01");
+	
+	private List<City> structures = new ArrayList<City>();
 	
 	/**
 	 * Used to check how many players are in the game
@@ -91,6 +99,35 @@ public class Game extends Thread {
 		this.start();
 	}
 	
+	public void importMap(File gameMap) {
+		String gameMapName = gameMap.getPath();
+		int playerNum = 0; // Start at 0 increase every time map finds a base
+		int row = 0;
+		try {
+			Scanner scanner = new Scanner(new FileReader(gameMapName));
+			while (scanner.hasNextLine()){
+		      playerNum = processChar(scanner.nextLine(), playerNum, row); // will have increased if a base is assigned to a player
+		      row++;
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public int processChar(String input, int playerNum, int row) {
+		for (int i = 0; i < input.length(); i++) { // Go through the column in the map
+			if (input.charAt(i) == ('C')) {
+				structures.add(new City(new Coordinate(row, i)));
+			}
+			if (input.charAt(i) == ('B') && playerNum < players.size()) {
+				structures.add(new Base(players.get(playerNum), new Coordinate(row, i))); // Give base to next player without a base
+				playerNum++;
+			}
+		}
+		return playerNum;
+	}
+	
 	
 	/* (non-Javadoc)
 	 * @see java.lang.Thread#run()
@@ -107,7 +144,10 @@ public class Game extends Thread {
 		 * 			[[ PLAY GAME ]]
 		 */
 		Map<Integer, List<ActionResult>> actionResults = new HashMap<Integer, List<ActionResult>>();
-		List<City> structures = Game.getStructures(players.size());
+		importMap(gameMap);
+		structures = getStructures();
+		System.out.println(structures);
+		placeOriginalShips();
 		// TODO: set structures to players and vice-versa
 		for(ServerPlayer p : players)
 			actionResults.put(p.getId(), new LinkedList<ActionResult>());
@@ -119,7 +159,7 @@ public class Game extends Thread {
 		}
 		while (livePlayers > 1) {
 			doTurn(actionResults, structures);
-			viz.updateGraphics();
+			//viz.updateGraphics();
 			livePlayers = 0;
 			for (ServerPlayer player: players) {
 				if (player.isAlive()) {
@@ -269,6 +309,7 @@ public class Game extends Thread {
 				}
 			}
 		}
+		allocateIncome();
 	}
 	
 	/**
@@ -304,31 +345,53 @@ public class Game extends Thread {
 	 *
 	 * @return the ships
 	 */
-	public static List<Ship> getShips() {
+//	public static List<Ship> getShips() {
+//		List<Ship> ships = new ArrayList<Ship>();
+//		ships.add(new Ship());
+//		// Setting the original ship Ids
+//		for (int i = 0; i < ships.size(); i++) {
+//			ships.get(i).setShipId(i);
+//		}
+//		return ships;
+//	}
+	
+	/**
+	 * Places the original ships for each player
+	 */
+	public void placeOriginalShips() {
 		List<Ship> ships = new ArrayList<Ship>();
-		ships.add(new Ship());
-		// Setting the original ship Ids
-		for (int i = 0; i < ships.size(); i++) {
-			ships.get(i).setShipId(i);
+		Ship ship;
+		for (City base: structures) {
+			if (base instanceof Base) { // CHECK
+				ship = new Ship(base.getLocation());
+				ship.setPlayerId(base.getOwner().getId());
+				ships.add(ship);
+				base.getOwner().placeShip(ship);
+			}
 		}
-		return ships;
 	}
 	
 	/**
 	 * Creates a base for each player then the default cities per number of players.
 	 *
-	 * @return the ships
+	 * @return the list of structures
 	 */
-	public static List<City> getStructures(int numPlayers) {
-		// TODO: not even close to done
-		List<City> structures = new ArrayList<City>();
-		// init bases
-		for(int i=0;i<numPlayers;i++)
-			structures.add(new Base());
-		// init neutral cities
-		for (int i = 0; i < 6; i++) {
-			structures.add(new City());
-		}
+	public List<City> getStructures() {
 		return structures;
+	}
+	
+	public List<City> updateStructures() {
+		return null;
+	}
+	
+	public void allocateIncome() {
+		for (City city: structures) {
+			ServerPlayer p = city.getOwner();
+			if (p == null) { // neutral city
+				continue;
+			}
+			 // increment players minerals by the amount the city generates
+			p.incrementMinerals(city.getMineralGenerationSpeed());
+		}
 	}
 }
