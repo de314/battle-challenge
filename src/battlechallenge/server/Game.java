@@ -56,6 +56,8 @@ public class Game extends Thread {
 	
 	private List<City> structures = new ArrayList<City>();
 	
+	private int minsPerShip = 10; // TODO: Make variable per game
+	
 	/**
 	 * Used to check how many players are in the game
 	 * @return The number of players in the game
@@ -150,6 +152,7 @@ public class Game extends Thread {
 		Map<Integer, List<ActionResult>> actionResults = new HashMap<Integer, List<ActionResult>>();
 		importMap(gameMap);
 		structures = getStructures();
+		setGameConstants();
 		placeOriginalShips();
 		// TODO: set structures to players and vice-versa
 		for(ServerPlayer p : players)
@@ -200,6 +203,19 @@ public class Game extends Thread {
 			}
 		}
 	}
+	
+	public void setGameConstants() {
+		for(ServerPlayer p : players) {
+			p.setMinsPerShip(minsPerShip);
+		}
+	}
+	
+	public void updateShipMap() {
+		for(ServerPlayer p : players) {
+			p.updateShipMap();
+		}
+	}
+	
 	
 	/**
 	 * Will sink all ships that are overlapping after moving
@@ -314,6 +330,8 @@ public class Game extends Thread {
 		}
 		updateCities();
 		allocateIncome();
+		spawnShips();
+		updateShipMap();
 	}
 	
 	/**
@@ -345,21 +363,6 @@ public class Game extends Thread {
 	}
 	
 	/**
-	 * Creates the default ships for this game.
-	 *
-	 * @return the ships
-	 */
-//	public static List<Ship> getShips() {
-//		List<Ship> ships = new ArrayList<Ship>();
-//		ships.add(new Ship());
-//		// Setting the original ship Ids
-//		for (int i = 0; i < ships.size(); i++) {
-//			ships.get(i).setShipId(i);
-//		}
-//		return ships;
-//	}
-	
-	/**
 	 * Places the original ships for each player
 	 */
 	public void placeOriginalShips() {
@@ -389,6 +392,9 @@ public class Game extends Thread {
 	
 	public void allocateIncome() {
 		for (City city: structures) {
+			if (city instanceof Base) {
+				continue;
+			}
 			int ownerId = city.getOwnerId();
 			if (ownerId == -1) { // neutral city
 				continue;
@@ -424,6 +430,12 @@ public class Game extends Thread {
 			}
 		}
 		
+	}
+	
+	public void spawnShips() {
+		for (ServerPlayer player: players) {
+			player.spawnShip();
+		}
 	}
 	
 }

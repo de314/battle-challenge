@@ -68,6 +68,16 @@ public class ServerPlayer {
 	
 	private Base base;
 	
+	private int minsPerShip;
+	
+	public int getMinsPerShip() {
+		return minsPerShip;
+	}
+
+	public void setMinsPerShip(int minsForShip) {
+		this.minsPerShip = minsForShip;
+	}
+
 	/**
 	 * Gets the id.
 	 *
@@ -495,6 +505,7 @@ public class ServerPlayer {
 			//TODO: Decide where to keep ships, in hashmap or list
 			ships.add(ship);
 			shipMap.put((ship.getIdentifier()).toString(), ship);
+			shipMap.put(ship.getLocation().toString(), ship);
 	}
 
 	public Base getBase() {
@@ -503,6 +514,39 @@ public class ServerPlayer {
 
 	public void setBase(Base base) {
 		this.base = base;
+	}
+	
+	public void updateShipMap() {
+		shipMap.clear();
+		for (Ship s: ships) {
+			if (!s.isSunken()) {
+				shipMap.put(s.getIdentifier().toString(), s);
+				shipMap.put(s.getLocation().toString(), s);
+			}
+		}
+	}
+	
+	public boolean baseBlocked() {
+		if (shipMap.get(base.getLocation()) != null) // no ship on base
+			return true;
+		return false;
+	}
+	
+	/**
+	 * Spawn a new ship at the base if the player has enough
+	 * minerals and another ship is not blocking the base
+	 */
+	public void spawnShip() {
+		if (minerals >= minsPerShip && !baseBlocked()) {
+			Ship ship = new Ship(base.getLocation());
+			ship.setPlayerId(id);
+			ships.add(ship);
+			ship.setShipId(ships.size() - 1); // TODO: Keep track of number of ships created thus far instead
+			shipMap.put((ship.getIdentifier()).toString(), ship);
+			shipMap.put(ship.getLocation().toString(), ship);
+			minerals -= minsPerShip; // Subtract cost to make a ship
+		}
+			
 	}
 	
 }
