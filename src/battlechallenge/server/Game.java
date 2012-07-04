@@ -418,7 +418,10 @@ public class Game extends Thread {
 			}
 			ship = allShipCoords.get(city.getLocation());
 			if (ship != null) // There is a ship on the city
-				city.setOwner(ship.getShipId());
+				city.setOwner(ship.getPlayerId());
+			else {
+				city.setOwner(-1); // Neutral City
+			}
 		}
 		
 	}
