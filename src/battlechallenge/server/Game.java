@@ -52,7 +52,7 @@ public class Game extends Thread {
 	
 	private BCViz viz;
 	
-	private File gameMap = new File("Maps/Map_01");
+	private File gameMap = new File("/home/califax/workspace/battle-challenge/Maps/Map_01");
 	
 	private List<City> structures = new ArrayList<City>();
 	
@@ -100,7 +100,7 @@ public class Game extends Thread {
 	}
 	
 	public void importMap(File gameMap) {
-		String gameMapName = gameMap.getPath();
+		String gameMapName = gameMap.toString();
 		int playerNum = 0; // Start at 0 increase every time map finds a base
 		int row = 0;
 		try {
@@ -121,7 +121,7 @@ public class Game extends Thread {
 				structures.add(new City(new Coordinate(row, i)));
 			}
 			if (input.charAt(i) == ('B') && playerNum < players.size()) {
-				structures.add(new Base(players.get(playerNum), new Coordinate(row, i))); // Give base to next player without a base
+				structures.add(new Base(playerNum, new Coordinate(row, i))); // Give base to next player without a base
 				playerNum++;
 			}
 		}
@@ -277,9 +277,13 @@ public class Game extends Thread {
 			if (!p.isAlive()) // Player is dead no need to get actions when they cannot act
 				continue;
 			for(ShipAction sa : playerActions.get(p.getId())) {
+				System.out.println("ship action: " + sa.getShipIdentifier());
+				System.out.println(p.getShip(sa.getShipIdentifier()));
+				System.out.println(p.getId());
+	
 				// NOTE: moves are processed in: ServerPlayer.getTurn(...);
 				// check if shot is within game boundaries
-				for (int k=0;k<p.getShip(sa.getShipIdentifier()).getNumShots();k++) {
+				for (int k=0;k<p.getShip(sa.getShipIdentifier()).getNumShots(); k++) {
 					Coordinate c = sa.getShotCoordList().get(k);
 					Ship s = p.getShip(sa.getShipIdentifier());
 					if ((s.distanceFromCenter(c) > s.getRange()) || 
@@ -364,9 +368,10 @@ public class Game extends Thread {
 		for (City base: structures) {
 			if (base instanceof Base) { // CHECK
 				ship = new Ship(base.getLocation());
-				ship.setPlayerId(base.getOwner().getId());
+				ship.setPlayerId(base.getOwnerId());
 				ships.add(ship);
-				base.getOwner().placeShip(ship);
+				System.out.println("Owner ID: " + base.getOwnerId());
+				players.get(base.getOwnerId()).placeShip(ship);
 			}
 		}
 	}
@@ -386,7 +391,7 @@ public class Game extends Thread {
 	
 	public void allocateIncome() {
 		for (City city: structures) {
-			ServerPlayer p = city.getOwner();
+			ServerPlayer p = players.get(city.getOwnerId());
 			if (p == null) { // neutral city
 				continue;
 			}

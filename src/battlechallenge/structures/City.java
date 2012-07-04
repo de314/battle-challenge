@@ -12,7 +12,7 @@ public class City implements Serializable {
 	private int mineralGenerationSpeed;
 	
 	/** The owner. */
-	private ServerPlayer owner;
+	private int ownerId;
 	
 	/** The location. */
 	private Coordinate location;
@@ -40,8 +40,8 @@ public class City implements Serializable {
 	 *
 	 * @return the owner
 	 */
-	public ServerPlayer getOwner() {
-		return owner;
+	public int getOwnerId() {
+		return ownerId;
 	}
 	
 	/**
@@ -49,8 +49,8 @@ public class City implements Serializable {
 	 *
 	 * @param owner the new owner
 	 */
-	public void setOwner(ServerPlayer owner) {
-		this.owner = owner;
+	public void setOwner(int ownerId) {
+		this.ownerId = ownerId;
 	}
 	
 	/**
@@ -72,18 +72,18 @@ public class City implements Serializable {
 	}
 	
 	public City() {
-		this(1, null, null);
+		this(1, -1, null);
 	}
 	
 	public City(Coordinate coord) {
-		this(1, null, coord);
+		this(1, -1, coord);
 	}
 
-	public City(int mineralGenerationSpeed, ServerPlayer owner,
+	public City(int mineralGenerationSpeed, int ownerId,
 			Coordinate location) {
 		super();
 		this.mineralGenerationSpeed = mineralGenerationSpeed;
-		this.owner = owner;
+		this.ownerId = ownerId;
 		this.location = location;
 	}
 	

@@ -122,7 +122,7 @@ public class ClientGame {
 	public Base getMyBase() {
 		for (City c : structures) {
 			if (c instanceof Base) {
-				if (c.getOwner().getId() == networkId)
+				if (c.getOwnerId() == networkId)
 					return (Base)c;
 			}
 		}
@@ -138,7 +138,7 @@ public class ClientGame {
 		List<Base> bases = new ArrayList<Base>();
 		for (City c : structures) {
 			if (c instanceof Base) {
-				if (c.getOwner().getId() != networkId)
+				if (c.getOwnerId() != networkId)
 					bases.add((Base)c);
 			}
 		}
@@ -154,7 +154,7 @@ public class ClientGame {
 		List<City> cities = new ArrayList<City>();
 		for (City c : structures) {
 			if (!(c instanceof Base)) {
-				if (c.getOwner().getId() == networkId)
+				if (c.getOwnerId() == networkId)
 					cities.add(c);
 			}
 		}
@@ -170,7 +170,7 @@ public class ClientGame {
 		List<City> cities = new ArrayList<City>();
 		for (City c : structures) {
 			if (!(c instanceof Base)) {
-				if (c.getOwner().getId() != networkId)
+				if (c.getOwnerId() != networkId)
 					cities.add(c);
 			}
 		}

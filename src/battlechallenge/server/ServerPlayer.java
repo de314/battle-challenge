@@ -57,10 +57,10 @@ public class ServerPlayer {
 	private boolean hasShips = true;
 	
 	/** The ship map. */
-	private Map<ShipIdentifier, Ship> shipMap = new HashMap();
+	private Map<ShipIdentifier, Ship> shipMap = new HashMap<ShipIdentifier, Ship>();
 	
 	/** The last ship positions. */
-	private Map<String, Coordinate> lastShipPositions = new HashMap();
+	private Map<String, Coordinate> lastShipPositions = new HashMap<String, Coordinate>();
 	
 	/** The minerals. */
 	private int minerals;
