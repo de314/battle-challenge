@@ -52,7 +52,7 @@ public class Game extends Thread {
 	
 	private BCViz viz;
 	
-	private File gameMap = new File("/home/califax/workspace/battle-challenge/Maps/Map_01");
+	private File gameMap = new File("C:/Users/Califax/workspace/battle-challenge/Maps/Map_01");
 	
 	private List<City> structures = new ArrayList<City>();
 	
@@ -116,12 +116,16 @@ public class Game extends Thread {
 	}
 	
 	public int processChar(String input, int playerNum, int row) {
+		
+		Base base;
 		for (int i = 0; i < input.length(); i++) { // Go through the column in the map
 			if (input.charAt(i) == ('C')) {
 				structures.add(new City(new Coordinate(row, i)));
 			}
 			if (input.charAt(i) == ('B') && playerNum < players.size()) {
-				structures.add(new Base(playerNum, new Coordinate(row, i))); // Give base to next player without a base
+			    base = new Base(playerNum, new Coordinate(row, i));
+				structures.add(base); 
+				players.get(playerNum).setBase(base); // Tell server player where its base is
 				playerNum++;
 			}
 		}
@@ -146,7 +150,6 @@ public class Game extends Thread {
 		Map<Integer, List<ActionResult>> actionResults = new HashMap<Integer, List<ActionResult>>();
 		importMap(gameMap);
 		structures = getStructures();
-		System.out.println(structures);
 		placeOriginalShips();
 		// TODO: set structures to players and vice-versa
 		for(ServerPlayer p : players)
@@ -159,7 +162,7 @@ public class Game extends Thread {
 		}
 		while (livePlayers > 1) {
 			doTurn(actionResults, structures);
-			//viz.updateGraphics();
+//			viz.updateGraphics();
 			livePlayers = 0;
 			for (ServerPlayer player: players) {
 				if (player.isAlive()) {
@@ -206,7 +209,7 @@ public class Game extends Thread {
 		HashSet<Ship> shipsToSink = new HashSet<Ship>();
 		for(int j=0;j<players.size();j++) {
 			ServerPlayer p = players.get(j);
-			for (Ship s: p.getShipsOpponnent(p)) {
+			for (Ship s: p.getUnsunkenShips(p)) {
 					Coordinate coord = s.getLocation();
 					if (allShipCoords.get(coord) != null) {
 						shipsToSink.add(allShipCoords.get(coord)); // sink ship that had coordinates in allShipCoords
@@ -241,7 +244,7 @@ public class Game extends Thread {
 		// TODO: alter for fog of war
 		Map<Integer, List<Ship>> allPlayersShips = new HashMap<Integer, List<Ship>>();
 		for (ServerPlayer p : players) {
-			allPlayersShips.put(p.getId(), p.getShipsOpponnent(p)); // List of all players ships to send to each player	
+			allPlayersShips.put(p.getId(), p.getUnsunkenShips(p)); // List of all players ships to send to each player	
 		}
 		for(ServerPlayer p : players) {
 			if (!p.isAlive()) // Player is dead, don't request their turn
@@ -277,10 +280,6 @@ public class Game extends Thread {
 			if (!p.isAlive()) // Player is dead no need to get actions when they cannot act
 				continue;
 			for(ShipAction sa : playerActions.get(p.getId())) {
-				System.out.println("ship action: " + sa.getShipIdentifier());
-				System.out.println(p.getShip(sa.getShipIdentifier()));
-				System.out.println(p.getId());
-	
 				// NOTE: moves are processed in: ServerPlayer.getTurn(...);
 				// check if shot is within game boundaries
 				for (int k=0;k<p.getShip(sa.getShipIdentifier()).getNumShots(); k++) {
@@ -313,6 +312,7 @@ public class Game extends Thread {
 				}
 			}
 		}
+		updateCities();
 		allocateIncome();
 	}
 	
@@ -364,13 +364,11 @@ public class Game extends Thread {
 	 */
 	public void placeOriginalShips() {
 		List<Ship> ships = new ArrayList<Ship>();
-		Ship ship;
 		for (City base: structures) {
-			if (base instanceof Base) { // CHECK
-				ship = new Ship(base.getLocation());
+			if (base instanceof Base) {
+				Ship ship = new Ship(base.getLocation());
 				ship.setPlayerId(base.getOwnerId());
 				ships.add(ship);
-				System.out.println("Owner ID: " + base.getOwnerId());
 				players.get(base.getOwnerId()).placeShip(ship);
 			}
 		}
@@ -391,12 +389,38 @@ public class Game extends Thread {
 	
 	public void allocateIncome() {
 		for (City city: structures) {
-			ServerPlayer p = players.get(city.getOwnerId());
-			if (p == null) { // neutral city
+			int ownerId = city.getOwnerId();
+			if (ownerId == -1) { // neutral city
 				continue;
 			}
+			ServerPlayer p = players.get(ownerId);
 			 // increment players minerals by the amount the city generates
 			p.incrementMinerals(city.getMineralGenerationSpeed());
 		}
 	}
+	
+	/**
+	 * Updates cities owners to players that have ships in the cities
+	 */
+	public void updateCities() {
+		Map<Coordinate, Ship> allShipCoords = new HashMap<Coordinate, Ship>(); // Stores coords of all players ships
+		Ship ship;
+		for(int j=0;j<players.size();j++) {
+			ServerPlayer p = players.get(j);
+			for (Ship s: p.getUnsunkenShips(p)) {
+					Coordinate coord = s.getLocation();
+					allShipCoords.put(coord, s);
+				}
+		}	
+		for (City city: structures) {
+			if (city instanceof Base) {
+				continue;
+			}
+			ship = allShipCoords.get(city.getLocation());
+			if (ship != null) // There is a ship on the city
+				city.setOwner(ship.getShipId());
+		}
+		
+	}
+	
 }

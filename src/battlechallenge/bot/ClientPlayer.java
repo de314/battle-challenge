@@ -100,7 +100,7 @@ public class ClientPlayer {
 		List<ShipAction> actions = new LinkedList<ShipAction>();
 		List<Coordinate> shotCoord = new LinkedList<Coordinate>();
 		List<Direction> moveCoord = new LinkedList<Direction>();
-		shotCoord.add(new Coordinate(0,5));
+		shotCoord.add(new Coordinate(10,10));
 		moveCoord.add(Direction.NORTH);
 		
 		for (Ship s: ClientGame.getMyShips()) {

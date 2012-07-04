@@ -134,6 +134,7 @@ public class ServerConnection {
 			bot.setBoardWidth(socket.readInt(true));
 			bot.setBoardHeight(socket.readInt(true));
 			bot.setNetworkID(id);
+			game.setNetworkID(id);
 			System.out.println("bot generated with network ID: " + id);
 			// send name to server
 			socket.writeObject(name);
@@ -159,9 +160,9 @@ public class ServerConnection {
 			game.setStructures((List<City>)socket.readObject(true));
 			
 			// doTurn and send resulting coordinates to server
-			List<ShipAction> coords = bot.doTurn();
-			if (coords != null)
-				socket.writeObject(coords);
+			List<ShipAction> actions = bot.doTurn();
+			if (actions != null)
+				socket.writeObject(actions);
 			return;
 		} catch (ClassCastException e) {
 			System.err.println("Network Exception: Unexpected game object from server. Check server version.");

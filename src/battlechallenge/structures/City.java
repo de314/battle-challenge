@@ -81,7 +81,6 @@ public class City implements Serializable {
 
 	public City(int mineralGenerationSpeed, int ownerId,
 			Coordinate location) {
-		super();
 		this.mineralGenerationSpeed = mineralGenerationSpeed;
 		this.ownerId = ownerId;
 		this.location = location;
