@@ -101,12 +101,19 @@ public class Game extends Thread {
 		this.start();
 	}
 	
+	/**
+	 * Map first line should be the width space height
+	 * @param gameMap The map to play the game on
+	 */
 	public void importMap(File gameMap) {
 		String gameMapName = gameMap.toString();
 		int playerNum = 0; // Start at 0 increase every time map finds a base
 		int row = 0;
 		try {
 			Scanner scanner = new Scanner(new FileReader(gameMapName));
+			boardWidth = scanner.nextInt();
+			boardHeight = scanner.nextInt();
+			scanner.nextLine();
 			while (scanner.hasNextLine()){
 		      playerNum = processChar(scanner.nextLine(), playerNum, row); // will have increased if a base is assigned to a player
 		      row++;
@@ -117,8 +124,7 @@ public class Game extends Thread {
 		}
 	}
 	
-	public int processChar(String input, int playerNum, int row) {
-		
+	public int processChar(String input, int playerNum, int row) {	
 		Base base;
 		for (int i = 0; i < input.length(); i++) { // Go through the column in the map
 			if (input.charAt(i) == ('C')) {
