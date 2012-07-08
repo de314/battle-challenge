@@ -121,6 +121,7 @@ public class NetworkSocket {
 			} catch (IOException e) {
 				System.err.println("Socket Exception: Cannot write to socket.");
 				socket = null;
+				e.printStackTrace();
 				throw new ConnectionLostException("Socket Exception: Cannot write to socket.");
 			}
 		}

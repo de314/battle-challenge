@@ -16,6 +16,7 @@ import battlechallenge.ShipIdentifier;
 import battlechallenge.network.ConnectionLostException;
 import battlechallenge.ship.Ship;
 import battlechallenge.ship.Ship.Direction;
+import battlechallenge.structures.Base;
 import battlechallenge.structures.City;
 
 /**
@@ -57,14 +58,26 @@ public class ServerPlayer {
 	private boolean hasShips = true;
 	
 	/** The ship map. */
-	private Map<ShipIdentifier, Ship> shipMap = new HashMap();
+	private Map<String, Ship> shipMap = new HashMap<String, Ship>();
 	
 	/** The last ship positions. */
-	private Map<String, Coordinate> lastShipPositions = new HashMap();
+	private Map<String, Coordinate> lastShipPositions = new HashMap<String, Coordinate>();
 	
 	/** The minerals. */
 	private int minerals;
 	
+	private Base base;
+	
+	private int minsPerShip;
+	
+	public int getMinsPerShip() {
+		return minsPerShip;
+	}
+
+	public void setMinsPerShip(int minsForShip) {
+		this.minsPerShip = minsForShip;
+	}
+
 	/**
 	 * Gets the id.
 	 *
@@ -260,6 +273,7 @@ public class ServerPlayer {
 	private void moveShips(List<ShipAction> shipAction, int boardWidth, int boardHeight) {
 		for (ShipAction shipAct: shipAction) {
 			if (this.id != shipAct.getShipIdentifier().playerId) { // playerId does not match shipId
+				System.out.println("Attempted to act on ship that isn't players");
 				continue;
 			}
 			Ship s = shipMap.get(shipAct.getShipIdentifier().toString());
@@ -429,7 +443,7 @@ public class ServerPlayer {
 	 * @param opp the opp
 	 * @return the ships opponnent
 	 */
-	public List<Ship> getShipsOpponnent(ServerPlayer opp) {
+	public List<Ship> getUnsunkenShips(ServerPlayer opp) {
 		// TODO: return not all ships
 		// currently returns all unsunken ships
 		List<Ship> unsunkShips = new LinkedList();
@@ -490,7 +504,49 @@ public class ServerPlayer {
 			ship.setPlayerId(id); // So ServerPlayer knows which ships belongs to it
 			//TODO: Decide where to keep ships, in hashmap or list
 			ships.add(ship);
-			shipMap.put(ship.getIdentifier(), ship);
+			shipMap.put((ship.getIdentifier()).toString(), ship);
+			shipMap.put(ship.getLocation().toString(), ship);
+	}
+
+	public Base getBase() {
+		return base;
+	}
+
+	public void setBase(Base base) {
+		this.base = base;
+	}
+	
+	public void updateShipMap() {
+		shipMap.clear();
+		for (Ship s: ships) {
+			if (!s.isSunken()) {
+				shipMap.put(s.getIdentifier().toString(), s);
+				shipMap.put(s.getLocation().toString(), s);
+			}
+		}
+	}
+	
+	public boolean baseBlocked() {
+		if (shipMap.get(base.getLocation()) != null) // no ship on base
+			return true;
+		return false;
+	}
+	
+	/**
+	 * Spawn a new ship at the base if the player has enough
+	 * minerals and another ship is not blocking the base
+	 */
+	public void spawnShip() {
+		if (minerals >= minsPerShip && !baseBlocked()) {
+			Ship ship = new Ship(base.getLocation());
+			ship.setPlayerId(id);
+			ships.add(ship);
+			ship.setShipId(ships.size() - 1); // TODO: Keep track of number of ships created thus far instead
+			shipMap.put((ship.getIdentifier()).toString(), ship);
+			shipMap.put(ship.getLocation().toString(), ship);
+			minerals -= minsPerShip; // Subtract cost to make a ship
+		}
+			
 	}
 	
 }

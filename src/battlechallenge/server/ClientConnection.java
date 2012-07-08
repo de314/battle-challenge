@@ -133,7 +133,6 @@ public class ClientConnection {
 	 */
 	public boolean requestTurn(Map<Integer, List<Ship>> ships, Map<Integer, List<ActionResult>> actionResults, List<City> structures) {
 		try {
-			System.out.println("Requesting Turn");
 			// send command
 			socket.writeObject(CommunicationConstants.REQUEST_DO_TURN);
 			// send current players boats
@@ -141,10 +140,7 @@ public class ClientConnection {
 			// send action results hash table
 			socket.writeObject(actionResults);
 			// send list of structures
-			System.out.println("Writing structures");
-			System.out.println(structures);
 			socket.writeObject(structures);
-			System.out.println("Requested Turn");
 			return true;
 		} catch (ConnectionLostException e) {
 			System.err.println("Socket Exception: Client disconnected. Disqualifying player and ending game.");

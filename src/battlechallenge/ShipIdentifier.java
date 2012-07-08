@@ -31,5 +31,10 @@ public class ShipIdentifier implements Serializable {
 	public String toString() {
 		return "[" + playerId + " : " + shipId + "]";
 	}
+	
+	@Override
+	public int hashCode() {
+		return this.toString().hashCode();
+	}
 
 }

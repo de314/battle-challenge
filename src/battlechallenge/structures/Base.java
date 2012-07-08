@@ -35,11 +35,11 @@ public class Base extends City implements Serializable {
 	 * Instantiates a new base.
 	 */
 	public Base() {
-		this(10, 1, null, null);
+		this(10, 1, -1, null);
 	}
 	
-	public Base(ServerPlayer owner, Coordinate coord) {
-		this(10, 1, owner, coord);	
+	public Base(int ownerId, Coordinate coord) {
+		this(10, 1, ownerId, coord);	
 	}
 	
 	/**
@@ -50,9 +50,9 @@ public class Base extends City implements Serializable {
 	 * @param owner the owner
 	 * @param location the location
 	 */
-	public Base(int health, int mineralGenerationSpeed, ServerPlayer owner,
+	public Base(int health, int mineralGenerationSpeed, int ownerId,
 			Coordinate location) {
-		super(mineralGenerationSpeed, owner, location);
+		super(mineralGenerationSpeed, ownerId, location);
 		this.health = health;
 	}
 	

@@ -33,7 +33,7 @@ public class ClientGame {
 	}
 
 	public void setNetworkID(int networkId) {
-		this.networkId = networkId;
+		ClientGame.networkId = networkId;
 	}
 
 	public Map<Integer, List<Ship>> getShipMap() {
@@ -41,7 +41,7 @@ public class ClientGame {
 	}
 
 	public void setShipMap(Map<Integer, List<Ship>> shipMap) {
-		this.shipMap = shipMap;
+		ClientGame.shipMap = shipMap;
 	}
 
 	public Map<Integer, List<ActionResult>> getActionResults() {
@@ -122,7 +122,7 @@ public class ClientGame {
 	public Base getMyBase() {
 		for (City c : structures) {
 			if (c instanceof Base) {
-				if (c.getOwner().getId() == networkId)
+				if (c.getOwnerId() == networkId)
 					return (Base)c;
 			}
 		}
@@ -130,15 +130,15 @@ public class ClientGame {
 	}
 	
 	/**
-	 * Gets the oponnent bases.
+	 * Gets the opponent bases.
 	 *
-	 * @return the oponnent bases
+	 * @return the opponent bases
 	 */
-	public List<Base> getOponnentBases() {
+	public List<Base> getOpponentBases() {
 		List<Base> bases = new ArrayList<Base>();
 		for (City c : structures) {
 			if (c instanceof Base) {
-				if (c.getOwner().getId() != networkId)
+				if (c.getOwnerId() != networkId)
 					bases.add((Base)c);
 			}
 		}
@@ -154,7 +154,7 @@ public class ClientGame {
 		List<City> cities = new ArrayList<City>();
 		for (City c : structures) {
 			if (!(c instanceof Base)) {
-				if (c.getOwner().getId() == networkId)
+				if (c.getOwnerId() == networkId)
 					cities.add(c);
 			}
 		}
@@ -170,7 +170,7 @@ public class ClientGame {
 		List<City> cities = new ArrayList<City>();
 		for (City c : structures) {
 			if (!(c instanceof Base)) {
-				if (c.getOwner().getId() != networkId)
+				if (c.getOwnerId() != networkId)
 					cities.add(c);
 			}
 		}

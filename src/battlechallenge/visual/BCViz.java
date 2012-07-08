@@ -23,12 +23,10 @@ public class BCViz extends JFrame {
 	public final int TOTAL_HEIGHT_PX;
 	public final int TOTAL_WIDTH_PX;
 
-	private List<ServerPlayer> players;
 	private final int totalWidth;
 	private final int totalHeight;
 	
 	private BoardPanel bp;
-	private ConsolePanel cp;
 	private StatsContainer scL;
 	private StatsContainer scR;
 
@@ -72,10 +70,6 @@ public class BCViz extends JFrame {
 		bp = new BoardPanel(totalWidth, totalHeight, players);
 		this.add(bp, BorderLayout.CENTER);
 		
-		// add console panel
-		cp = new ConsolePanel();
-		this.add(cp, BorderLayout.SOUTH);
-		
 		this.setSize(DEFAULT_WIDTH_PX, DEFAULT_HEIGHT_PX);
 		this.setResizable(false);
 		this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
@@ -95,7 +89,6 @@ public class BCViz extends JFrame {
 	@Override
 	public void paint(Graphics g) {
 		bp.repaint();
-		cp.repaint();
 		scL.repaint();
 		if (scR != null)
 			scR.repaint();

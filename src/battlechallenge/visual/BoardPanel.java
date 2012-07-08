@@ -19,7 +19,6 @@ public class BoardPanel extends Panel {
 	public static final Color OCEAN = Color.cyan;
 	public static final Color MISS = Color.red;
 	public static final Color HIT = Color.green;
-	public static final Color SUNKEN = Color.lightGray;
 	public static final Color SHIP_BORDER = Color.black;
 
 	// TODO: need 8 player colors
