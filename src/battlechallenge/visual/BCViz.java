@@ -8,6 +8,7 @@ import java.util.List;
 import javax.swing.JFrame;
 
 import battlechallenge.server.ServerPlayer;
+import battlechallenge.structures.Structure;
 
 public class BCViz extends JFrame {
 
@@ -30,7 +31,7 @@ public class BCViz extends JFrame {
 	private StatsContainer scL;
 	private StatsContainer scR;
 
-	public BCViz(List<ServerPlayer> players, int boardWidth,
+	public BCViz(List<ServerPlayer> players, List<Structure> structures, int boardWidth,
 			int boardHeight) {
 		super("Battle Challenge Viz 0.1");
 		this.totalWidth = boardWidth;
@@ -67,7 +68,7 @@ public class BCViz extends JFrame {
 		this.add(new HeaderPanel(players), BorderLayout.NORTH);
 
 		// add board panel
-		bp = new BoardPanel(totalWidth, totalHeight, players);
+		bp = new BoardPanel(totalWidth, totalHeight, players, structures);
 		this.add(bp, BorderLayout.CENTER);
 		
 		this.setSize(DEFAULT_WIDTH_PX, DEFAULT_HEIGHT_PX);

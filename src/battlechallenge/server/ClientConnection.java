@@ -8,10 +8,11 @@ import java.util.Map;
 import battlechallenge.ActionResult;
 import battlechallenge.CommunicationConstants;
 import battlechallenge.ShipAction;
+import battlechallenge.maps.BattleMap;
 import battlechallenge.network.ConnectionLostException;
 import battlechallenge.network.NetworkSocket;
 import battlechallenge.ship.Ship;
-import battlechallenge.structures.City;
+import battlechallenge.structures.Structure;
 
 /**
  * The Class ClientConnection.
@@ -131,7 +132,7 @@ public class ClientConnection {
 	 * @return true, if successful
 	 * @throws ConnectionLostException a lost connection exception
 	 */
-	public boolean requestTurn(Map<Integer, List<Ship>> ships, Map<Integer, List<ActionResult>> actionResults, List<City> structures) {
+	public boolean requestTurn(Map<Integer, List<Ship>> ships, Map<Integer, List<ActionResult>> actionResults, BattleMap map) {
 		try {
 			// send command
 			socket.writeObject(CommunicationConstants.REQUEST_DO_TURN);
@@ -140,7 +141,7 @@ public class ClientConnection {
 			// send action results hash table
 			socket.writeObject(actionResults);
 			// send list of structures
-			socket.writeObject(structures);
+			socket.writeObject(map);
 			return true;
 		} catch (ConnectionLostException e) {
 			System.err.println("Socket Exception: Client disconnected. Disqualifying player and ending game.");

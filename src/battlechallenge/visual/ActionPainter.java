@@ -8,31 +8,34 @@ import battlechallenge.ActionResult.ShotResult;
 
 public class ActionPainter {
 
-	private static final int MIN_WIDTH_PX = 8;
-	private static final int MIN_HEIGHT_PX = 8;
-	private static final int OFFSET_X = 8;
-	private static final int OFFSET_Y = 5;
-	private static final int diameter = 8 << 1;
-	
-	public static void paintResults(BoardPanel bp, List<ActionResult> actionResults) {
+	public static void paintResults(BoardPanel bp,
+			List<ActionResult> actionResults) {
 		Graphics g = bp.getGraphics();
+		g.setColor(BoardPanel.SHOT);
+		// line offset
+		int offsetCol = bp.getColPx() >> 1;
+		int offsetRow = bp.getRowPx() >> 1;
+		// hit (X) offset
+		int eigthCol = bp.getColPx() >> 3;
+		int eigthRow = bp.getRowPx() >> 3;
 		for (ActionResult result : actionResults) {
-			if (result.getResult() == ShotResult.MISS)
-				g.setColor(BoardPanel.MISS);
-			else
-				g.setColor(BoardPanel.HIT);
-			int w = bp.getColPx() - diameter;
-			w = w < MIN_WIDTH_PX ? MIN_WIDTH_PX : w;
-			int h = bp.getRowPx() - diameter;
-			h = h < MIN_HEIGHT_PX ? MIN_HEIGHT_PX : h;
-			g.fillOval(bp.getColPx(result.getCoordinate().getCol()) + OFFSET_X,
-					bp.getRowPx(result.getCoordinate().getRow()) + OFFSET_Y,
-					w, h);
-			g.setColor(BoardPanel.SHIP_BORDER);
-			g.drawOval(bp.getColPx(result.getCoordinate().getCol()) + OFFSET_X,
-					bp.getRowPx(result.getCoordinate().getRow()) + OFFSET_Y,
-					w, h);
-			// TODO: draw line from ship to hit/miss
+			int endCol = result.getCoordinate().getCol();
+			int endRow = result.getCoordinate().getRow();
+			int originCol = result.getOrigin().getCol();
+			int originRow = result.getOrigin().getRow();
+			g.drawLine(bp.getColPx(originCol) + offsetCol,
+					bp.getRowPx(originRow) + offsetRow, bp.getColPx(endCol)
+							+ offsetCol, bp.getRowPx(originRow) + offsetRow);
+			if (result.getResult() == ShotResult.HIT) {
+				g.drawLine(bp.getColPx(endCol) + eigthCol, bp.getRowPx(endRow)
+						+ eigthRow, bp.getColPx(endCol) + 7 * eigthCol,
+						bp.getRowPx(originRow) + 7 * eigthRow);
+				g.drawLine(bp.getColPx(endCol) + 7 * eigthCol,
+						bp.getRowPx(endRow) + eigthRow, bp.getColPx(endCol)
+								+ eigthCol, bp.getRowPx(originRow) + 7
+								* eigthRow);
+			}
+
 		}
 	}
 

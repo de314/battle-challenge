@@ -7,9 +7,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import battlechallenge.ActionResult;
+import battlechallenge.maps.BattleMap;
 import battlechallenge.ship.Ship;
 import battlechallenge.structures.Base;
 import battlechallenge.structures.City;
+import battlechallenge.structures.Structure;
 
 /**
  * The Class ClientGame.
@@ -25,8 +27,7 @@ public class ClientGame {
 	/** The action results. */
 	private static Map<Integer, List<ActionResult>> actionResults;
 	
-	/** The structures. */
-	private List<City> structures;
+	private BattleMap map;
 	
 	public static int getNetworkID() {
 		return networkId;
@@ -52,12 +53,12 @@ public class ClientGame {
 		this.actionResults = actionResults;
 	}
 
-	public List<City> getStructures() {
-		return structures;
+	public BattleMap getMap() {
+		return map;
 	}
 
-	public void setStructures(List<City> structures) {
-		this.structures = structures;
+	public void setMap(BattleMap map) {
+		this.map = map;
 	}
 
 	/**
@@ -120,11 +121,9 @@ public class ClientGame {
 	 * @return the my base
 	 */
 	public Base getMyBase() {
-		for (City c : structures) {
-			if (c instanceof Base) {
-				if (c.getOwnerId() == networkId)
-					return (Base)c;
-			}
+		for (Base b : map.getBases()) {
+			if (b.getOwnerId() == networkId)
+				return b;
 		}
 		return null;
 	}
@@ -136,11 +135,9 @@ public class ClientGame {
 	 */
 	public List<Base> getOpponentBases() {
 		List<Base> bases = new ArrayList<Base>();
-		for (City c : structures) {
-			if (c instanceof Base) {
-				if (c.getOwnerId() != networkId)
-					bases.add((Base)c);
-			}
+		for (Base b : map.getBases()) {
+			if (b.getOwnerId() != networkId)
+				bases.add(b);
 		}
 		return bases;
 	}
@@ -152,8 +149,9 @@ public class ClientGame {
 	 */
 	public List<City> getMyCities() {
 		List<City> cities = new ArrayList<City>();
-		for (City c : structures) {
-			if (!(c instanceof Base)) {
+		for (Structure str : map.getStructures()) {
+			if (str instanceof City) {
+				City c = (City)str;
 				if (c.getOwnerId() == networkId)
 					cities.add(c);
 			}
@@ -168,8 +166,9 @@ public class ClientGame {
 	 */
 	public List<City> getAllCities() {
 		List<City> cities = new ArrayList<City>();
-		for (City c : structures) {
-			if (!(c instanceof Base)) {
+		for (Structure str : map.getStructures()) {
+			if (str instanceof City) {
+				City c = (City) str;
 				if (c.getOwnerId() != networkId)
 					cities.add(c);
 			}

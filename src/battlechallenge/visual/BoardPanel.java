@@ -8,6 +8,7 @@ import java.util.List;
 
 import battlechallenge.server.ServerPlayer;
 import battlechallenge.ship.Ship;
+import battlechallenge.structures.Structure;
 
 public class BoardPanel extends Panel {
 
@@ -17,8 +18,7 @@ public class BoardPanel extends Panel {
 	private static final long serialVersionUID = 1L;
 
 	public static final Color OCEAN = Color.cyan;
-	public static final Color MISS = Color.red;
-	public static final Color HIT = Color.green;
+	public static final Color SHOT = Color.red;
 	public static final Color SHIP_BORDER = Color.black;
 
 	// TODO: need 8 player colors
@@ -32,6 +32,7 @@ public class BoardPanel extends Panel {
 	private int colPx;
 	private int rowPx;
 	private List<ServerPlayer> players;
+	private List<Structure> structures;
 
 	public int getRowPx(int row) {
 		return row * rowPx;
@@ -49,6 +50,14 @@ public class BoardPanel extends Panel {
 		return colPx;
 	}
 
+	public BoardPanel(int widthSpaces, int heightSpaces,
+			List<ServerPlayer> players,List<Structure> structures) {
+		this.widthSpaces = widthSpaces;
+		this.heightSpaces = heightSpaces;
+		this.players = players;
+		this.structures = structures;
+	}
+
 	private void updateSizeVariables() {
 		this.widthPx = this.getWidth();
 		this.heightPx = this.getHeight();
@@ -56,32 +65,27 @@ public class BoardPanel extends Panel {
 		rowPx = this.heightPx / this.heightSpaces;
 	}
 
-	public BoardPanel(int widthSpaces, int heightSpaces,
-			List<ServerPlayer> players) {
-		this.widthSpaces = widthSpaces;
-		this.heightSpaces = heightSpaces;
-		this.players = players;
-	}
-
 	@Override
 	public void paint(Graphics g) {
+		List<List<Ship>> shipsCollection = new ArrayList<List<Ship>>();
+		for (ServerPlayer p : players)
+			shipsCollection.add(p.getShipsCopy());
 		updateSizeVariables();
 		// draw ocean
 		g.setColor(OCEAN);
 		g.fillRect(0, 0, widthPx, heightPx);
-		// draw sunken ships under grid		
-		List<List<Ship>> shipsCollection = new ArrayList<List<Ship>>();
-		for (ServerPlayer p : players)
-			shipsCollection.add(p.getShipsCopy());
-		for (List<Ship> ships : shipsCollection)
-			ShipPainter.paintSunkenShips(this, ships);
 		// draw ocean grids
 		g.setColor(Color.black);
-		for (int i=1;i<=this.widthSpaces;i++)
-			g.drawLine(i * colPx, 0, i*colPx, heightPx);
-		for (int i=1;i<this.heightSpaces;i++)
-			g.drawLine(0, i*rowPx, widthPx, i*rowPx);
-		// draw ships with health
+		for (int i = 1; i <= this.widthSpaces; i++)
+			g.drawLine(i * colPx, 0, i * colPx, heightPx);
+		for (int i = 1; i < this.heightSpaces; i++)
+			g.drawLine(0, i * rowPx, widthPx, i * rowPx);
+		// draw structures
+		for (int i = 0; i < players.size(); i++)
+			StructurePainter.paintBase(this, players.get(i).getBase(),
+					PLAYER_COLORS[i]);
+		StructurePainter.paintStructures(this, structures);
+		// draw ships
 		for (int i = 0; i < players.size(); i++)
 			ShipPainter.paintShips(this, shipsCollection.get(i),
 					PLAYER_COLORS[i]);

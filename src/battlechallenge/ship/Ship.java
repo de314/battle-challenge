@@ -212,7 +212,7 @@ public class Ship implements Serializable {
 	}
 
 	public Ship(Coordinate location) {
-		this(1, 1, 10, 1, 1, location);	
+		this(1, 1, 10, 1, 1, location);
 	}
 
 	/**
@@ -296,9 +296,9 @@ public class Ship implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder("Ship: ");
-		sb.append(location).append(" ").append(" Health ")
-				.append(health);
+		StringBuilder sb = new StringBuilder("Ship[ Location: ");
+		sb.append(location).append(" Idenifier: ").append(getIdentifier())
+				.append(" Health: ").append(health).append(" ]");
 		return sb.toString();
 	}
 
@@ -355,5 +355,14 @@ public class Ship implements Serializable {
 		Ship temp = new Ship(damage, health, range, movement, numShots,
 				location);
 		return temp;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof Ship) {
+			Ship s = (Ship) o;
+			return s.getPlayerId() == playerId && s.getShipId() == shipId;
+		}
+		return false;
 	}
 }

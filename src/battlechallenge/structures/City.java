@@ -5,7 +5,13 @@ import java.io.Serializable;
 import battlechallenge.Coordinate;
 import battlechallenge.server.ServerPlayer;
 
-public class City implements Serializable {
+// TODO: Auto-generated Javadoc
+/**
+ * The Class City.
+ */
+public class City extends Structure implements Serializable {
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 0L;
 
 	/** The mineral generation speed. */
@@ -13,9 +19,6 @@ public class City implements Serializable {
 	
 	/** The owner. */
 	private int ownerId;
-	
-	/** The location. */
-	private Coordinate location;
 	
 	/**
 	 * Gets the mineral generation speed.
@@ -47,45 +50,45 @@ public class City implements Serializable {
 	/**
 	 * Sets the owner.
 	 *
-	 * @param owner the new owner
+	 * @param ownerId the new owner
 	 */
 	public void setOwner(int ownerId) {
 		this.ownerId = ownerId;
 	}
 	
 	/**
-	 * Gets the location.
-	 *
-	 * @return the location
+	 * Instantiates a new city.
 	 */
-	public Coordinate getLocation() {
-		return location;
-	}
-	
-	/**
-	 * Sets the location.
-	 *
-	 * @param location the new location
-	 */
-	public void setLocation(Coordinate location) {
-		this.location = location;
-	}
-	
 	public City() {
 		this(1, -1, null);
 	}
 	
+	/**
+	 * Instantiates a new city.
+	 *
+	 * @param coord the coord
+	 */
 	public City(Coordinate coord) {
 		this(1, -1, coord);
 	}
 
+	/**
+	 * Instantiates a new city.
+	 *
+	 * @param mineralGenerationSpeed the mineral generation speed
+	 * @param ownerId the owner id
+	 * @param location the location
+	 */
 	public City(int mineralGenerationSpeed, int ownerId,
 			Coordinate location) {
+		super(location);
 		this.mineralGenerationSpeed = mineralGenerationSpeed;
 		this.ownerId = ownerId;
-		this.location = location;
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder("City: ");

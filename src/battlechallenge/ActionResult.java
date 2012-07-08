@@ -25,16 +25,18 @@ public class ActionResult implements Serializable {
 	}
 	
 	/** The coordinate. */
-	private Coordinate coordinate;
+	private final Coordinate coordinate;
+	
+	private final Coordinate origin;
 	
 	/** The result. */
-	private ShotResult result;
+	private final ShotResult result;
 	
 	/** The health. */
-	private int health;
+	private final int health;
 	
 	/** The player id. */
-	private int playerId;
+	private final int playerId;
 	
 	/**
 	 * Gets the coordinate.
@@ -43,6 +45,15 @@ public class ActionResult implements Serializable {
 	 */
 	public Coordinate getCoordinate() {
 		return coordinate;
+	}
+	
+	/**
+	 * Gets the coordinate.
+	 *
+	 * @return the coordinate
+	 */
+	public Coordinate getOrigin() {
+		return origin;
 	}
 
 	/**
@@ -74,15 +85,17 @@ public class ActionResult implements Serializable {
 
 	/**
 	 * Instantiates a new action result.
+	 * 
+	 * Note: Assumes good input. No validation.
 	 *
 	 * @param c the c
 	 * @param result the result
 	 * @param health the health
 	 * @param playerId the player id
 	 */
-	public ActionResult(Coordinate c, ShotResult result, int health, int playerId) {
-		// TODO: Action Result constructor: validate input
-		this.coordinate = c;
+	public ActionResult(Coordinate target, Coordinate origin, ShotResult result, int health, int playerId) {
+		this.coordinate = target;
+		this.origin = origin;
 		this.result = result;
 		this.health = health;
 		this.playerId = playerId;

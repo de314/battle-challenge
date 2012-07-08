@@ -1,7 +1,6 @@
 package battlechallenge.server;
 
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,11 +12,12 @@ import battlechallenge.ActionResult.ShotResult;
 import battlechallenge.Coordinate;
 import battlechallenge.ShipAction;
 import battlechallenge.ShipIdentifier;
+import battlechallenge.maps.BattleMap;
 import battlechallenge.network.ConnectionLostException;
 import battlechallenge.ship.Ship;
 import battlechallenge.ship.Ship.Direction;
+import battlechallenge.ship.ShipCollection;
 import battlechallenge.structures.Base;
-import battlechallenge.structures.City;
 
 /**
  * The Class ServerPlayer.
@@ -28,7 +28,7 @@ public class ServerPlayer {
 	private String name;
 
 	/** The ships. */
-	private List<Ship> ships;
+	private ShipCollection ships;
 
 	/** The conn. */
 	private ClientConnection conn;
@@ -56,9 +56,6 @@ public class ServerPlayer {
 
 	/** The has ships. */
 	private boolean hasShips = true;
-	
-	/** The ship map. */
-	private Map<String, Ship> shipMap = new HashMap<String, Ship>();
 	
 	/** The last ship positions. */
 	private Map<String, Coordinate> lastShipPositions = new HashMap<String, Coordinate>();
@@ -97,26 +94,15 @@ public class ServerPlayer {
 	}
 	
 	/**
-	 * Gets the ships.
-	 *
-	 * @return the ships
-	 */
-	public List<Ship> getShips() {
-		return ships;
-	}
-	
-	/**
 	 * Gets the ships copy.
 	 *
 	 * @return the ships copy
 	 */
 	public List<Ship> getShipsCopy() {
 		List<Ship> temp = new LinkedList<Ship>();
-		synchronized(ships) {
-			for(Ship s : ships)
+			for(Ship s : ships.getPlayerShips(this))
 				temp.add(s.deepCopy());
 			return temp;
-		}
 	}
 	
 	/**
@@ -198,20 +184,10 @@ public class ServerPlayer {
 	 */
 	public int getNumLiveShips() {
 		int count = 0;
-		for (Ship s : ships)
+		for (Ship s : ships.getPlayerShips(this))
 			if (!s.isSunken())
 				count++;
 		return count;
-	}
-	
-	/**
-	 * Gets the ship.
-	 *
-	 * @param si the ShipIdentifier
-	 * @return the ship
-	 */
-	public Ship getShip(ShipIdentifier si) {
-		return shipMap.get(si.toString());
 	}
 
 	/**
@@ -262,6 +238,10 @@ public class ServerPlayer {
 		return this.name != null;
 	}
 	
+	public void setShipCollection(ShipCollection shipCollection) {
+		this.ships = shipCollection;
+	}
+	
 	/**
 	 * Move ships.
 	 *
@@ -276,7 +256,7 @@ public class ServerPlayer {
 				System.out.println("Attempted to act on ship that isn't players");
 				continue;
 			}
-			Ship s = shipMap.get(shipAct.getShipIdentifier().toString());
+			Ship s = ships.getShip(shipAct.getShipIdentifier());
 			if (s != null && shipAct.getMoveDir() != null && !s.isSunken()) {
 				lastShipPositions.put(s.getIdentifier().toString(), s.getLocation());
 				Coordinate newCoord = move(shipAct.getMoveDir(), s.getLocation());
@@ -295,7 +275,7 @@ public class ServerPlayer {
 	 * @param shipId The Id of the ship
 	 */
 	public void revertMovement(ShipIdentifier shipId) {
-		Ship s = shipMap.get(shipId.toString());
+		Ship s = ships.getShip(shipId);
 		s.setLocation(lastShipPositions.get(s.getIdentifier().toString()));
 	}
 	
@@ -331,10 +311,10 @@ public class ServerPlayer {
 	 * @param actionResults the action results
 	 * @return true, if successful
 	 */
-	public boolean requestTurn(Map<Integer, List<Ship>> allPlayersShips, Map<Integer, List<ActionResult>> actionResults, List<City> structures) {
+	public boolean requestTurn(Map<Integer, List<Ship>> allPlayersShips, Map<Integer, List<ActionResult>> actionResults, BattleMap map) {
 		setLastActionResults(actionResults.get(id));
 		this.actionLog.addAll(actionResults.get(this.id));
-		return conn.requestTurn(allPlayersShips, actionResults, structures);
+		return conn.requestTurn(allPlayersShips, actionResults, map);
 	}
 
 	/**
@@ -390,7 +370,7 @@ public class ServerPlayer {
 		if (!conn.isOpen())
 			return false;
 		if (hasShips) {
-			for (Ship s : ships) {
+			for (Ship s : ships.getPlayerShips(this)) {
 				if (!s.isSunken()) {
 					return true;
 				}
@@ -416,15 +396,15 @@ public class ServerPlayer {
 	 * @param damage the damage incurred as a result of the action
 	 * @return the action result
 	 */
-	public ActionResult isHit(Coordinate c, int damage) {
+	public ActionResult isHit(Coordinate c, Ship attacker, int damage) {
 		if (c == null)
-			return new ActionResult(c, ShotResult.MISS, -1, id);
-		for (Ship s : ships) {
+			return new ActionResult(c, attacker.getLocation(), ShotResult.MISS, -1, id);
+		for (Ship s : ships.getPlayerShips(this)) {
 			if (s.isHit(c, damage)) {
-				return new ActionResult(c, s.isSunken() ? ShotResult.SUNK : ShotResult.HIT, s.getHealth(), id);
+				return new ActionResult(c, attacker.getLocation(), s.isSunken() ? ShotResult.SUNK : ShotResult.HIT, s.getHealth(), id);
 			}
 		}
-		return new ActionResult(c, ShotResult.MISS, -1, id);
+		return new ActionResult(c, attacker.getLocation(), ShotResult.MISS, -1, id);
 	}
 	
 	/* (non-Javadoc)
@@ -446,8 +426,8 @@ public class ServerPlayer {
 	public List<Ship> getUnsunkenShips(ServerPlayer opp) {
 		// TODO: return not all ships
 		// currently returns all unsunken ships
-		List<Ship> unsunkShips = new LinkedList();
-		for (Ship ship: ships)
+		List<Ship> unsunkShips = new LinkedList<Ship>();
+		for (Ship ship: ships.getPlayerShips(this))
 			if (!ship.isSunken())
 				unsunkShips.add(ship);
 		return unsunkShips;
@@ -479,55 +459,28 @@ public class ServerPlayer {
 	public void incrementMinerals(int income) {
 		this.minerals += income;	
 	}
-	
-	/**
-	 * Update ServerPlayer's list of ships from game
-	 * and sets the id of the ships to the network id
-	 * @param ships Games copy of ships
-	 */
-	public void placeShips(List<Ship> ships) {
-		this.ships = ships;
-		for (Ship ship: ships) {
-			ship.setPlayerId(id);
-		}	
-	}
-	
-	/**
-	 * Inserts ship into shipMap and shipList for server player
-	 * and sets the id of the ships to the network id
-	 * @param ship ship sent from Game
-	 */
-	public void placeShip(Ship ship) {
-			if (ships == null) {
-				ships = new ArrayList<Ship>();
-			}
-			ship.setPlayerId(id); // So ServerPlayer knows which ships belongs to it
-			//TODO: Decide where to keep ships, in hashmap or list
-			ships.add(ship);
-			shipMap.put((ship.getIdentifier()).toString(), ship);
-			shipMap.put(ship.getLocation().toString(), ship);
-	}
 
 	public Base getBase() {
 		return base;
 	}
 
-	public void setBase(Base base) {
+	public void setBase(Base base, List<Ship> ships) {
 		this.base = base;
-	}
-	
-	public void updateShipMap() {
-		shipMap.clear();
-		for (Ship s: ships) {
-			if (!s.isSunken()) {
-				shipMap.put(s.getIdentifier().toString(), s);
-				shipMap.put(s.getLocation().toString(), s);
-			}
+		for (Ship ship: ships) {
+			ship.setPlayerId(id);
 		}
+		// place first ship like normal
+		Ship s = ships.get(0);
+		s.setLocation(base.getLocation());
+		s.setShipId(this.ships.getNextShipId());
+		s.setPlayerId(this.id);
+		this.ships.addShip(s);
+		// FIXME: place ships correctly
+		this.minerals += (ships.size() - 1)*this.minsPerShip; // allocate minerals for any remaining ships.
 	}
 	
 	public boolean baseBlocked() {
-		if (shipMap.get(base.getLocation()) != null) // no ship on base
+		if (ships.getShip(base.getLocation()) != null) // no ship on base
 			return true;
 		return false;
 	}
@@ -540,10 +493,8 @@ public class ServerPlayer {
 		if (minerals >= minsPerShip && !baseBlocked()) {
 			Ship ship = new Ship(base.getLocation());
 			ship.setPlayerId(id);
-			ships.add(ship);
-			ship.setShipId(ships.size() - 1); // TODO: Keep track of number of ships created thus far instead
-			shipMap.put((ship.getIdentifier()).toString(), ship);
-			shipMap.put(ship.getLocation().toString(), ship);
+			ship.setShipId(ships.getNextShipId()); // TODO: Keep track of number of ships created thus far instead
+			ships.addShip(ship);
 			minerals -= minsPerShip; // Subtract cost to make a ship
 		}
 			

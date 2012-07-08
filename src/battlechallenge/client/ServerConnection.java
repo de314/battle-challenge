@@ -7,10 +7,10 @@ import battlechallenge.ActionResult;
 import battlechallenge.CommunicationConstants;
 import battlechallenge.ShipAction;
 import battlechallenge.bot.ClientPlayer;
+import battlechallenge.maps.BattleMap;
 import battlechallenge.network.ConnectionLostException;
 import battlechallenge.network.NetworkSocket;
 import battlechallenge.ship.Ship;
-import battlechallenge.structures.City;
 
 /**
  * The Class ServerConnection.
@@ -157,7 +157,7 @@ public class ServerConnection {
 		try {
 			game.setShipMap((Map<Integer,List<Ship>>)socket.readObject(true));
 			game.setActionResults((Map<Integer, List<ActionResult>>)socket.readObject(true));
-			game.setStructures((List<City>)socket.readObject(true));
+			game.setMap((BattleMap)socket.readObject(true));
 			
 			// doTurn and send resulting coordinates to server
 			List<ShipAction> actions = bot.doTurn();

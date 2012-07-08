@@ -20,12 +20,15 @@ public class StatPanel extends Panel {
 	private static final long serialVersionUID = 1L;
 
 	private ServerPlayer p;
+	private String compressedName;
+	private boolean dead;
 
 	public StatPanel(ServerPlayer player) {
 		super();
 		this.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 		this.p = player;
 		this.setBackground(Color.DARK_GRAY);
+		this.dead = false;
 	}
 
 	@Override
@@ -34,22 +37,31 @@ public class StatPanel extends Panel {
 		g.setColor(Color.green);
 		int ts = g.getFont().getSize();
 		int i = 1;
-		if (!p.isAlive())
-			g.drawString("**DEAD**", PADDING_HORZ, PADDING_VERT);
-		else
-			g.drawString(p.getName(), PADDING_HORZ, PADDING_VERT);
+		g.drawString(compressName(), PADDING_HORZ, PADDING_VERT);
 		g.drawString("Score: " + p.getScore(), PADDING_HORZ, PADDING_VERT + (ts * i++));
 		g.drawString("Ships: " + p.getNumLiveShips(), PADDING_HORZ,
 				PADDING_VERT + (ts * i++));
-		g.drawString("Hits: " + p.getHitCount(), PADDING_HORZ, PADDING_VERT
+		g.drawString("Next Ship: " + (p.getMinsPerShip()-p.getMinerals()), PADDING_HORZ,
+				PADDING_VERT + (ts * i++));
+		g.drawString("Hits/Shots/Acc.: ", PADDING_HORZ, PADDING_VERT
 				+ (ts * i++));
-		g.drawString("Shots: " + p.getTotalShotCount(), PADDING_HORZ, PADDING_VERT
+		g.drawString(p.getHitCount() + "/" + p.getTotalShotCount() + "/" + ((int) (p.getShotAccuracy() * 1000)/10), PADDING_HORZ, PADDING_VERT
 				+ (ts * i++));
-		// g.drawString(String.format("Acc: %.1g%n",
-		// p.getShotAccuracy()*100)+"%", PADDING_HORZ, PADDING_VERT + (ts * 4));
-		g.drawString(
-				new StringBuilder("Acc: ")
-						.append((int) (p.getShotAccuracy() * 1000)/10).append("%")
-						.toString(), PADDING_HORZ, PADDING_VERT + (ts * i++));
+	}
+	
+	private String compressName() {
+		if (compressedName == null || (!p.isAlive() && !dead)) {
+			if (p.getName() == null)
+				compressedName = "Unknown";
+			else
+				compressedName = p.getName();
+			if (!p.isAlive()) {
+				compressedName += "*DEAD*";
+				dead = true;
+			}
+			if (compressedName.length() > 15)
+				compressedName = compressedName.substring(0, 13) + "...";
+		}
+		return compressedName;
 	}
 }

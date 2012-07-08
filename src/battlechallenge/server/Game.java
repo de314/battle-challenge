@@ -1,25 +1,23 @@
 package battlechallenge.server;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Scanner;
 
 import battlechallenge.ActionResult;
 import battlechallenge.ActionResult.ShotResult;
 import battlechallenge.CommunicationConstants;
 import battlechallenge.Coordinate;
 import battlechallenge.ShipAction;
+import battlechallenge.maps.BattleMap;
+import battlechallenge.maps.MapImporter;
 import battlechallenge.ship.Ship;
-import battlechallenge.structures.Base;
+import battlechallenge.ship.ShipCollection;
 import battlechallenge.structures.City;
+import battlechallenge.structures.Structure;
 import battlechallenge.visual.BCViz;
 
 /**
@@ -39,12 +37,6 @@ public class Game extends Thread {
 		DEFAULT_SPEED = 750; // number of milliseconds to sleep between turns
 	}
 	
-	/** The board width. */
-	private int boardWidth;
-	
-	/** The board height. */
-	private int boardHeight;
-	
 	/** The players. */
 	private List<ServerPlayer> players;
 	
@@ -52,9 +44,9 @@ public class Game extends Thread {
 	
 	private BCViz viz;
 	
-	private File gameMap = new File("../Maps/Map_01");
+	private BattleMap map;
 	
-	private List<City> structures = new ArrayList<City>();
+	private ShipCollection ships;
 	
 	private int minsPerShip = 10; // TODO: Make variable per game
 	
@@ -87,9 +79,12 @@ public class Game extends Thread {
 			throw new IllegalArgumentException();
 		// TODO: ensure no null entries in list
 		this.players = players;
-		this.boardHeight = height;
-		this.boardWidth = width;
 		this.manager = manager;
+		ships = new ShipCollection();
+		for (ServerPlayer p : players) {
+			ships.addPlayer(p);
+			p.setShipCollection(ships);
+		}
 		
 		// DEBUG INFO
 		StringBuilder sb = new StringBuilder("Starting new Game with players { ");
@@ -99,45 +94,6 @@ public class Game extends Thread {
 		System.out.println(sb.toString());
 		
 		this.start();
-	}
-	
-	/**
-	 * Map first line should be the width space height
-	 * @param gameMap The map to play the game on
-	 */
-	public void importMap(File gameMap) {
-		String gameMapName = gameMap.toString();
-		int playerNum = 0; // Start at 0 increase every time map finds a base
-		int row = 0;
-		try {
-			Scanner scanner = new Scanner(new FileReader(gameMapName));
-			boardWidth = scanner.nextInt();
-			boardHeight = scanner.nextInt();
-			scanner.nextLine();
-			while (scanner.hasNextLine()){
-		      playerNum = processChar(scanner.nextLine(), playerNum, row); // will have increased if a base is assigned to a player
-		      row++;
-			}
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	public int processChar(String input, int playerNum, int row) {	
-		Base base;
-		for (int i = 0; i < input.length(); i++) { // Go through the column in the map
-			if (input.charAt(i) == ('C')) {
-				structures.add(new City(new Coordinate(row, i)));
-			}
-			if (input.charAt(i) == ('B') && playerNum < players.size()) {
-			    base = new Base(playerNum, new Coordinate(row, i));
-				structures.add(base); 
-				players.get(playerNum).setBase(base); // Tell server player where its base is
-				playerNum++;
-			}
-		}
-		return playerNum;
 	}
 	
 	
@@ -150,17 +106,17 @@ public class Game extends Thread {
 		/*
 		 * 			[[ INITIALIZE GAME ]]
 		 */
+		map = MapImporter.getMap(); // get default map
 		setPlayerCredentials();
+		map.assignPlayersToBases(players, getInitialShips()); // set bases
+		setGameConstants();
+		viz = new BCViz(players, map.getStructures(), map.getNumCols(), map.getNumRows());
 		
 		/*
 		 * 			[[ PLAY GAME ]]
 		 */
-		Map<Integer, List<ActionResult>> actionResults = new HashMap<Integer, List<ActionResult>>();
-		importMap(gameMap);
-		structures = getStructures();
-		setGameConstants();
-		placeOriginalShips();
 		// TODO: set structures to players and vice-versa
+		Map<Integer, List<ActionResult>> actionResults = new HashMap<Integer, List<ActionResult>>();
 		for(ServerPlayer p : players)
 			actionResults.put(p.getId(), new LinkedList<ActionResult>());
 		int livePlayers = 0;
@@ -170,8 +126,8 @@ public class Game extends Thread {
 			}
 		}
 		while (livePlayers > 1) {
-			doTurn(actionResults, structures);
-//			viz.updateGraphics();
+			doTurn(actionResults);
+			viz.updateGraphics();
 			livePlayers = 0;
 			for (ServerPlayer player: players) {
 				if (player.isAlive()) {
@@ -202,7 +158,7 @@ public class Game extends Thread {
 	
 	private void setPlayerCredentials() {
 		for(ServerPlayer p : players) {
-			if (p.setCredentials(boardWidth, boardHeight))
+			if (p.setCredentials(map.getNumCols(), map.getNumRows()))
 				System.out.println("Set player credentials: " + p.toString());
 			else {
 				// TODO: remove player and pause game if necessary
@@ -213,12 +169,6 @@ public class Game extends Thread {
 	public void setGameConstants() {
 		for(ServerPlayer p : players) {
 			p.setMinsPerShip(minsPerShip);
-		}
-	}
-	
-	public void updateShipMap() {
-		for(ServerPlayer p : players) {
-			p.updateShipMap();
 		}
 	}
 	
@@ -250,7 +200,7 @@ public class Game extends Thread {
 	 * 
 	 * @param actionResults The results of last turns actions
 	 */
-	private void doTurn(Map<Integer, List<ActionResult>> actionResults, List<City> structures) {
+	private void doTurn(Map<Integer, List<ActionResult>> actionResults) {
 		if (DEBUG) {
 			// DEGBUG INFO: print each users guess
 			StringBuilder sb = new StringBuilder();
@@ -271,7 +221,7 @@ public class Game extends Thread {
 		for(ServerPlayer p : players) {
 			if (!p.isAlive()) // Player is dead, don't request their turn
 				continue;
-			if (!p.requestTurn(allPlayersShips, actionResults, structures)) {
+			if (!p.requestTurn(allPlayersShips, actionResults, map)) {
 				// TODO: handle lost socket connection
 			}
 		}
@@ -290,7 +240,7 @@ public class Game extends Thread {
 			if (!p.isAlive()) // Player is dead no need to get actions when they cannot act
 				continue;
 			// shot coordinates and moves ships
-			List<ShipAction> shipActions = p.getTurn(boardWidth, boardHeight);
+			List<ShipAction> shipActions = p.getTurn(map.getNumCols(), map.getNumRows());
 			// reset action results for current user
 			actionResults.get(p.getId()).clear();
 			playerActions.put(p.getId(), shipActions);
@@ -304,11 +254,11 @@ public class Game extends Thread {
 			for(ShipAction sa : playerActions.get(p.getId())) {
 				// NOTE: moves are processed in: ServerPlayer.getTurn(...);
 				// check if shot is within game boundaries
-				for (int k=0;k<p.getShip(sa.getShipIdentifier()).getNumShots(); k++) {
+				Ship s = ships.getShip(sa.getShipIdentifier());
+				for (int k=0;k<s.getNumShots(); k++) {
 					Coordinate c = sa.getShotCoordList().get(k);
-					Ship s = p.getShip(sa.getShipIdentifier());
 					if ((s.distanceFromCenter(c) > s.getRange()) || 
-							!c.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1) || 
+							!c.inBoundsInclusive(0, map.getNumRows()-1, 0, map.getNumCols()-1) || 
 							s.isSunken()) {
 						// ignore shot out of bounds or invalid shot range
 						continue;
@@ -319,7 +269,7 @@ public class Game extends Thread {
 						for(ServerPlayer opp : players) {
 							// add all action results
 							// beware of friendly fire				
-							temp = (opp.isHit(c, s.getDamage()));
+							temp = (opp.isHit(c, s, s.getDamage()));
 							if (temp.getResult() == ShotResult.HIT)
 								hit = temp;
 							else if (temp.getResult() == ShotResult.SUNK) {
@@ -337,7 +287,8 @@ public class Game extends Thread {
 		updateCities();
 		allocateIncome();
 		spawnShips();
-		updateShipMap();
+		ships.removeSunkenShips();
+		ships.updateCoordinates();
 	}
 	
 	/**
@@ -368,46 +319,22 @@ public class Game extends Thread {
 		return null;
 	}
 	
-	/**
-	 * Places the original ships for each player
-	 */
-	public void placeOriginalShips() {
-		List<Ship> ships = new ArrayList<Ship>();
-		for (City base: structures) {
-			if (base instanceof Base) {
-				Ship ship = new Ship(base.getLocation());
-				ship.setPlayerId(base.getOwnerId());
-				ships.add(ship);
-				players.get(base.getOwnerId()).placeShip(ship);
-			}
-		}
-	}
-	
-	/**
-	 * Creates a base for each player then the default cities per number of players.
-	 *
-	 * @return the list of structures
-	 */
-	public List<City> getStructures() {
-		return structures;
-	}
-	
 	public List<City> updateStructures() {
 		return null;
 	}
 	
 	public void allocateIncome() {
-		for (City city: structures) {
-			if (city instanceof Base) {
-				continue;
+		for (Structure str: map.getStructures()) {
+			// there are no bases in map.getStructures
+			if (str instanceof City) {
+				City city = (City)str;
+				int ownerId = city.getOwnerId();
+				if (ownerId >= 0) { // all non-neutral cities
+					ServerPlayer p = players.get(ownerId);
+					 // increment players minerals by the amount the city generates
+					p.incrementMinerals(city.getMineralGenerationSpeed());
+				}
 			}
-			int ownerId = city.getOwnerId();
-			if (ownerId == -1) { // neutral city
-				continue;
-			}
-			ServerPlayer p = players.get(ownerId);
-			 // increment players minerals by the amount the city generates
-			p.incrementMinerals(city.getMineralGenerationSpeed());
 		}
 	}
 	
@@ -423,16 +350,17 @@ public class Game extends Thread {
 					Coordinate coord = s.getLocation();
 					allShipCoords.put(coord, s);
 				}
-		}	
-		for (City city: structures) {
-			if (city instanceof Base) {
-				continue;
-			}
-			ship = allShipCoords.get(city.getLocation());
-			if (ship != null) // There is a ship on the city
-				city.setOwner(ship.getPlayerId());
-			else {
-				city.setOwner(-1); // Neutral City
+		}
+		for (Structure str: map.getStructures()) {
+			// there are no bases in map.getStructures
+			if (str instanceof City) {
+				City city = (City)str;
+				ship = allShipCoords.get(city.getLocation());
+				if (ship != null) // There is a ship on the city
+					city.setOwner(ship.getPlayerId());
+				else {
+					city.setOwner(-1); // Neutral City
+				}
 			}
 		}
 		
@@ -444,4 +372,9 @@ public class Game extends Thread {
 		}
 	}
 	
+	public List<Ship> getInitialShips() {
+		List<Ship> ships = new LinkedList<Ship>();
+		ships.add(new Ship());
+		return ships;
+	}
 }
