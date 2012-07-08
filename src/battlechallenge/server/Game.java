@@ -52,7 +52,7 @@ public class Game extends Thread {
 	
 	private BCViz viz;
 	
-	private File gameMap = new File("Maps/Map_01");
+	private File gameMap = new File("../Maps/Map_01");
 	
 	private List<City> structures = new ArrayList<City>();
 	
