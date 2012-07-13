@@ -63,6 +63,12 @@ public class ServerPlayer {
 	/** The minerals. */
 	private int minerals;
 	
+	private int totalMinerals = 0;
+	
+	public int getTotalMinerals() {
+		return totalMinerals;
+	}
+	
 	private Base base;
 	
 	private int minsPerShip;
@@ -466,7 +472,8 @@ public class ServerPlayer {
 	 * @param income the income
 	 */
 	public void incrementMinerals(int income) {
-		this.minerals += income;	
+		this.minerals += income;
+		this.totalMinerals += income;
 	}
 
 	public Base getBase() {
