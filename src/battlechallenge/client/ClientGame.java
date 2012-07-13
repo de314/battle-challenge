@@ -27,42 +27,42 @@ public class ClientGame {
 	/** The action results. */
 	private static Map<Integer, List<ActionResult>> actionResults;
 	
-	private BattleMap map;
+	private static BattleMap map;
 	
 	public static int getNetworkID() {
 		return networkId;
 	}
 
-	public void setNetworkID(int networkId) {
+	public static void setNetworkID(int networkId) {
 		ClientGame.networkId = networkId;
 	}
 
-	public Map<Integer, List<Ship>> getShipMap() {
+	public static Map<Integer, List<Ship>> getShipMap() {
 		return shipMap;
 	}
 
-	public void setShipMap(Map<Integer, List<Ship>> shipMap) {
+	public static void setShipMap(Map<Integer, List<Ship>> shipMap) {
 		ClientGame.shipMap = shipMap;
 	}
 
-	public Map<Integer, List<ActionResult>> getActionResults() {
+	public static Map<Integer, List<ActionResult>> getActionResults() {
 		return actionResults;
 	}
 
-	public void setActionResults(Map<Integer, List<ActionResult>> actionResults) {
-		this.actionResults = actionResults;
+	public static void setActionResults(Map<Integer, List<ActionResult>> newActionResults) {
+		actionResults = newActionResults;
 	}
 
-	public BattleMap getMap() {
+	public static BattleMap getMap() {
 		return map;
 	}
 
-	public void setMap(BattleMap map) {
-		this.map = map;
+	public static void setMap(BattleMap newMap) {
+		map = newMap;
 	}
 
 	/**
-	 * Gets the my ships.
+	 * Gets the my shMps.
 	 *
 	 * @return the my ships
 	 */
@@ -76,7 +76,7 @@ public class ClientGame {
 	 *
 	 * @return the opponent ships
 	 */
-	public List<Ship> getOpponentShips() {
+	public static List<Ship> getOpponentShips() {
 		List<Ship> enemyShips = new LinkedList<Ship>();
 		for (Entry<Integer, List<Ship>> e: shipMap.entrySet()) { 
 			if (e.getKey() == networkId)
@@ -93,7 +93,7 @@ public class ClientGame {
 	 *
 	 * @return the my action results
 	 */
-	public List<ActionResult> getMyActionResults() {
+	public static List<ActionResult> getMyActionResults() {
 		List<ActionResult> myActionResults = actionResults.get(networkId);
 		return myActionResults;
 	}
@@ -103,7 +103,7 @@ public class ClientGame {
 	 *
 	 * @return the opponent action results
 	 */
-	public List<ActionResult> getOpponentActionResults() {
+	public static List<ActionResult> getOpponentActionResults() {
 		List<ActionResult> enemyActions = new LinkedList<ActionResult>();
 		for (Entry<Integer, List<ActionResult>> e: actionResults.entrySet()) { 
 			if (e.getKey() == networkId)
@@ -120,7 +120,7 @@ public class ClientGame {
 	 *
 	 * @return the my base
 	 */
-	public Base getMyBase() {
+	public static Base getMyBase() {
 		for (Base b : map.getBases()) {
 			if (b.getOwnerId() == networkId)
 				return b;
@@ -133,7 +133,7 @@ public class ClientGame {
 	 *
 	 * @return the opponent bases
 	 */
-	public List<Base> getOpponentBases() {
+	public static List<Base> getOpponentBases() {
 		List<Base> bases = new ArrayList<Base>();
 		for (Base b : map.getBases()) {
 			if (b.getOwnerId() != networkId)
@@ -147,7 +147,7 @@ public class ClientGame {
 	 *
 	 * @return the my cities
 	 */
-	public List<City> getMyCities() {
+	public static List<City> getMyCities() {
 		List<City> cities = new ArrayList<City>();
 		for (Structure str : map.getStructures()) {
 			if (str instanceof City) {
@@ -164,7 +164,7 @@ public class ClientGame {
 	 *
 	 * @return the all cities
 	 */
-	public List<City> getAllCities() {
+	public static List<City> getAllCities() {
 		List<City> cities = new ArrayList<City>();
 		for (Structure str : map.getStructures()) {
 			if (str instanceof City) {

@@ -10,27 +10,59 @@ import javax.swing.JFrame;
 import battlechallenge.server.ServerPlayer;
 import battlechallenge.structures.Structure;
 
+/**
+ * The Class BCViz.
+ * 
+ * 
+ * TODO: Look into JLayeredPane
+ * 	http://docs.oracle.com/javase/tutorial/uiswing/components/layeredpane.html
+ */
 public class BCViz extends JFrame {
 
-	/**
-	 * 
-	 */
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
 	
+	/** The Constant DEFAULT_HEIGHT_PX. */
 	public static final int DEFAULT_HEIGHT_PX = 400;
+	
+	/** The Constant DEFAULT_WIDTH_PX. */
 	public static final int DEFAULT_WIDTH_PX = 800;
+	
+	/** The Constant DEFAULT_ROW_OFFSET_PX. */
 	public static final int DEFAULT_ROW_OFFSET_PX = 30;
+	
+	/** The Constant DEFAULT_COL_OFFSET_PX. */
 	public static final int DEFAULT_COL_OFFSET_PX = 0;
+	
+	/** The TOTA l_ heigh t_ px. */
 	public final int TOTAL_HEIGHT_PX;
+	
+	/** The TOTA l_ widt h_ px. */
 	public final int TOTAL_WIDTH_PX;
 
+	/** The total width. */
 	private final int totalWidth;
+	
+	/** The total height. */
 	private final int totalHeight;
 	
+	/** The bp. */
 	private BoardPanel bp;
+	
+	/** The sc l. */
 	private StatsContainer scL;
+	
+	/** The sc r. */
 	private StatsContainer scR;
 
+	/**
+	 * Instantiates a new bC viz.
+	 *
+	 * @param players the players
+	 * @param structures the structures
+	 * @param boardWidth the board width
+	 * @param boardHeight the board height
+	 */
 	public BCViz(List<ServerPlayer> players, List<Structure> structures, int boardWidth,
 			int boardHeight) {
 		super("Battle Challenge Viz 0.1");
@@ -79,14 +111,23 @@ public class BCViz extends JFrame {
 		this.validate();
 	}
 	
+	/**
+	 * Kill.
+	 */
 	public void kill() {
 		this.dispose();
 	}
 
+	/**
+	 * Update graphics.
+	 */
 	public void updateGraphics() {
 		this.repaint();
 	}
 
+	/* (non-Javadoc)
+	 * @see java.awt.Container#paint(java.awt.Graphics)
+	 */
 	@Override
 	public void paint(Graphics g) {
 		bp.repaint();

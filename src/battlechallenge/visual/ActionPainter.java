@@ -24,16 +24,16 @@ public class ActionPainter {
 			int originCol = result.getOrigin().getCol();
 			int originRow = result.getOrigin().getRow();
 			g.drawLine(bp.getColPx(originCol) + offsetCol,
-					bp.getRowPx(originRow) + offsetRow, bp.getColPx(endCol)
-							+ offsetCol, bp.getRowPx(originRow) + offsetRow);
+					bp.getRowPx(originRow) + offsetRow, 
+					bp.getColPx(endCol) + offsetCol, 
+					bp.getRowPx(endRow) + offsetRow);
 			if (result.getResult() == ShotResult.HIT) {
 				g.drawLine(bp.getColPx(endCol) + eigthCol, bp.getRowPx(endRow)
-						+ eigthRow, bp.getColPx(endCol) + 7 * eigthCol,
-						bp.getRowPx(originRow) + 7 * eigthRow);
-				g.drawLine(bp.getColPx(endCol) + 7 * eigthCol,
+						+ eigthRow, bp.getColPx(endCol+1) - eigthCol,
+						bp.getRowPx(endRow+1) - eigthRow);
+				g.drawLine(bp.getColPx(endCol+1) - eigthCol,
 						bp.getRowPx(endRow) + eigthRow, bp.getColPx(endCol)
-								+ eigthCol, bp.getRowPx(originRow) + 7
-								* eigthRow);
+								+ eigthCol, bp.getRowPx(endRow+1) - eigthRow);
 			}
 
 		}

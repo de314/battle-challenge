@@ -14,10 +14,14 @@ public class MapImporter {
 
 	public static final String DEFAULT_MAP;
 	public static final String DEFAULT_MAP_ECLIPSE;
+	public static final String DEFAULT_MAP_WINDOWS;
+	public static final String DEFAULT_MAP_ECLIPSE_WINDOWS;
 	
 	static {
 		DEFAULT_MAP = "../Maps/Map_01";
 		DEFAULT_MAP_ECLIPSE = "Maps/Map_01";
+		DEFAULT_MAP_WINDOWS = "..\\Maps\\Map_01";
+		DEFAULT_MAP_ECLIPSE_WINDOWS = "Maps\\Map_01";
 	}
 	
 	public static BattleMap getMap() {
