@@ -341,9 +341,9 @@ public class Ship implements Serializable {
 	 * 
 	 * @param coord
 	 *            The coordinate to get the distance to
-	 * @return The distance between a ships center and a coordinate
+	 * @return The distance between a ship and a coordinate
 	 */
-	public double distanceFromCenter(Coordinate coord) {
+	public double distanceFromCoord(Coordinate coord) {
 		return location.distanceTo(coord);
 	}
 
