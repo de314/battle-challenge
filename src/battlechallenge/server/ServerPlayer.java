@@ -300,6 +300,9 @@ public class ServerPlayer {
 			case WEST: {
 				return new Coordinate(coor.getRow(), coor.getCol() - 1);
 			}
+			case STOP: {
+				return coor;
+			}
 		}
 		return null;
 	}
