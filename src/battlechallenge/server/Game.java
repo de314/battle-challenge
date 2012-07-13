@@ -38,7 +38,7 @@ public class Game extends Thread {
 	}
 	
 	/** The players. */
-	private List<ServerPlayer> players;
+	private Map<Integer, ServerPlayer> players;
 	
 	private GameManager manager;
 	
@@ -78,7 +78,9 @@ public class Game extends Thread {
 		if (players == null || players.size() < 2)
 			throw new IllegalArgumentException();
 		// TODO: ensure no null entries in list
-		this.players = players;
+		this.players = new HashMap<Integer, ServerPlayer>();
+		for (ServerPlayer p : players)
+			this.players.put(p.getId(), p);
 		this.manager = manager;
 		ships = new ShipCollection();
 		for (ServerPlayer p : players) {
@@ -108,19 +110,19 @@ public class Game extends Thread {
 		 */
 		map = MapImporter.getMap(); // get default map
 		setPlayerCredentials();
-		map.assignPlayersToBases(players, getInitialShips()); // set bases
+		map.assignPlayersToBases(players.values(), getInitialShips()); // set bases
 		setGameConstants();
-		viz = new BCViz(players, map.getStructures(), map.getNumCols(), map.getNumRows());
+		viz = new BCViz(players.values(), map.getStructures(), map.getNumCols(), map.getNumRows());
 		
 		/*
 		 * 			[[ PLAY GAME ]]
 		 */
 		// TODO: set structures to players and vice-versa
 		Map<Integer, List<ActionResult>> actionResults = new HashMap<Integer, List<ActionResult>>();
-		for(ServerPlayer p : players)
+		for(ServerPlayer p : players.values())
 			actionResults.put(p.getId(), new LinkedList<ActionResult>());
 		int livePlayers = 0;
-		for (ServerPlayer player: players) {
+		for (ServerPlayer player: players.values()) {
 			if (player.isAlive()) {
 				livePlayers++;
 			}
@@ -129,7 +131,7 @@ public class Game extends Thread {
 			doTurn(actionResults);
 			viz.updateGraphics();
 			livePlayers = 0;
-			for (ServerPlayer player: players) {
+			for (ServerPlayer player: players.values()) {
 				if (player.isAlive()) {
 					livePlayers++;
 				}
@@ -146,7 +148,7 @@ public class Game extends Thread {
 		else
 			System.out.println("Error: Winner not found.");
 		
-		for(ServerPlayer p : players) {
+		for(ServerPlayer p : players.values()) {
 			if (winner == p)
 				p.endGame(CommunicationConstants.RESULT_WIN);
 			else {
@@ -157,7 +159,7 @@ public class Game extends Thread {
 	}
 	
 	private void setPlayerCredentials() {
-		for(ServerPlayer p : players) {
+		for(ServerPlayer p : players.values()) {
 			if (p.setCredentials(map.getNumCols(), map.getNumRows()))
 				System.out.println("Set player credentials: " + p.toString());
 			else {
@@ -167,7 +169,7 @@ public class Game extends Thread {
 	}
 	
 	public void setGameConstants() {
-		for(ServerPlayer p : players) {
+		for(ServerPlayer p : players.values()) {
 			p.setMinsPerShip(minsPerShip);
 		}
 	}
@@ -179,8 +181,7 @@ public class Game extends Thread {
 	public void handleCollisions() {
 		Map<Coordinate, Ship> allShipCoords = new HashMap<Coordinate, Ship>(); // Stores coords of all players ships
 		HashSet<Ship> shipsToSink = new HashSet<Ship>();
-		for(int j=0;j<players.size();j++) {
-			ServerPlayer p = players.get(j);
+		for(ServerPlayer p : players.values()) {
 			for (Ship s: p.getUnsunkenShips(p)) {
 					Coordinate coord = s.getLocation();
 					if (allShipCoords.get(coord) != null) {
@@ -202,7 +203,10 @@ public class Game extends Thread {
 	 */
 	private void doTurn(Map<Integer, List<ActionResult>> actionResults) {
 		if (DEBUG) {
+
+
 			// DEGBUG INFO: print each users guess
+			/*
 			StringBuilder sb = new StringBuilder();
 			for (Entry<Integer, List<ActionResult>> e : actionResults.entrySet()) {
 				sb.append("\t{ ").append(e.getKey()).append(" ");
@@ -211,14 +215,17 @@ public class Game extends Thread {
 				sb.append(" }\n");
 			}
 			System.out.println(sb.toString());
+			*/
+
+
 		}
 		// hash map of ships to  reveal entire map
 		// TODO: alter for fog of war
 		Map<Integer, List<Ship>> allPlayersShips = new HashMap<Integer, List<Ship>>();
-		for (ServerPlayer p : players) {
+		for (ServerPlayer p : players.values()) {
 			allPlayersShips.put(p.getId(), p.getUnsunkenShips(p)); // List of all players ships to send to each player	
 		}
-		for(ServerPlayer p : players) {
+		for(ServerPlayer p : players.values()) {
 			if (!p.isAlive()) // Player is dead, don't request their turn
 				continue;
 			if (!p.requestTurn(allPlayersShips, actionResults, map)) {
@@ -235,8 +242,7 @@ public class Game extends Thread {
 		// Get all player actions and save them into a hash map by network id
 		// This is where all the ships are moved.
 		Map<Integer, List<ShipAction>> playerActions = new HashMap<Integer, List<ShipAction>>();
-		for(int j=0;j<players.size();j++) {
-			ServerPlayer p = players.get(j);
+		for(ServerPlayer p : players.values()) {
 			if (!p.isAlive()) // Player is dead no need to get actions when they cannot act
 				continue;
 			// shot coordinates and moves ships
@@ -255,6 +261,8 @@ public class Game extends Thread {
 				// NOTE: moves are processed in: ServerPlayer.getTurn(...);
 				// check if shot is within game boundaries
 				Ship s = ships.getShip(sa.getShipIdentifier());
+				if (s == null)
+					continue;
 				for (int k=0;k<s.getNumShots(); k++) {
 					Coordinate c = sa.getShotCoordList().get(k);
 					if (c == null || (s.distanceFromCoord(c) > s.getRange()) || 
@@ -266,7 +274,7 @@ public class Game extends Thread {
 						ActionResult hit = null;
 						ActionResult temp = null;
 						// valid shot location received
-						for(ServerPlayer opp : players) {
+						for(ServerPlayer opp : players.values()) {
 							// add all action results
 							// beware of friendly fire				
 							temp = (opp.isHit(c, s, s.getDamage()));
@@ -311,7 +319,7 @@ public class Game extends Thread {
 	 */
 	public ServerPlayer getWinner() {
 		// TODO: get player with max score
-		for (ServerPlayer player: players) {
+		for (ServerPlayer player: players.values()) {
 			if (player.isAlive()) {
 				return player;
 			}
@@ -367,7 +375,7 @@ public class Game extends Thread {
 	}
 	
 	public void spawnShips() {
-		for (ServerPlayer player: players) {
+		for (ServerPlayer player: players.values()) {
 			player.spawnShip();
 		}
 	}

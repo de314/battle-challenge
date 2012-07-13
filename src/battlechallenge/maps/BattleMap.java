@@ -1,6 +1,7 @@
 package battlechallenge.maps;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -103,15 +104,16 @@ public class BattleMap implements Serializable {
 	 * @param players the players
 	 * @return true, if successful
 	 */
-	public boolean assignPlayersToBases(List<ServerPlayer> players, List<Ship> ships) {
+	public boolean assignPlayersToBases(Collection<ServerPlayer> players, List<Ship> ships) {
 		if (players.size() > bases.size())
 			return false;
 		List<Ship> temp = new LinkedList<Ship>();
-		for(int i=0;i<players.size();i++) {
+		int count = 0;
+		for(ServerPlayer p : players) {
 			temp.clear();
 			for (Ship s : ships)
 				temp.add(s.deepCopy());
-			players.get(i).setBase(bases.get(i), temp);
+			p.setBase(bases.get(count++), temp);
 		}
 		return true;
 	}

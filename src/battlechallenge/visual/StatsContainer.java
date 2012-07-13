@@ -1,10 +1,11 @@
 package battlechallenge.visual;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Panel;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,9 +20,8 @@ public class StatsContainer extends Panel {
 	
 	private List<StatPanel> panels;
 	
-	public StatsContainer(List<ServerPlayer> players) {
+	public StatsContainer(Collection<ServerPlayer> players) {
 		super();
-		
 		panels = new LinkedList<StatPanel>();
 		for (ServerPlayer p : players)
 			panels.add(new StatPanel(p));

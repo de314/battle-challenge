@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Panel;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import battlechallenge.server.ServerPlayer;
@@ -31,7 +32,7 @@ public class BoardPanel extends Panel {
 	private int widthSpaces;
 	private int colPx;
 	private int rowPx;
-	private List<ServerPlayer> players;
+	private Collection<ServerPlayer> players;
 	private List<Structure> structures;
 
 	public int getRowPx(int row) {
@@ -51,7 +52,7 @@ public class BoardPanel extends Panel {
 	}
 
 	public BoardPanel(int widthSpaces, int heightSpaces,
-			List<ServerPlayer> players,List<Structure> structures) {
+			Collection<ServerPlayer> players,List<Structure> structures) {
 		this.widthSpaces = widthSpaces;
 		this.heightSpaces = heightSpaces;
 		this.players = players;
@@ -81,9 +82,10 @@ public class BoardPanel extends Panel {
 		for (int i = 1; i < this.heightSpaces; i++)
 			g.drawLine(0, i * rowPx, widthPx, i * rowPx);
 		// draw structures
-		for (int i = 0; i < players.size(); i++)
-			StructurePainter.paintBase(this, players.get(i).getBase(),
-					PLAYER_COLORS[i]);
+		int colorIndex = 0;
+		for (ServerPlayer p : players)
+			StructurePainter.paintBase(this, p.getBase(),
+					PLAYER_COLORS[colorIndex++]);
 		StructurePainter.paintStructures(this, structures);
 		// draw ships
 		for (int i = 0; i < players.size(); i++)

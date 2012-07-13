@@ -2,6 +2,7 @@ package battlechallenge.visual;
 
 import java.awt.BorderLayout;
 import java.awt.Graphics;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -63,7 +64,7 @@ public class BCViz extends JFrame {
 	 * @param boardWidth the board width
 	 * @param boardHeight the board height
 	 */
-	public BCViz(List<ServerPlayer> players, List<Structure> structures, int boardWidth,
+	public BCViz(Collection<ServerPlayer> players, List<Structure> structures, int boardWidth,
 			int boardHeight) {
 		super("Battle Challenge Viz 0.1");
 		this.totalWidth = boardWidth;
@@ -80,14 +81,15 @@ public class BCViz extends JFrame {
 			this.add(scL, BorderLayout.WEST);
 			break;
 		case 8 :;
-			List<ServerPlayer> temp = new LinkedList<ServerPlayer>();
+		List<ServerPlayer> playersList = new LinkedList<ServerPlayer>(players);
+		List<ServerPlayer> temp = new LinkedList<ServerPlayer>();
 			for (int i=0;i<4;i++)
-				temp.add(players.get(i));
+				temp.add(playersList.get(i));
 			scL = new StatsContainer(temp);
 			this.add(scL, BorderLayout.WEST);
 			temp = new LinkedList<ServerPlayer>();
 			for (int i=4;i<8;i++)
-				temp.add(players.get(i));
+				temp.add(playersList.get(i));
 			scR = new StatsContainer(temp);
 			this.add(scR, BorderLayout.EAST);
 			break;
