@@ -52,35 +52,7 @@ public class KevinBot extends ClientPlayer {
 	public KevinBot(final String playerName, final int mapWidth, final int boardHeight, final int networkID) {
 		super(playerName, mapWidth, boardHeight, networkID);
 	}
-	/**
-	 * This method is called at the beginning of the game to determine
-	 * where the player wants to place his ships. For each ship set the
-	 * starting position and the direction in which the ship's length will extend. Make sure
-	 * ships are not overlapping and are within the defined bounds of the game map.
-	 * @param shipList A list of ships with all null attributes
-	 * @return the shipList with updated values for the starting position
-	 * and direction the ship is facing
-	 */
-	public List<Ship> placeShips(List<Ship> shipList) {
-		//fillDirectionList(); // so direction list has N,E,S,W
-//		List<Integer> shipRow = new ArrayList<Integer>();
-//		int row = 0;
-//		int col = 0;
-//		for (Ship ship: shipList) {
-//			while (shipRow.contains(row)) {
-//				row = (int) (Math.random() * boardHeight);
-//				col = (int) (Math.random() * (boardWidth-5));
-//			}
-//		
-//			shipRow.add(row);
-//			shipRow.add(row+1);
-//			shipRow.add(row-1);
-//			ship.setStartPosition(new Coordinate(row,col));
-//			ship.setDirection(Ship.Direction.EAST);
-//		}
-//		System.out.println("placed ships");
-		return shipList;		
-	}
+
 	
 	public Coordinate move(Direction dir, Coordinate coor) {
 		switch (dir) {
@@ -123,61 +95,60 @@ public class KevinBot extends ClientPlayer {
 		return true;
 	}
 	
-	public List<Ship> getEnemyShipList(Map<Integer, List<Ship>> ships) {
-
-	enemyShips = new LinkedList<Ship>();
-	for (Entry<Integer, List<Ship>> e: ships.entrySet()) { 
-		if (e.getKey() == networkID)
-			continue;
-		for (Ship s : ships.get(e.getKey())) {
-			enemyShips.add(s);
-		}	
-	}
-	return enemyShips;
-	}
-	
-	public List<Coordinate> getEnemyCoordinates(List<Ship> eShips) {
-		List<Coordinate> enemyShipCoord = new LinkedList<Coordinate>();
-		for (Ship eShip : enemyShips) 
-		{
-//			for (Coordinate coord: eShip.getCoordinates()) {
-//				enemyShipCoord.add(coord);
-//			}
-		}
-		return enemyShipCoord;
-	}
-	
 	public Direction moveTowardsShip(Ship s1, Ship s2) {
+		Direction bestDirection = null;
+		double minDistance = Double.MAX_VALUE;
 		for (Direction d : directionList) {
 			Coordinate newCoord; 
+			double newDist = 0.0;
 			switch (d) {
 			case NORTH: {
-//				newCoord = new Coordinate(s1.getCenter().getRow()-1, s1.getCenter().getCol());
-//				if (s2.distanceFromCenter(newCoord) < s2.distanceFromCenter(s1.getCenter())) {
-//					return Direction.NORTH;
-//				} 
+				newCoord = new Coordinate(s1.getLocation().getRow()-1, s1.getLocation().getCol());
+				newDist = s2.distanceFromCoord(newCoord);
+				if (newDist < s2.distanceFromCoord(s1.getLocation())) {
+					if (newDist < minDistance) {
+						minDistance = newDist; 
+						bestDirection = Direction.NORTH;
+					}
+				}
+				continue;
 			}
 			case SOUTH: {
-//				newCoord = new Coordinate(s1.getCenter().getRow()+1, s1.getCenter().getCol());
-//				if (s2.distanceFromCenter(newCoord) < s2.distanceFromCenter(s1.getCenter())) {
-//					return Direction.SOUTH;
-//				} 
+				newCoord = new Coordinate(s1.getLocation().getRow()+1, s1.getLocation().getCol());
+				newDist = s2.distanceFromCoord(newCoord);
+				if (newDist < s2.distanceFromCoord(s1.getLocation())) {
+					if (newDist < minDistance) {
+						minDistance = newDist; 
+						bestDirection = Direction.SOUTH;
+					}
+				}
+				continue;
 			}
 			case EAST: {
-//				newCoord = new Coordinate(s1.getCenter().getRow(), s1.getCenter().getCol()+1);
-//				if (s2.distanceFromCenter(newCoord) < s2.distanceFromCenter(s1.getCenter())) {
-//					return Direction.EAST;
-//				} 
+				newCoord = new Coordinate(s1.getLocation().getRow(), s1.getLocation().getCol() + 1);
+				newDist = s2.distanceFromCoord(newCoord);
+				if (newDist < s2.distanceFromCoord(s1.getLocation())) {
+					if (newDist < minDistance) {
+						minDistance = newDist; 
+						bestDirection = Direction.EAST;
+					}
+				}
+				continue;
 			}
 			case WEST: {
-//				newCoord = new Coordinate(s1.getCenter().getRow(), s1.getCenter().getCol()-1);
-//				if (s2.distanceFromCenter(newCoord) < s2.distanceFromCenter(s1.getCenter())) {
-//					return Direction.WEST;
-//				} 
+				newCoord = new Coordinate(s1.getLocation().getRow()-1, s1.getLocation().getCol() - 1);
+				newDist = s2.distanceFromCoord(newCoord);
+				if (newDist < s2.distanceFromCoord(s1.getLocation())) {
+					if (newDist < minDistance) {
+						minDistance = newDist; 
+						bestDirection = Direction.WEST;
+					}
+				}
+				continue;
 			}
 			}
 		}
-		return null;
+		return bestDirection;
 	}
 	
 	public Ship closestEnemy(Ship myShip, List<Ship> enemyShips) {
@@ -185,11 +156,11 @@ public class KevinBot extends ClientPlayer {
 		double currDist;
 		double minDist = Double.MAX_VALUE;
 		for (Ship eShip: enemyShips) {
-//			currDist = myShip.distanceFromCenter(eShip.getCenter());
-//			if (currDist < minDist) {
-//				closestShip = eShip;
-//				minDist = currDist;
-//			}
+			currDist = myShip.distanceFromCoord(eShip.getLocation());
+			if (currDist < minDist) {
+				closestShip = eShip;
+				minDist = currDist;
+			}
 		}
 		return closestShip;
 	}
