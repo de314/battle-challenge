@@ -27,7 +27,9 @@ public class Ship implements Serializable {
 		/** The SOUTH. */
 		SOUTH,
 		/** The WEST. */
-		WEST
+		WEST,
+		/** Don't move. */
+		STOP
 	}
 
 	/** The damage. */

@@ -257,7 +257,7 @@ public class Game extends Thread {
 				Ship s = ships.getShip(sa.getShipIdentifier());
 				for (int k=0;k<s.getNumShots(); k++) {
 					Coordinate c = sa.getShotCoordList().get(k);
-					if ((s.distanceFromCenter(c) > s.getRange()) || 
+					if (c == null || (s.distanceFromCoord(c) > s.getRange()) || 
 							!c.inBoundsInclusive(0, map.getNumRows()-1, 0, map.getNumCols()-1) || 
 							s.isSunken()) {
 						// ignore shot out of bounds or invalid shot range

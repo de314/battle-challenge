@@ -37,6 +37,9 @@ public class BattleshipClient {
 	/**
 	 * The main method.
 	 *
+	 * Example
+	 * 		./runClient 'Name' 3000, '127.0.0.1' 'BotName'
+	 *
 	 * @param args the arguments
 	 */
 	public static void main(String[] args) {
