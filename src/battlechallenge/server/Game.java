@@ -253,8 +253,7 @@ public class Game extends Thread {
 		}
 		handleCollisions(); // if ships are overlapping after moving
 		// Now that all ships are moved, evaluate shots for each player
-		for(int j=0;j<players.size();j++) {
-			ServerPlayer p = players.get(j);
+		for(ServerPlayer p : players.values()) {
 			if (!p.isAlive()) // Player is dead no need to get actions when they cannot act
 				continue;
 			for(ShipAction sa : playerActions.get(p.getId())) {
@@ -352,8 +351,7 @@ public class Game extends Thread {
 	public void updateCities() {
 		Map<Coordinate, Ship> allShipCoords = new HashMap<Coordinate, Ship>(); // Stores coords of all players ships
 		Ship ship;
-		for(int j=0;j<players.size();j++) {
-			ServerPlayer p = players.get(j);
+		for(ServerPlayer p : players.values()) {
 			for (Ship s: p.getUnsunkenShips(p)) {
 					Coordinate coord = s.getLocation();
 					allShipCoords.put(coord, s);
