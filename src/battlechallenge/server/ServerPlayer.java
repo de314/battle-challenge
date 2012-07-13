@@ -67,6 +67,12 @@ public class ServerPlayer {
 	
 	private int minsPerShip;
 	
+	private int totalShips = 1;
+	
+	public int getTotalShips() {
+		return totalShips;
+	}
+	
 	public int getMinsPerShip() {
 		return minsPerShip;
 	}
@@ -494,6 +500,7 @@ public class ServerPlayer {
 	 */
 	public void spawnShip() {
 		if (minerals >= minsPerShip && !baseBlocked()) {
+			totalShips++;
 			Ship ship = new Ship(base.getLocation());
 			ship.setPlayerId(id);
 			ship.setShipId(ships.getNextShipId()); // TODO: Keep track of number of ships created thus far instead
