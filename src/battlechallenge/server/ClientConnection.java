@@ -1,6 +1,7 @@
 package battlechallenge.server;
 
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +13,6 @@ import battlechallenge.maps.BattleMap;
 import battlechallenge.network.ConnectionLostException;
 import battlechallenge.network.NetworkSocket;
 import battlechallenge.ship.Ship;
-import battlechallenge.structures.Structure;
 
 /**
  * The Class ClientConnection.
