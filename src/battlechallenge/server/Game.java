@@ -31,10 +31,13 @@ public class Game extends Thread {
 	public static final int DEFAULT_HEIGHT;
 	public static final int DEFAULT_SPEED;
 	
+	public static final int MAX_NUM_TURNS;
+	
 	static {
 		DEFAULT_WIDTH = 15;
 		DEFAULT_HEIGHT = 15;
 		DEFAULT_SPEED = 750; // number of milliseconds to sleep between turns
+		MAX_NUM_TURNS = 300; // 5 minutes if 1 turn per second
 	}
 	
 	/** The players. */
@@ -127,7 +130,7 @@ public class Game extends Thread {
 				livePlayers++;
 			}
 		}
-		while (livePlayers > 1) {
+		for (int turnCount = 0; turnCount<MAX_NUM_TURNS && livePlayers > 1;turnCount++) {
 			doTurn(actionResults);
 			viz.updateGraphics();
 			livePlayers = 0;
@@ -282,7 +285,7 @@ public class Game extends Thread {
 							else if (temp.getResult() == ShotResult.SUNK) {
 								hit = temp;
 								if (opp != p) {
-									p.incrementScore();
+									p.recordSunkenShip();
 								}
 							}
 						}
@@ -317,13 +320,24 @@ public class Game extends Thread {
 	 * @return the winner who is the only player with at least one ship left unsunk.
 	 */
 	public ServerPlayer getWinner() {
-		// TODO: get player with max score
-		for (ServerPlayer player: players.values()) {
-			if (player.isAlive()) {
-				return player;
+		List<ServerPlayer> validPlayers = new LinkedList<ServerPlayer>();
+		for (ServerPlayer player: players.values())
+			if (player.isAlive())
+				validPlayers.add(player);
+		if (validPlayers.size() == 1)
+			return validPlayers.get(0);
+		if (validPlayers.size() == 0)
+			validPlayers = new LinkedList<ServerPlayer>(players.values());
+		int maxScore = -1;
+		ServerPlayer maxPlayer = null;
+		// TODO: handle tie when selecting winner
+		for (ServerPlayer p : validPlayers) {
+			if (p.getScore() > maxScore) {
+				maxScore = p.getScore();
+				maxPlayer = p;
 			}
 		}
-		return null;
+		return maxPlayer;
 	}
 	
 	public List<City> updateStructures() {

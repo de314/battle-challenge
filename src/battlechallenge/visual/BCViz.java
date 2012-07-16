@@ -17,6 +17,7 @@ import battlechallenge.structures.Structure;
  * 
  * TODO: Look into JLayeredPane
  * 	http://docs.oracle.com/javase/tutorial/uiswing/components/layeredpane.html
+ * 	http://docs.oracle.com/javase/tutorial/displayCode.html?code=http://docs.oracle.com/javase/tutorial/uiswing/examples/components/LayeredPaneDemo2Project/src/components/LayeredPaneDemo2.java
  */
 public class BCViz extends JFrame {
 
