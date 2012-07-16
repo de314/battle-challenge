@@ -1,143 +1,160 @@
 package battlechallenge.bot;
+
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
+import java.util.Map.Entry;
 import java.util.Set;
 
-import battlechallenge.ActionResult;
-import battlechallenge.ActionResult.ShotResult;
 import battlechallenge.Coordinate;
 import battlechallenge.ShipAction;
+import battlechallenge.client.ClientGame;
 import battlechallenge.ship.Ship;
 import battlechallenge.ship.Ship.Direction;
-
+import battlechallenge.structures.City;
 
 public class DavidBot extends ClientPlayer {
 
-	private Set<String> guessed;
-	private Queue<Coordinate> adjacentList;
-	private List<MyCoordinate> nextGuesses;
 	
+	private Map<Coordinate, Ship> investments;
+	private Map<Ship, List<Coordinate>> closestCities;
+	private Map<Ship, Coordinate> closestEnemies;
+	private Set<String> nextPositions;
+
 	public DavidBot(String playerName, int boardWidth, int boardHeight,
 			int networkID) {
 		super(playerName, boardWidth, boardHeight, networkID);
-		this.guessed = new HashSet<String>();
-		adjacentList = new LinkedList<Coordinate>();
+		System.out.println("Initializing DavidBot");
+		investments = new HashMap<Coordinate, Ship>();
+		closestEnemies = new HashMap<Ship, Coordinate>();
+		closestCities = new HashMap<Ship, List<Coordinate>>();
+		nextPositions = new HashSet<String>();
 	}
 
 	@Override
 	public List<ShipAction> doTurn() {
-//		List<ActionResult> results = actionResults.get(super.networkID);
-//		for (ActionResult ar : results) {
-//			if (ar.getResult() == ShotResult.HIT) {
-//				addAdjacent(ar.getCoordinate().getRow(), ar.getCoordinate().getCol());
-//				System.out.println("Recording hit at " + ar.getCoordinate().toString() + " with size " + adjacentList.size());
-//			}
-//		}
-		Coordinate c = null;
-		while (c == null && !adjacentList.isEmpty()) {
-			c = adjacentList.poll();
-			if (guessed.contains(c.toString()))
-				c = null;
-		}
-		while (c == null) {
-			c = new Coordinate((int)(Math.random() * super.boardHeight), (int)(Math.random() * super.boardWidth));
-			if (guessed.contains(c.toString()))
-				c = null;
-		}
-		System.out.println("#guesses: " + guessed.size() + "  ||  #adjacent: " + adjacentList.size());
-		guessed.add(c.toString());
-		List<Coordinate> ret = new LinkedList<Coordinate>();
-		ret.add(c);
-//		return ret;
-		return null;
+		System.out.println("[[TURN]]");
+		setClosestEnemies();
+		setClosestCities();
+		assignShipsToCities();
+		Map<Ship, Direction> actions = moveShips();
+		return fireShots(actions);
 	}
-	
-	public void addAdjacent(int row, int col) {
-		if (col < super.boardWidth-1)
-			adjacentList.offer(new Coordinate(row, col+1));
-		if (col > 0)
-			adjacentList.offer(new Coordinate(row, col-1));
-		if (row < super.boardHeight-1)
-			adjacentList.offer(new Coordinate(row+1, col));
-		if (row > 0)
-			adjacentList.offer(new Coordinate(row-1, col));
-	}
-	
-	
-	/*
-	 * TODO: halfway through implementation
-	 */
-	private static class MyCoordinate {
-		
-		public enum Orientation { HORIZONTAL, VERTICLE }
-		
-		private Orientation dir;
-		private Coordinate coord;
-		private MyCoordinate referrer;
-		private List<MyCoordinate> vert;
-		private List<MyCoordinate> horz;
-		
-		public MyCoordinate(Coordinate coord, Orientation dir, MyCoordinate referrer) {
-			this.coord = coord;
-			this.dir = dir;
-			this.referrer = referrer;
-		}
-		
-		private List<MyCoordinate> getHorzGuesses(Set<String> guessed, int width, int height) {
-			if (horz != null)
-				return horz;
-			horz = new LinkedList<MyCoordinate>();
-			if (this.coord.getCol() < width-1) {
-				Coordinate coord = new Coordinate(this.coord.getRow(), this.coord.getCol()+1);
-				if (!guessed.contains(coord))
-					horz.add(new MyCoordinate(coord, Orientation.HORIZONTAL, this));
+
+	private void setClosestEnemies() {
+		closestEnemies.clear();
+		for (Ship mine : ClientGame.getMyShips()) {
+			Coordinate c = mine.getLocation();
+			Ship closest = null;
+			double dist = -1;
+			for (Ship enemy : ClientGame.getOpponentShips()) {
+				double temp = c.distanceTo(enemy.getLocation());
+				if (closest == null || temp < dist) {
+					closest = enemy;
+					dist = temp;
+				}
 			}
-			if (this.coord.getCol() > 0) {
-				Coordinate coord = new Coordinate(this.coord.getRow(), this.coord.getCol()-1);
-				if (!guessed.contains(coord))
-					horz.add(new MyCoordinate(coord, Orientation.HORIZONTAL, this));
-			}
-			return horz;
-		}
-			
-		private List<MyCoordinate> getVertGuesses(Set<String> guessed, int width, int height) {
-			if (vert != null)
-				return vert;
-			vert = new LinkedList<MyCoordinate>();
-			if (this.coord.getRow() < height-1) {
-				Coordinate coord = new Coordinate(this.coord.getRow()+1, this.coord.getCol());
-				if (!guessed.contains(coord))
-					vert.add(new MyCoordinate(coord, Orientation.HORIZONTAL, this));
-			}
-			if (this.coord.getRow() > 0) {
-				Coordinate coord = new Coordinate(this.coord.getRow()-1, this.coord.getCol());
-				if (!guessed.contains(coord))
-					vert.add(new MyCoordinate(coord, Orientation.HORIZONTAL, this));
-			}
-			return vert;
-		}
-		
-		public List<MyCoordinate> getGuesses(Set<String> guessed, int width, int height) {
-			List<MyCoordinate> temp = new LinkedList<MyCoordinate>();
-			temp.addAll(getHorzGuesses(guessed, width, height));
-			temp.addAll(getVertGuesses(guessed, width, height));
-			return temp;
-		}
-		
-		public void remove(List<MyCoordinate> nextMoves) {
-			if (dir == Orientation.VERTICLE)
-				nextMoves.removeAll(referrer.getHorzGuesses(null, -1, -1));
-			else 
-				nextMoves.removeAll(referrer.getVertGuesses(null, -1, -1));
-		}
-		
-		@Override
-		public String toString() {
-			return coord.toString();
+			closestEnemies.put(mine, closest.getLocation());
 		}
 	}
-	
+
+	private void setClosestCities() {
+		closestCities.clear();
+		for (final Ship mine : ClientGame.getMyShips()) {
+			List<City> temp = ClientGame.getAllCities();
+			temp.removeAll(ClientGame.getMyCities());
+			Coordinate[] arr = new Coordinate[temp.size()];
+			for (int i=0;i<arr.length;i++)
+				arr[i] = temp.get(i).getLocation();
+			Arrays.sort(arr, new Comparator<Coordinate>() {
+				@Override
+				public int compare(Coordinate a, Coordinate b) {
+					double temp = mine.distanceFromCoord(a) - mine.distanceFromCoord(b);
+					if (temp < 0)
+						return -1;
+					if (temp > 0)
+						return 1;
+					return 0;
+				}
+			});
+			List<Coordinate> coords = new LinkedList<Coordinate>();
+			for (int i=0;i<arr.length;i++)
+				coords.add(arr[i]);
+			closestCities.put(mine, coords);
+		}
+	}
+
+	private void assignShipsToCities() {
+		investments.clear();
+		List<City> cities = ClientGame.getAllCities();
+		cities.removeAll(ClientGame.getMyCities());
+		List<Ship> ships = ClientGame.getMyShips();
+		ships.removeAll(investments.keySet());
+		for (Ship s : ClientGame.getMyShips()) {
+			for (Coordinate c : closestCities.get(s)) {
+				if (investments.get(c) == null) {
+					investments.put(c, s);
+					break;
+				}
+			}
+		}
+	}
+
+	private Map<Ship, Direction> moveShips() {
+		nextPositions.clear();
+		Map<Ship, Direction> actions = new HashMap<Ship, Direction>();
+		System.out.println(investments.size());
+		for (Entry<Coordinate, Ship> e : investments.entrySet()) {
+			Ship s = e.getValue();
+			Coordinate c = s.getLocation();
+			Direction dir = Direction.EAST;
+			if (e.getKey().getCol() > c.getCol()) {
+				c = new Coordinate(c.getRow(), c.getCol()-1);
+			} else if (e.getKey().getCol() < c.getCol()) {
+				dir = Direction.WEST;
+				c = new Coordinate(c.getRow(), c.getCol()+1);
+			} else if (e.getKey().getRow() > c.getRow()) {
+				dir = Direction.SOUTH;
+				c = new Coordinate(c.getRow()+1, c.getCol());
+			} else if (e.getKey().getRow() < c.getRow()) {
+				dir = Direction.NORTH;
+				c = new Coordinate(c.getRow()-1, c.getCol());
+			} else {
+				actions.put(s, Direction.STOP);
+				continue;
+			}
+			if (!nextPositions.contains(c.toString())) {
+				actions.put(s, dir);
+				nextPositions.add(c.toString());
+			}
+		}
+		for (Ship s : ClientGame.getMyShips()) {
+			if (actions.containsKey(s))
+				continue;
+			Coordinate closest = closestEnemies.get(s);
+			if (closest.getRow() > s.getLocation().getRow())
+				actions.put(s, Direction.NORTH);
+			else if (closest.getRow() < s.getLocation().getRow())
+				actions.put(s, Direction.SOUTH);
+			else if (closest.getCol() > s.getLocation().getCol())
+				actions.put(s, Direction.EAST);
+			else
+				actions.put(s, Direction.WEST);
+			System.out.println(s.getLocation() + ":" + closest + ":"
+					+ actions.get(s));
+		}
+		return actions;
+	}
+
+	private List<ShipAction> fireShots(Map<Ship, Direction> directions) {
+		List<ShipAction> actions = new LinkedList<ShipAction>();
+		for (Ship s : directions.keySet())
+			actions.add(new ShipAction(s.getIdentifier(),
+					closestEnemies.get(s), directions.get(s)));
+		return actions;
+	}
 }

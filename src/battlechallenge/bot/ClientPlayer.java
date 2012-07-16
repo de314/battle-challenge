@@ -104,7 +104,6 @@ public class ClientPlayer {
 		moveCoord.add(Direction.NORTH);
 		
 		for (Ship s: ClientGame.getMyShips()) {
-			System.out.println(s);
 			actions.add(new ShipAction(s.getIdentifier(), shotCoord, moveCoord));
 		}
 		return actions;

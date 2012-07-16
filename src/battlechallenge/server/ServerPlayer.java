@@ -36,7 +36,7 @@ public class ServerPlayer {
 	private ClientConnection conn;
 
 	/** The score. */
-	private int score;
+	private ScoreKeeper score;
 	
 	/** The hits. */
 	private int hits;
@@ -91,6 +91,10 @@ public class ServerPlayer {
 
 	public void setMinsPerShip(int minsForShip) {
 		this.minsPerShip = minsForShip;
+	}
+	
+	public void updateScore() {
+		
 	}
 
 	/**
@@ -365,24 +369,8 @@ public class ServerPlayer {
 	 * @return the score
 	 */
 	public int getScore() {
-		return score;
+		return score.getScore();
 	}
-
-	/**
-	 * Win.
-	 */
-	public void win() {
-		// TODO: decide how to score a win
-		score++;
-	}
-	
-	/**
-	 * Increments the players score for sinking an enemy ship.
-	 */
-	public void incrementScore() {
-		score++;
-	}
-
 	
 	/**
 	 * Checks to see if the player has any ships not sunk.
@@ -402,15 +390,6 @@ public class ServerPlayer {
 		}
 		return hasShips;
 	}
-	
-	/**
-	 * Lose.
-	 */
-	public void lose() {
-		// TODO: decide how to score a loss
-		score--;
-	}
-	
 	
 	/**
 	 * Checks if the ship is hit as a result of an action.
@@ -482,6 +461,7 @@ public class ServerPlayer {
 	public void incrementMinerals(int income) {
 		this.minerals += income;
 		this.totalMinerals += income;
+		this.score.addMineralsEarned(income);
 	}
 
 	public Base getBase() {
@@ -568,4 +548,9 @@ public class ServerPlayer {
 		return validSpawnCoordinates;
 }
 	
+	
+	public void recordSunkenShip() {
+		score.addSunkShip();
+	}
+
 }
