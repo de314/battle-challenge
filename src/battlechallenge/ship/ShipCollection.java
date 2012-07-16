@@ -1,5 +1,6 @@
 package battlechallenge.ship;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -56,6 +57,11 @@ public class ShipCollection {
 	
 	public Collection<Ship> getPlayerShips(int playerId) {
 		return idenMap.get(playerId).values();
+	}
+	
+	public Map<String, Ship> getCoordMap() {
+		return coordMap;
+
 	}
 	
 	public Ship getShip(ServerPlayer player, int shipId) {

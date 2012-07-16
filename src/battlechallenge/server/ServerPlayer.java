@@ -1,6 +1,8 @@
 package battlechallenge.server;
 
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -64,6 +66,10 @@ public class ServerPlayer {
 	private int minerals;
 	
 	private int totalMinerals = 0;
+	
+	private int boardHeight;
+	
+	private int boardWidth;
 	
 	public int getTotalMinerals() {
 		return totalMinerals;
@@ -194,9 +200,9 @@ public class ServerPlayer {
 	}
 	
 	/**
-	 * Gets the num live ships.
+	 * Gets the number of live ships.
 	 *
-	 * @return the num live ships
+	 * @return the number of live ships
 	 */
 	public int getNumLiveShips() {
 		int count = 0;
@@ -250,6 +256,8 @@ public class ServerPlayer {
 	 * @return true, if successful
 	 */
 	public boolean setCredentials(int boardWidth, int boardHeight) {
+		this.boardWidth = boardWidth;
+		this.boardHeight = boardHeight;
 		this.name = conn.setCredentials(id, boardWidth, boardHeight);
 		return this.name != null;
 	}
@@ -486,17 +494,63 @@ public class ServerPlayer {
 	 * minerals and another ship is not blocking the base
 	 */
 	public void spawnShip() {
-		if (minerals >= minsPerShip && !baseBlocked()) {
+		List<Coordinate> spawnLocations = genSpawnCoords(base.getLocation());
+		int i = 0;
+		while (minerals >= minsPerShip  && i < spawnLocations.size()) {
 			totalShips++;
-			Ship ship = new Ship(base.getLocation());
+			Ship ship = new Ship(spawnLocations.get(i));  // get first available spawn location (will be base if available)
 			ship.setPlayerId(id);
 			ship.setShipId(ships.getNextShipId()); // TODO: Keep track of number of ships created thus far instead
 			ships.addShip(ship, true);
 			minerals -= minsPerShip; // Subtract cost to make a ship
-		}		
+			i++;
+		}
 	}
+	
+	public List<Coordinate> genSpawnCoords(Coordinate coord) {
+		List<Coordinate> adjCoords = new ArrayList<Coordinate>();
+		Coordinate Base = base.getLocation();
+		Coordinate North = new Coordinate(coord.getRow()-1, coord.getCol());
+		Coordinate South = new Coordinate(coord.getRow()+1, coord.getCol());
+		Coordinate East = new Coordinate(coord.getRow(), coord.getCol() + 1);
+		Coordinate West = new Coordinate(coord.getRow(), coord.getCol() - 1);
+		Coordinate NorthEast = new Coordinate(coord.getRow()-1, coord.getCol() + 1);
+		Coordinate NorthWest = new Coordinate(coord.getRow()-1, coord.getCol() - 1);
+		Coordinate SouthEast = new Coordinate(coord.getRow()+1, coord.getCol() + 1);
+		Coordinate SouthWest = new Coordinate(coord.getRow()+1, coord.getCol() - 1);
+		adjCoords.add(Base);
+		adjCoords.add(North);
+		adjCoords.add(South);
+		adjCoords.add(East);
+		adjCoords.add(West);
+		adjCoords.add(NorthEast);
+		adjCoords.add(SouthWest);
+		adjCoords.add(NorthWest);
+		adjCoords.add(SouthEast);
+		adjCoords = validateCoordinateList(adjCoords);
+		return adjCoords;
+}
+	/**
+	 * Gets the adjacent coordinates
+	 * @param coord The coordinate to get the adjacent coordinates of
+	 * @return A list of adjacent coordinates to the coordinate
+	 */
+	public List<Coordinate> validateCoordinateList(Collection<Coordinate> coordList) {
+		Map<String, Ship> allShipsLocations = ships.getCoordMap();
+		List<Coordinate> validSpawnCoordinates = new LinkedList<Coordinate>();
+		for (Coordinate coord: coordList) {
+			if (allShipsLocations.get(coord.toString()) == null) {
+				if (!(coord.getRow() < 0 || coord.getRow() >= boardHeight || coord.getCol() < 0 || coord.getCol() >= boardWidth)) {
+					validSpawnCoordinates.add(coord);
+				}
+			}
+		}
+		return validSpawnCoordinates;
+}
+	
 	
 	public void recordSunkenShip() {
 		score.addSunkShip();
 	}
+
 }
