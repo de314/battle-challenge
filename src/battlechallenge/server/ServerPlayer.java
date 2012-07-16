@@ -491,7 +491,7 @@ public class ServerPlayer {
 			Ship ship = new Ship(base.getLocation());
 			ship.setPlayerId(id);
 			ship.setShipId(ships.getNextShipId()); // TODO: Keep track of number of ships created thus far instead
-			ships.addShip(ship);
+			ships.addShip(ship, true);
 			minerals -= minsPerShip; // Subtract cost to make a ship
 		}		
 	}

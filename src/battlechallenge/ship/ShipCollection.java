@@ -35,8 +35,15 @@ public class ShipCollection {
 	}
 	
 	public void addShip(Ship s) {
+		addShip(s, false);
+	}
+	
+	public void addShip(Ship s, boolean addCoordinate) {
 		idenMap.get(s.getPlayerId()).put(s.getShipId(), s);
-		needsCoordUpdate = true;
+		if (addCoordinate)
+			coordMap.put(s.getLocation().toString(), s);
+		else
+			needsCoordUpdate = true;
 	}
 	
 	public Ship getShip(ShipIdentifier si) {
