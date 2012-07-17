@@ -51,7 +51,7 @@ public class Game extends Thread {
 	
 	private ShipCollection ships;
 	
-	private int minsPerShip = 10; // TODO: Make variable per game
+	private int minsPerShip = 4; // TODO: Make variable per game
 	
 	/**
 	 * Used to check how many players are in the game
@@ -263,7 +263,7 @@ public class Game extends Thread {
 				// NOTE: moves are processed in: ServerPlayer.getTurn(...);
 				// check if shot is within game boundaries
 				Ship s = ships.getShip(sa.getShipIdentifier());
-				if (s == null)
+				if (s == null || sa.getShotCoordList().isEmpty()) // Handle null ships and empty shot list
 					continue;
 				for (int k=0;k<s.getNumShots() && k<sa.getShotCoordList().size(); k++) {
 					Coordinate c = sa.getShotCoordList().get(k);

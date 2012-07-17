@@ -36,7 +36,7 @@ public class ServerPlayer {
 	private ClientConnection conn;
 
 	/** The score. */
-	private ScoreKeeper score;
+	private ScoreKeeper score = new ScoreKeeper();
 	
 	/** The hits. */
 	private int hits;
@@ -91,10 +91,6 @@ public class ServerPlayer {
 
 	public void setMinsPerShip(int minsForShip) {
 		this.minsPerShip = minsForShip;
-	}
-	
-	public void updateScore() {
-		
 	}
 
 	/**
@@ -491,14 +487,25 @@ public class ServerPlayer {
 	
 	/**
 	 * Spawn a new ship at the base if the player has enough
-	 * minerals and another ship is not blocking the base
+	 * minerals. Spawn ships adjacent to base if spawning more than one ship at a time
 	 */
 	public void spawnShip() {
 		List<Coordinate> spawnLocations = genSpawnCoords(base.getLocation());
 		int i = 0;
+		if (minerals >= minsPerShip && minerals - minsPerShip < minsPerShip) { // Only enough minerals to spawn one ship so spawn on base if possi ble
+			if (!baseBlocked()) {
+				totalShips++;
+				Ship ship = new Ship(spawnLocations.get(i));
+				ship.setPlayerId(id);
+				ship.setShipId(ships.getNextShipId()); 
+				ships.addShip(ship, true);
+				minerals -= minsPerShip; // Subtract cost to make a ship
+				return;
+			}
+		}
 		while (minerals >= minsPerShip  && i < spawnLocations.size()) {
 			totalShips++;
-			Ship ship = new Ship(spawnLocations.get(i));  // get first available spawn location (will be base if available)
+			Ship ship = new Ship(spawnLocations.get(i));  // get first available spawn location
 			ship.setPlayerId(id);
 			ship.setShipId(ships.getNextShipId()); // TODO: Keep track of number of ships created thus far instead
 			ships.addShip(ship, true);
@@ -509,7 +516,6 @@ public class ServerPlayer {
 	
 	public List<Coordinate> genSpawnCoords(Coordinate coord) {
 		List<Coordinate> adjCoords = new ArrayList<Coordinate>();
-		Coordinate Base = base.getLocation();
 		Coordinate North = new Coordinate(coord.getRow()-1, coord.getCol());
 		Coordinate South = new Coordinate(coord.getRow()+1, coord.getCol());
 		Coordinate East = new Coordinate(coord.getRow(), coord.getCol() + 1);
@@ -518,7 +524,7 @@ public class ServerPlayer {
 		Coordinate NorthWest = new Coordinate(coord.getRow()-1, coord.getCol() - 1);
 		Coordinate SouthEast = new Coordinate(coord.getRow()+1, coord.getCol() + 1);
 		Coordinate SouthWest = new Coordinate(coord.getRow()+1, coord.getCol() - 1);
-		adjCoords.add(Base);
+		Coordinate Base = base.getLocation();
 		adjCoords.add(North);
 		adjCoords.add(South);
 		adjCoords.add(East);
@@ -527,6 +533,7 @@ public class ServerPlayer {
 		adjCoords.add(SouthWest);
 		adjCoords.add(NorthWest);
 		adjCoords.add(SouthEast);
+		adjCoords.add(Base);
 		adjCoords = validateCoordinateList(adjCoords);
 		return adjCoords;
 }
