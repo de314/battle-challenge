@@ -1,8 +1,10 @@
 package battlechallenge.structures;
 
+import java.io.Serializable;
+
 import battlechallenge.Coordinate;
 
-public class Barrier extends Structure {
+public class Barrier extends Structure implements Serializable{
 
 	/**
 	 * 

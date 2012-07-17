@@ -30,7 +30,6 @@ public class Game extends Thread {
 	public static final int DEFAULT_WIDTH;
 	public static final int DEFAULT_HEIGHT;
 	public static final int DEFAULT_SPEED;
-	
 	public static final int MAX_NUM_TURNS;
 	
 	static {
@@ -249,7 +248,7 @@ public class Game extends Thread {
 			if (!p.isAlive()) // Player is dead no need to get actions when they cannot act
 				continue;
 			// shot coordinates and moves ships
-			List<ShipAction> shipActions = p.getTurn(map.getNumCols(), map.getNumRows());
+			List<ShipAction> shipActions = p.getTurn(map.getNumCols(), map.getNumRows(), map.getStructures());
 			// reset action results for current user
 			actionResults.get(p.getId()).clear();
 			playerActions.put(p.getId(), shipActions);
@@ -296,8 +295,9 @@ public class Game extends Thread {
 		}
 		updateCities();
 		allocateIncome();
-		spawnShips();
 		ships.removeSunkenShips();
+		ships.updateCoordinates();
+		spawnShips();
 		ships.updateCoordinates();
 	}
 	
@@ -338,10 +338,6 @@ public class Game extends Thread {
 			}
 		}
 		return maxPlayer;
-	}
-	
-	public List<City> updateStructures() {
-		return null;
 	}
 	
 	public void allocateIncome() {

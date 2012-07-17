@@ -20,6 +20,8 @@ import battlechallenge.ship.Ship;
 import battlechallenge.ship.Ship.Direction;
 import battlechallenge.ship.ShipCollection;
 import battlechallenge.structures.Base;
+import battlechallenge.structures.Structure;
+import battlechallenge.structures.Barrier;
 
 /**
  * The Class ServerPlayer.
@@ -270,7 +272,7 @@ public class ServerPlayer {
 	 * @param boardHeight the board height
 	 * @return the list
 	 */
-	private void moveShips(List<ShipAction> shipAction, int boardWidth, int boardHeight) {
+	private void moveShips(List<ShipAction> shipAction, int boardWidth, int boardHeight, List<Structure> structures) {
 		for (ShipAction shipAct: shipAction) {
 			if (this.id != shipAct.getShipIdentifier().playerId) { // playerId does not match shipId
 				System.out.println("Attempted to act on ship that isn't players");
@@ -283,6 +285,11 @@ public class ServerPlayer {
 				s.setLocation(newCoord);
 				if (!s.inBoundsInclusive(0, boardHeight-1, 0, boardWidth-1)) { // Check if ship remains on map
 					s.setLocation(lastShipPositions.get(s.getIdentifier().toString()));
+				}
+				for (Structure str: structures) {
+					if (str instanceof Barrier && str.getLocation().equals(newCoord)) { // Is the new coordinate on top of a barrier?
+						s.setLocation(lastShipPositions.get(s.getIdentifier().toString())); // reverting the movement because attempting to move into a barrier
+					}
 				}
 			}
 		}
@@ -347,11 +354,11 @@ public class ServerPlayer {
 	 * @param boardHeight the game board height
 	 * @return a list of ship actions from the ClientPlayer
 	 */
-	public List<ShipAction> getTurn(int boardWidth, int boardHeight) {
+	public List<ShipAction> getTurn(int boardWidth, int boardHeight, List<Structure> structures) {
 		List<ShipAction> shipActions = new LinkedList<ShipAction>();
 		try {
 			shipActions = conn.getTurn(); // get the ship action list from the client player
-			moveShips(shipActions, boardWidth, boardHeight);
+			moveShips(shipActions, boardWidth, boardHeight, structures);
 			return shipActions;
 		} catch (ConnectionLostException e) {
 			// TODO: handle lost connection

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import battlechallenge.Coordinate;
+import battlechallenge.structures.Barrier;
 import battlechallenge.structures.Base;
 import battlechallenge.structures.City;
 import battlechallenge.structures.Structure;
@@ -51,6 +52,8 @@ public class MapImporter {
 						structures.add(new City(new Coordinate(row, col)));
 					if (line.charAt(col) == ('B'))
 						bases.add(new Base(playerNum, new Coordinate(row, col))); 
+					if (line.charAt(col) == 'W') // barriers
+						structures.add(new Barrier(new Coordinate(row, col)));
 				}
 			}
 			return new BattleMap(name, boardWidth, boardHeight, structures, bases);
