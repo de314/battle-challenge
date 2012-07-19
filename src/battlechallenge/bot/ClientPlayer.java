@@ -5,6 +5,7 @@ import java.util.List;
 
 import battlechallenge.Coordinate;
 import battlechallenge.ShipAction;
+import battlechallenge.ShipIdentifier;
 import battlechallenge.client.ClientGame;
 import battlechallenge.ship.Ship;
 import battlechallenge.ship.Ship.Direction;
@@ -96,15 +97,38 @@ public class ClientPlayer {
 	 *
 	 * @return a List of coordinates corresponding to where you wish to fire
 	 */
+	
+	int count = 0;
 	public List<ShipAction> doTurn() {
 		List<ShipAction> actions = new LinkedList<ShipAction>();
 		List<Coordinate> shotCoord = new LinkedList<Coordinate>();
 		List<Direction> moveCoord = new LinkedList<Direction>();
+//		shotCoord.add(null);
 		shotCoord.add(new Coordinate(10,10));
 		moveCoord.add(Direction.NORTH);
-		
+		ShipIdentifier shipID = null;
+		int i = 0;
 		for (Ship s: ClientGame.getMyShips()) {
-			actions.add(new ShipAction(s.getIdentifier(), shotCoord, moveCoord));
+			if (i == 0) {
+				shipID = s.getIdentifier();
+			}
+			if (i > 0) {
+				moveCoord.clear();
+				moveCoord.add(Direction.SOUTH);
+				shotCoord.add(new Coordinate(10,9));
+			}
+			actions.add(new ShipAction(shipID, shotCoord, moveCoord)); 
+			i++;
+		}
+		count+= 200;
+		if (count > 1000) {
+			count = 0;
+		}
+		try {
+			Thread.sleep(count); 
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return actions;
 	}

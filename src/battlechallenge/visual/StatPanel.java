@@ -44,6 +44,8 @@ public class StatPanel extends Panel {
 				PADDING_VERT + (ts * i++));
 		g.drawString("Income: " + p.getLastIncome(), PADDING_HORZ,
 				PADDING_VERT + (ts * i++));
+		g.drawString("Minerals: " + p.getMinerals(), PADDING_HORZ,
+				PADDING_VERT + (ts * i++));
 //		g.drawString("Next Ship: " + (p.getMinsPerShip() - p.getMinerals()),
 //				PADDING_HORZ, PADDING_VERT + (ts * i++));
 //		g.drawString("Total Mins: " + p.getTotalMinerals(), PADDING_HORZ,

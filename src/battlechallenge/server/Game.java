@@ -130,7 +130,7 @@ public class Game extends Thread {
 			}
 		}
 		for (int turnCount = 0; turnCount<MAX_NUM_TURNS && livePlayers > 1;turnCount++) {
-			doTurn(actionResults);
+			doTurn(actionResults, turnCount);
 			viz.updateGraphics();
 			livePlayers = 0;
 			for (ServerPlayer player: players.values()) {
@@ -203,7 +203,7 @@ public class Game extends Thread {
 	 * 
 	 * @param actionResults The results of last turns actions
 	 */
-	private void doTurn(Map<Integer, List<ActionResult>> actionResults) {
+	private void doTurn(Map<Integer, List<ActionResult>> actionResults, int turnCount) {
 		if (DEBUG) {
 
 
@@ -230,7 +230,7 @@ public class Game extends Thread {
 		for(ServerPlayer p : players.values()) {
 			if (!p.isAlive()) // Player is dead, don't request their turn
 				continue;
-			if (!p.requestTurn(allPlayersShips, actionResults, map)) {
+			if (!p.requestTurn(allPlayersShips, actionResults, map, turnCount)) {
 				// TODO: handle lost socket connection
 			}
 		}
@@ -248,19 +248,30 @@ public class Game extends Thread {
 			if (!p.isAlive()) // Player is dead no need to get actions when they cannot act
 				continue;
 			// shot coordinates and moves ships
-			List<ShipAction> shipActions = p.getTurn(map.getNumCols(), map.getNumRows(), map.getStructures());
+			List<ShipAction> shipActions = p.getTurn(map.getNumCols(), map.getNumRows(), map.getStructures(), turnCount);
 			// reset action results for current user
 			actionResults.get(p.getId()).clear();
 			playerActions.put(p.getId(), shipActions);
 		}
 		handleCollisions(); // if ships are overlapping after moving
 		// Now that all ships are moved, evaluate shots for each player
+		Map<String, String> shipIDMap = new HashMap<String, String>(); // keep track of ships already given actions
 		for(ServerPlayer p : players.values()) {
 			if (!p.isAlive()) // Player is dead no need to get actions when they cannot act
 				continue;
 			for(ShipAction sa : playerActions.get(p.getId())) {
 				// NOTE: moves are processed in: ServerPlayer.getTurn(...);
 				// check if shot is within game boundaries
+				if (sa.getShipIdentifier() == null) { // Player passed in null shipIdentifier
+					continue;
+				}
+				// Prevent same ship from getting multiple move commands
+				if (shipIDMap.get(sa.getShipIdentifier().toString()) != null) {
+					continue;
+				}
+				
+				shipIDMap.put(sa.getShipIdentifier().toString(), sa.getShipIdentifier().toString());
+				
 				Ship s = ships.getShip(sa.getShipIdentifier());
 				if (s == null || sa.getShotCoordList().isEmpty()) // Handle null ships and empty shot list
 					continue;

@@ -371,6 +371,8 @@ public class KevinBot extends ClientPlayer {
 				moveTargets.add(s.getLocation());
 				moves.add(Direction.STOP);
 			}
+			
+			
 			// Decide where to shoot
 			
 			Coordinate newCloseEnemyCoordGuess = move(moveTowardsCoord(closeEnemy, oldShipLocation), closeEnemy.getLocation());		
