@@ -46,6 +46,11 @@ public class StatsContainer extends Panel {
 		this.validate();
 	}
 	
+	public void update(Graphics g) {
+		for(StatPanel panel : panels)
+			panel.paint(g);
+	}
+	
 	@Override
 	public void paint(Graphics g) {
 		for(StatPanel panel : panels)

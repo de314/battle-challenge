@@ -33,30 +33,22 @@ public class StatPanel extends Panel {
 
 	@Override
 	public void paint(Graphics g) {
-
+		paint(g, 0, 0);
+	}
+	
+	public void paint(Graphics g, int offx, int offy) {
 		g.setColor(Color.green);
 		int ts = g.getFont().getSize();
 		int i = 1;
 		g.drawString(compressName(), PADDING_HORZ, PADDING_VERT);
-		g.drawString("Score: " + p.getScore(), PADDING_HORZ, PADDING_VERT
-				+ (ts * i++));
-		g.drawString("Ships: " + p.getNumLiveShips(), PADDING_HORZ,
-				PADDING_VERT + (ts * i++));
-		g.drawString("Income: " + p.getLastIncome(), PADDING_HORZ,
-				PADDING_VERT + (ts * i++));
-		g.drawString("Minerals: " + p.getMinerals(), PADDING_HORZ,
-				PADDING_VERT + (ts * i++));
-//		g.drawString("Next Ship: " + (p.getMinsPerShip() - p.getMinerals()),
-//				PADDING_HORZ, PADDING_VERT + (ts * i++));
-//		g.drawString("Total Mins: " + p.getTotalMinerals(), PADDING_HORZ,
-//				PADDING_VERT + (ts * i++));
-//		g.drawString("Total Ships: " + (p.getTotalShips()), PADDING_HORZ,
-//				PADDING_VERT + (ts * i++));
-//		g.drawString("Hits/Shots/Acc.: ", PADDING_HORZ, PADDING_VERT
-//				+ (ts * i++));
-//		g.drawString(p.getHitCount() + "/" + p.getTotalShotCount() + "/"
-//				+ ((int) (p.getShotAccuracy() * 1000) / 10), PADDING_HORZ,
-//				PADDING_VERT + (ts * i++));
+		g.drawString("Score: " + p.getScore(), PADDING_HORZ + offx, PADDING_VERT
+				+ (ts * i++) + offy);
+		g.drawString("Ships: " + p.getNumLiveShips(), PADDING_HORZ + offx,
+				PADDING_VERT + (ts * i++) + offy);
+		g.drawString("Income: " + p.getLastIncome(), PADDING_HORZ + offx,
+				PADDING_VERT + (ts * i++) + offy);
+		g.drawString("Minerals: " + p.getMinerals(), PADDING_HORZ + offx,
+				PADDING_VERT + (ts * i++) + offy);
 	}
 
 	private String compressName() {

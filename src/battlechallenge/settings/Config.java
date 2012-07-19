@@ -30,7 +30,7 @@ public class Config {
 			os = OperatingSystem.SOLARIS;
 		else
 			os = OperatingSystem.UNIX;
-		sep = System.getProperty("path.separator");
+		sep = System.getProperty("file.separator");
 		n = System.getProperty("line.separator");
 		params = new HashMap<String, String>();
 		parseConfigFile();
@@ -44,8 +44,8 @@ public class Config {
 			while (scan.hasNext()) {
 				String[] arr = scan.nextLine().split("=");
 				if (arr.length == 2)
-					params.put(arr[0].trim().toLowerCase(), arr[1].trim()
-							.toLowerCase().replace("/", sep).replace("\\", sep));
+					params.put(arr[0].trim(), arr[1].trim().replace("/", sep)
+							.replace("\\", sep));
 			}
 		} catch (FileNotFoundException e) {
 			params.put("mapDir", "Maps" + sep);
