@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import battlechallenge.Coordinate;
+import battlechallenge.server.GameManagerWindow;
 import battlechallenge.structures.Barrier;
 import battlechallenge.structures.Base;
 import battlechallenge.structures.City;
@@ -26,7 +27,7 @@ public class MapImporter {
 	}
 	
 	public static BattleMap getMap() {
-		return getMap(DEFAULT_MAP);
+		return getMap(GameManagerWindow.getSelectedMap().getFilepath());
 	}
 	
 	public static BattleMap getMap(String filename) {

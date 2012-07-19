@@ -11,12 +11,6 @@ import java.util.Set;
  * The Class GameManager.
  */
 public class GameManager {
-
-	public static final int DEFAULT_NUM_PLAYERS;
-	
-	static {
-		DEFAULT_NUM_PLAYERS = 4;
-	}
 	
 	/** The games. */
 	private Set<Game> games;
@@ -45,10 +39,10 @@ public class GameManager {
 		if (conn != null) {
 			waitingPlayers.add(new ServerPlayer(conn, playerCount++));
 			// FIXME: remove magic number "2"
-			while (waitingPlayers.size() >= DEFAULT_NUM_PLAYERS) {
+			while (waitingPlayers.size() >= GameManagerWindow.numberOfPlayers()) {
 				List<ServerPlayer> players = new LinkedList<ServerPlayer>();
 				// FIXME: allow for more players later
-				for(int i=0;i<DEFAULT_NUM_PLAYERS;i++)
+				for(int i=0;i<GameManagerWindow.numberOfPlayers();i++)
 					players.add(waitingPlayers.poll());
 				// Game constructor start its own thread
 				games.add(new Game(players, this));

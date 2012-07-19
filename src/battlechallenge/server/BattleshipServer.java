@@ -45,6 +45,7 @@ public class BattleshipServer extends Thread {
 	 */
 	public void run() {
 		System.out.println("Server started on port:" + socket.getLocalPort());
+		new GameManagerWindow();
 		while (true) {
 			try {
 				manager.addPlayer(socket.accept());

@@ -30,25 +30,25 @@ public class BoardPanel extends Panel {
 	private int widthPx;
 	private int heightSpaces;
 	private int widthSpaces;
-	private int colPx;
-	private int rowPx;
+	private double colPx;
+	private double rowPx;
 	private Collection<ServerPlayer> players;
 	private List<Structure> structures;
 
 	public int getRowPx(int row) {
-		return row * rowPx;
+		return (int)(row * rowPx);
 	}
 
 	public int getColPx(int col) {
-		return col * colPx;
+		return (int)(col * colPx);
 	}
 
 	public int getRowPx() {
-		return rowPx;
+		return (int)rowPx;
 	}
 
 	public int getColPx() {
-		return colPx;
+		return (int)colPx;
 	}
 
 	public BoardPanel(int widthSpaces, int heightSpaces,
@@ -78,9 +78,9 @@ public class BoardPanel extends Panel {
 		// draw ocean grids
 		g.setColor(Color.black);
 		for (int i = 1; i <= this.widthSpaces; i++)
-			g.drawLine(i * colPx, 0, i * colPx, heightPx);
+			g.drawLine((int)(i * colPx), 0, (int)(i * colPx), heightPx);
 		for (int i = 1; i < this.heightSpaces; i++)
-			g.drawLine(0, i * rowPx, widthPx, i * rowPx);
+			g.drawLine(0, (int)(i * rowPx), widthPx, (int)(i * rowPx));
 		// draw structures
 		int colorIndex = 0;
 		for (ServerPlayer p : players)

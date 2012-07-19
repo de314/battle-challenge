@@ -55,6 +55,12 @@ public class DavidBot2 extends ClientPlayer {
 		shipMoves.clear();
 		List<Ship> myShips = ClientGame.getMyShips();
 		
+		// keep ships on cities still
+		for (City c : ClientGame.getMyCities()) {
+			shipMoves.put(dMap.getShip(c), Direction.STOP);
+			myShips.remove(dMap.getShip(c));
+		}
+		
 		// move assigned ships
 		for(int i=0;i<myShips.size();) {
 			Ship s = myShips.get(i);
@@ -117,13 +123,15 @@ public class DavidBot2 extends ClientPlayer {
 		}
 		public Direction getMove(Ship s) {
 			Coordinate origin = s.getLocation();
+			if (origin.equals(goal))
+				return Direction.STOP;
 			PriorityQueue<SortedMove> sortedMoves = new PriorityQueue<SortedMove>();
 			for (Direction d : dirs) {
 				Coordinate temp = getMovedCoordinate(origin, d);
 				sortedMoves.add(new SortedMove(temp, d, temp.distanceTo(goal)));
 			}
-			while (!moves.isEmpty()) {
-				SortedMove move = sortedMoves.poll(); 
+			while (!sortedMoves.isEmpty()) {
+				SortedMove move = sortedMoves.poll();
 				if (!moves.contains(move.c.toString())) {
 					moves.add(move.c.toString());
 					return move.d;
