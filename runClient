@@ -4,5 +4,5 @@ cd bin/
 
 clear
 
-java battlechallenge.client.BattleshipClient $1 $2 $3 $4
+java -cp ../libs/jewelcli-0.7.6.jar:. battlechallenge.client.BattleshipClient $1 $2 $3 $4
 

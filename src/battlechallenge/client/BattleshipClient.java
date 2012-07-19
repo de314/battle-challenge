@@ -1,5 +1,7 @@
 package battlechallenge.client;
 
+import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException;
+import uk.co.flamingpenguin.jewel.cli.CliFactory;
 import battlechallenge.bot.ClientPlayer;
 import battlechallenge.bot.DavidBot;
 import battlechallenge.bot.DavidBot2;
@@ -11,10 +13,10 @@ import battlechallenge.bot.KevinBot;
 public class BattleshipClient {
 	
 	/** The Constant IP. */
-	public static final String IP = "127.0.0.1";
+	public static final String DEFAULT_IP = "127.0.0.1";
 	
 	/** The Constant PORT. */
-	public static final int PORT = 3000;
+	public static final int DEFAULT_PORT = 3000;
 	
 	/**
 	 * Bot to play. Allows user to develop multiple AI bots.
@@ -47,27 +49,24 @@ public class BattleshipClient {
 	 * @param args the arguments
 	 */
 	public static void main(String[] args) {
+		ClientRun runParams = null;
 		String name;
 		ClientPlayer bot;
-		if (args.length > 0)
-			name = args[0];
-		else
-			name = "player" + ((int)(Math.random()*Integer.MAX_VALUE));
-		int port = PORT;
-		if (args.length > 1) 
-			try {
-			port = Integer.parseInt(args[1]);
-			} catch (NumberFormatException e) { /* ignore exception */ }
-		String ip = IP;
-		if (args.length > 2)
-			ip = args[2];
-		if (args.length > 3) {
-			bot = botToPlay(args[3]);
+		int port;
+		String ip;
+		try {
+			runParams = CliFactory.parseArguments(ClientRun.class, args);
+			name = runParams.getPlayerName();
+			if (name == null)
+				name = "player" + ((int)(Math.random()*Integer.MAX_VALUE));
+			bot = botToPlay(runParams.getBotName());
+			port = runParams.getPort();
+			ip = runParams.getIP();
+			System.out.println("Starting: " + name + "@"+ip+":"+port + " with bot " + bot.getClass().toString());
+			new ServerConnection(port, ip, name, bot);
+		} catch (ArgumentValidationException e1) {
+			System.out.println(e1.getMessage());
+			System.out.println("Command line arguments exception. Please try again.");
 		}
-		else {
-			bot = botToPlay(name);
-		}		
-		System.out.println(port + " " + ip);
-		new ServerConnection(port, ip, name, bot);
 	}
 }
