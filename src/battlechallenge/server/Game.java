@@ -36,7 +36,7 @@ public class Game extends Thread {
 		DEFAULT_WIDTH = 15;
 		DEFAULT_HEIGHT = 15;
 		DEFAULT_SPEED = 750; // number of milliseconds to sleep between turns
-		MAX_NUM_TURNS = 300; // 5 minutes if 1 turn per second
+		MAX_NUM_TURNS = 100; //300; // 5 minutes if 1 turn per second
 	}
 	
 	/** The players. */
@@ -50,7 +50,7 @@ public class Game extends Thread {
 	
 	private ShipCollection ships;
 	
-	private int minsPerShip = 4; // TODO: Make variable per game
+	private int minsPerShip = 10; // TODO: Make variable per game
 	
 	/**
 	 * Used to check how many players are in the game
@@ -341,18 +341,22 @@ public class Game extends Thread {
 	}
 	
 	public void allocateIncome() {
+		Map<Integer,Integer> incomes = new HashMap<Integer,Integer>();
+		for(Integer id : players.keySet())
+			incomes.put(id, 0);
 		for (Structure str: map.getStructures()) {
 			// there are no bases in map.getStructures
 			if (str instanceof City) {
 				City city = (City)str;
 				int ownerId = city.getOwnerId();
 				if (ownerId >= 0) { // all non-neutral cities
-					ServerPlayer p = players.get(ownerId);
-					 // increment players minerals by the amount the city generates
-					p.incrementMinerals(city.getMineralGenerationSpeed());
+					// increment players minerals by the amount the city generates
+					incomes.put(ownerId, incomes.get(ownerId) + city.getMineralGenerationSpeed());
 				}
 			}
 		}
+		for (Entry<Integer,Integer> e : incomes.entrySet())
+			players.get(e.getKey()).incrementMinerals(e.getValue());
 	}
 	
 	/**

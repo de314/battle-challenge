@@ -56,6 +56,8 @@ public class BCViz extends JFrame {
 	
 	/** The sc r. */
 	private StatsContainer scR;
+	
+	private HeaderPanel hp;
 
 	/**
 	 * Instantiates a new bC viz.
@@ -100,7 +102,8 @@ public class BCViz extends JFrame {
 		}
 		
 		// add header panel
-		this.add(new HeaderPanel(players), BorderLayout.NORTH);
+		this.hp = new HeaderPanel(players);
+		this.add(hp, BorderLayout.NORTH);
 
 		// add board panel
 		bp = new BoardPanel(totalWidth, totalHeight, players, structures);
@@ -137,5 +140,6 @@ public class BCViz extends JFrame {
 		scL.repaint();
 		if (scR != null)
 			scR.repaint();
+		hp.repaint();
 	}
 }

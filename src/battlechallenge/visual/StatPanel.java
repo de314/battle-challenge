@@ -42,17 +42,19 @@ public class StatPanel extends Panel {
 				+ (ts * i++));
 		g.drawString("Ships: " + p.getNumLiveShips(), PADDING_HORZ,
 				PADDING_VERT + (ts * i++));
-		g.drawString("Next Ship: " + (p.getMinsPerShip() - p.getMinerals()),
-				PADDING_HORZ, PADDING_VERT + (ts * i++));
-		g.drawString("Total Mins: " + p.getTotalMinerals(), PADDING_HORZ,
+		g.drawString("Income: " + p.getLastIncome(), PADDING_HORZ,
 				PADDING_VERT + (ts * i++));
-		g.drawString("Total Ships: " + (p.getTotalShips()), PADDING_HORZ,
-				PADDING_VERT + (ts * i++));
-		g.drawString("Hits/Shots/Acc.: ", PADDING_HORZ, PADDING_VERT
-				+ (ts * i++));
-		g.drawString(p.getHitCount() + "/" + p.getTotalShotCount() + "/"
-				+ ((int) (p.getShotAccuracy() * 1000) / 10), PADDING_HORZ,
-				PADDING_VERT + (ts * i++));
+//		g.drawString("Next Ship: " + (p.getMinsPerShip() - p.getMinerals()),
+//				PADDING_HORZ, PADDING_VERT + (ts * i++));
+//		g.drawString("Total Mins: " + p.getTotalMinerals(), PADDING_HORZ,
+//				PADDING_VERT + (ts * i++));
+//		g.drawString("Total Ships: " + (p.getTotalShips()), PADDING_HORZ,
+//				PADDING_VERT + (ts * i++));
+//		g.drawString("Hits/Shots/Acc.: ", PADDING_HORZ, PADDING_VERT
+//				+ (ts * i++));
+//		g.drawString(p.getHitCount() + "/" + p.getTotalShotCount() + "/"
+//				+ ((int) (p.getShotAccuracy() * 1000) / 10), PADDING_HORZ,
+//				PADDING_VERT + (ts * i++));
 	}
 
 	private String compressName() {

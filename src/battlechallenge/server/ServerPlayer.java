@@ -73,6 +73,12 @@ public class ServerPlayer {
 	
 	private int boardWidth;
 	
+	private int lastIncome;
+	
+	public int getLastIncome() {
+		return lastIncome;
+	}
+	
 	public int getTotalMinerals() {
 		return totalMinerals;
 	}
@@ -465,6 +471,7 @@ public class ServerPlayer {
 		this.minerals += income;
 		this.totalMinerals += income;
 		this.score.addMineralsEarned(income);
+		this.lastIncome = income;
 	}
 
 	public Base getBase() {
