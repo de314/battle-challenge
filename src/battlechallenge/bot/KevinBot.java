@@ -12,6 +12,8 @@ import battlechallenge.ship.Ship;
 import battlechallenge.ship.Ship.Direction;
 import battlechallenge.structures.City;
 import battlechallenge.structures.Structure;
+import battlechallenge.bot.Node;
+
 
 /**
  * The Class ClientPlayer.
@@ -301,38 +303,27 @@ public class KevinBot extends ClientPlayer {
 		}
 		return false;
 	}
-//	1  procedure BFS(G,v):
-//		2      create a queue Q
-//		3      enqueue v onto Q
-//		4      mark v
-//		5      while Q is not empty:
-//		6          t ← Q.dequeue()
-//		7          if t is what we are looking for:
-//		8              return t
-//		9          for all edges e in G.incidentEdges(t) do
-//		10             o ← G.opposite(t,e)
-//		11             if o is not marked:
-//		12                  mark o
-//		13                  enqueue o onto Q
-	public Direction BFS(Ship s, Coordinate coord) {
-		Node currNode = new Node(coord, null, null); // Coordinate, Node, Direction
+
+	public Direction BFS(Ship s, Coordinate coord, List<Coordinate> myShipCoord) {
+		Node currNode = new Node(s.getLocation(), null, null, 0.0); // Coordinate, Node, Direction
 		Map<Node, Node> prev = new HashMap<Node, Node>();
 		Map<Node, String> visited = new HashMap<Node, String>();
 		List<Direction> directions = new LinkedList<Direction>();
-		Queue q = new LinkedList();
-		q.add(s.getLocation());
+		PriorityQueue<Node> q = new PriorityQueue<Node>();
+		q.add(currNode);//, currNode.getLocation().distanceTo(coord));
 		while (!q.isEmpty()) {
 			currNode = (Node) q.remove();
+			visited.put(currNode, currNode.toString());
 			if ((currNode.getLocation()).equals(coord)) { // Found where we want to go
 				break;
 			}
 			for (Direction dir: directionList) {
-				Node adjNode = new Node (move(dir, currNode.getLocation()), currNode, dir);
+				Node adjNode = new Node (move(dir, currNode.getLocation()), currNode, dir, coord.distanceTo(move(dir, currNode.getLocation())));
 				
-				if (visited.get(adjNode) != null || ClientGame.getMyShips().contains(adjNode.getLocation())) { // don't use path along friendly ship
+				if (visited.get(adjNode) != null || myShipCoord.contains(adjNode.getLocation())) { // don't use path along friendly ship
 					continue;
 				}
-				if (visited.get(adjNode) != null) {
+				if (visited.get(adjNode) == null) {
 					q.add(adjNode);
 					visited.put(adjNode, adjNode.toString());
 					prev.put(adjNode, currNode);	
@@ -347,7 +338,8 @@ public class KevinBot extends ClientPlayer {
 		for(Node node = currNode; node != null; node = prev.get(node)) {
 	        directions.add(node.getDir());
 	    }
-	    return directions.get(directions.size() - 1);
+		System.out.println(directions);
+	    return directions.get(0);
 		
 	}
 
@@ -358,6 +350,10 @@ public class KevinBot extends ClientPlayer {
 		Map<Coordinate, Ship> moveMap = new HashMap<Coordinate, Ship>();
 		Map<Coordinate, Ship> shotMap = new HashMap<Coordinate, Ship>();
 		List<Ship> myShips = ClientGame.getMyShips();
+		List<Coordinate> myShipLocations = new LinkedList<Coordinate>();
+		for (Ship s : myShips) {
+			myShipLocations.add(s.getLocation());
+		}
 		List<Ship> myMovedShips = new LinkedList<Ship>();
 		List<Ship> enemyShips = ClientGame.getOpponentShips();
 		List<City> cityList = ClientGame.getAllCities();
@@ -365,9 +361,9 @@ public class KevinBot extends ClientPlayer {
 		List<Coordinate> moveTargets = new LinkedList<Coordinate>();
 		List<Coordinate> shotTargets = new LinkedList<Coordinate>();
 		Map<Ship, Direction> shipMoves = new HashMap<Ship, Direction>();
-		for (City city: ClientGame.getMyCities()) {
-			moveTargets.add(city.getLocation());
-		}
+//		for (City city: ClientGame.getMyCities()) {
+//			moveTargets.add(city.getLocation());
+//		}
 		// System.out.println(enemyShips);
 		// System.out.println(enemyShipCoord);
 		City closeCity;
@@ -379,60 +375,75 @@ public class KevinBot extends ClientPlayer {
 			Coordinate oldShipLocation = s.getLocation();
 			Ship closeEnemy = null;
 			closeCity = null;
-			List<Coordinate> shotCoordinates = new ArrayList<Coordinate>();
 			Direction moveDirection = null;
-			if (isOnMyCity(s)) {
-				moveDirection = Direction.STOP;
-				if (moveMap.get(s.getLocation()) != null) {
-					shipMoves.remove(moveMap.get(s.getLocation()));
-					moveMap.put(s.getLocation(), s);
-					shipMoves.put(s, moveDirection); // will overwrite 
-				}
-			}
-
 			closeEnemy = closestEnemyShip(s, enemyShips);
 			closeCity = closestCity(s, cityList);
+			if (isOnMyCity(s)) {
+				if (moveMap.get(s.getLocation()) == null) {
+				
+//					Ship ship = moveMap.get(s.getLocation());
+//					shipMoves.remove(moveMap.get(s.getLocation()));
+//					if (moveMap.get(ship.getLocation()) != null) { //ship would collide with city
+//						moveMap.put(ship.getLocation(), ship);
+//						shipMoves.put(ship, Direction.STOP);
+//					}
+					moveDirection = Direction.STOP;
+					moveMap.put(s.getLocation(), s);
+					shipMoves.put(s, moveDirection); // will overwrite  
+					continue;
+				}
+				else {
+					moveDirection = BFS(s, closeCity.getLocation(), myShipLocations);
+				}
+				
+			}
+
+		
 
 			if (moveDirection == null) {
 				if (closeCity != null) {
 //					moveDirection = moveTowardsCoord(s, closeCity.getLocation());
-					moveDirection = BFS(s, closeCity.getLocation());
+					moveDirection = BFS(s, closeCity.getLocation(), myShipLocations);
+					System.out.println(moveDirection);
 					movingTowardsCity = true;
 				}
 				else {
-//					moveDirection = moveTowardsShip(s, closeEnemy);
-					moveDirection = BFS(s, closeEnemy.getLocation());
+					moveDirection = moveTowardsShip(s, closeEnemy);
+//					moveDirection = BFS(s, closeEnemy.getLocation());
 					movingTowardsShip = true;
 				}
 			}
 			if (moveDirection != null) {
 				Coordinate newCoord = move(moveDirection, s.getLocation());
-				 if (moveMap.get(newCoord) != null) {
-					 if (movingTowardsShip == false) {
-						 moveDirection = moveTowardsShip(s, closeEnemy);
-						 newCoord = move(moveDirection, s.getLocation());
-					 }
-				 }
+//				 if (moveMap.get(newCoord) != null) {
+//					 if (movingTowardsShip == false) {
+//						 moveDirection = moveTowardsShip(s, closeEnemy);
+//						 newCoord = move(moveDirection, s.getLocation());
+//					 }
+//				 }
 			
 				 
 				if (moveMap.get(newCoord) == null) { // Avoid collisions
 					shipMoves.put(s, moveDirection);
 					moveMap.put(newCoord, s);
-					oldShipLocation = s.getLocation();
-					s.setLocation(newCoord);
 				}
+			}
+			if (shipMoves.get(s) == null) {
+				moveMap.put(s.getLocation(), s);
 			}
 		}
 	
 				for (Ship s: shipMoves.keySet()) { 
 					List<Direction> moves = new LinkedList<Direction>();
+					List<Coordinate> shotCoordinates = new ArrayList<Coordinate>();
 					Direction dir = shipMoves.get(s);
 					moves.add(dir);
 					Coordinate newCoord = move(dir, s.getLocation());
 
 					Coordinate oldShipLocation = s.getLocation();
-					s.setLocation(newCoord);
 					Ship closeEnemy = closestEnemyShip(s, enemyShips);
+					s.setLocation(newCoord); // move ship
+					
 
 //				if (dir == null) {
 //				continue;
@@ -448,11 +459,6 @@ public class KevinBot extends ClientPlayer {
 			if (shotCoordinates.isEmpty() && s.inRange(closeEnemy.getLocation()) && (!shotTargets.contains(closeEnemy.getLocation()))) {
 				shotCoordinates.add(closeEnemy.getLocation());
 				shotTargets.add(closeEnemy.getLocation());
-			}
-			// DUPLICATE FIX
-			if (shotCoordinates.isEmpty() && s.inRange(newCloseEnemyCoordGuess) && !shotTargets.contains(newCloseEnemyCoordGuess)) {
-				shotCoordinates.add(newCloseEnemyCoordGuess);
-				shotTargets.add(newCloseEnemyCoordGuess);
 			}
 
 			Coordinate secondCloseEnemyCoordGuess = move(moveTowardsCoord(closeEnemy, theClosestCity(closeEnemy, cityList).getLocation()), closeEnemy.getLocation());
@@ -477,21 +483,21 @@ public class KevinBot extends ClientPlayer {
 			// Decide where to shoot
 
 
-
-			// Shoot at closest enemy even if out of range
-			if (shotCoordinates.isEmpty()) {
-				//Coordinate newCoord = move(moveTowardsCoord(closeEnemy, s.getLocation()), closeEnemy.getLocation());
-				if (s.inRange(newCoord) && !shotTargets.contains(newCoord)) {
-					shotCoordinates.add(newCoord);
-					shotTargets.add(newCoord);
-				}
-				else {
-					if (!shotTargets.contains(closeEnemy.getLocation())) {
-						shotCoordinates.add(closeEnemy.getLocation()); // shoot at closest enemy anyway
-						shotTargets.add(closeEnemy.getLocation());
-					}
-				}	
-			}
+//
+//			// Shoot at closest enemy even if out of range
+//			if (shotCoordinates.isEmpty()) {
+//				//Coordinate newCoord = move(moveTowardsCoord(closeEnemy, s.getLocation()), closeEnemy.getLocation());
+//				if (s.inRange(newCoord) && !shotTargets.contains(newCoord)) {
+//					shotCoordinates.add(newCoord);
+//					shotTargets.add(newCoord);
+//				}
+//				else {
+//					if (!shotTargets.contains(closeEnemy.getLocation())) {
+//						shotCoordinates.add(closeEnemy.getLocation()); // shoot at closest enemy anyway
+//						shotTargets.add(closeEnemy.getLocation());
+//					}
+//				}	
+//			}
 
 			actions.add(new ShipAction(s.getIdentifier(), shotCoordinates, moves));
 			// System.out.println(actions);

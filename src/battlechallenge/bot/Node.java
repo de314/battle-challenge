@@ -3,15 +3,21 @@ package battlechallenge.bot;
 import battlechallenge.Coordinate;
 import battlechallenge.ship.Ship.Direction;
 
-public class Node {
+public class Node implements Comparable<Node> {
 	private Coordinate c1;
 	private Direction dir;
 	private Node prev;
+	private Double distance;
 	
-	public Node(Coordinate c1, Node prev, Direction dir) {
+	public Node(Coordinate c1, Node prev, Direction dir, Double distance) {
 		this.c1 = c1;
 		this.dir = dir;
 		this.prev = prev;
+		this.distance = distance;
+	}
+	@Override
+	public int compareTo(Node other) {
+		return this.distance < other.distance ? -1 : this.distance == other.distance ? 0 : 1; // fix
 	}
 
 	public Node getPrev() {
