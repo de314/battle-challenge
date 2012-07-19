@@ -2,6 +2,7 @@ package battlechallenge.client;
 
 import battlechallenge.bot.ClientPlayer;
 import battlechallenge.bot.DavidBot;
+import battlechallenge.bot.DavidBot2;
 import battlechallenge.bot.KevinBot;
 
 /**
@@ -24,6 +25,9 @@ public class BattleshipClient {
 	public static ClientPlayer botToPlay(String botName) {
 		if (botName.equals("DavidBot")) {
 			return new DavidBot(botName, 0, 0, 0);
+		}
+		if (botName.equals("DavidBot2")) {
+			return new DavidBot2(botName, 0, 0, 0);
 		}
 		else if (botName.equals("KevinBot")) {
 			return new KevinBot(botName, 0, 0, 0);

@@ -59,6 +59,7 @@ public class Base extends City implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder("Base: ");
+		sb.append(getOwnerId()).append("-");
 		sb.append(getLocation());
 		return sb.toString();
 	}

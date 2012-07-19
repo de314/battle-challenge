@@ -51,7 +51,7 @@ public class MapImporter {
 					if (line.charAt(col) == ('C'))
 						structures.add(new City(new Coordinate(row, col)));
 					if (line.charAt(col) == ('B'))
-						bases.add(new Base(playerNum, new Coordinate(row, col))); 
+						bases.add(new Base(playerNum++, new Coordinate(row, col))); 
 					if (line.charAt(col) == 'W') // barriers
 						structures.add(new Barrier(new Coordinate(row, col)));
 				}

@@ -35,14 +35,7 @@ public class DavidBot2 extends ClientPlayer {
 		moves = new HashSet<String>();
 		cityCoords = new HashSet<String>();
 		dMap = new DoubleMap();
-		sortedCities = new PriorityQueue<City>(5, new Comparator<City>() {
-			@Override
-			public int compare(City arg0, City arg1) {
-				Coordinate base = ClientGame.getMyBase().getLocation();
-				return base.distanceTo(arg0.getLocation()) < base
-						.distanceTo(arg1.getLocation()) ? -1 : 1;
-			}
-		});
+		sortedCities = new PriorityQueue<City>(5, new CityComp());
 		ships = new HashMap<String, AssignedShip>();
 		shipMoves = new HashMap<Ship, Direction>();
 	}
@@ -75,6 +68,7 @@ public class DavidBot2 extends ClientPlayer {
 		// assign and move other ships
 		for (Ship s : myShips) {
 			AssignedShip as = AssignedShip.getAssignment(s);
+			System.out.println(as);
 			ships.put(s.getIdentifier().toString(), as);
 			shipMoves.put(s, as.getMove(s));
 		}
@@ -82,7 +76,8 @@ public class DavidBot2 extends ClientPlayer {
 		// choose shots and build action list
 		List<ShipAction> actions = new LinkedList<ShipAction>();
 		for (Entry<Ship,Direction> e : shipMoves.entrySet()) {
-			
+			System.out.println(e);
+			actions.add(new ShipAction(e.getKey().getIdentifier(), getShot(e.getKey()), e.getValue()));
 		}
 		return actions;
 	}
@@ -92,18 +87,20 @@ public class DavidBot2 extends ClientPlayer {
 			for (City c : ClientGame.getAllCities())
 				cityCoords.add(c.getLocation().toString());
 		}
-		
-		// TODO
-		return null;
+		// TODO: guess where to move
+		return getClosestEnemy(s);
 	}
 	
-	private Coordinate getClosestEnemy() {
+	private Coordinate getClosestEnemy(Ship origin) {
 		Coordinate minCoord = null;
-		double minDist = Double.MAX_VALUE;
+		double minDist = -1;
 		for (Entry<Integer, List<Ship>> e : ClientGame.getShipMap().entrySet()) {
 			if (e.getKey() != ClientGame.getNetworkID()) {
 				for (Ship s : e.getValue()) {
-					// TODO
+					if (minDist < 0 || minDist >  origin.getLocation().distanceTo(s.getLocation())) {
+						minCoord = s.getLocation();
+						minDist = origin.getLocation().distanceTo(s.getLocation());
+					}
 				}
 			}
 		}
@@ -223,5 +220,14 @@ public class DavidBot2 extends ClientPlayer {
 			return this.dist < that.dist ? -1 : this.dist == that.dist ? 0 : 1;
 		}
 		
+	}
+	
+	private static class CityComp implements Comparator<City> {
+		@Override
+		public int compare(City arg0, City arg1) {
+			Coordinate base = ClientGame.getMyBase().getLocation();
+			return base.distanceTo(arg0.getLocation()) < base
+					.distanceTo(arg1.getLocation()) ? -1 : 1;
+		}
 	}
 }
