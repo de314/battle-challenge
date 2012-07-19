@@ -20,6 +20,10 @@ public class HeaderPanel extends Panel {
 	private Collection<ServerPlayer> players;
 	
 	private int numTurns = 0;
+
+	public void setNumTurns(int numTurns) {
+		this.numTurns = numTurns;
+	}
 	
 	public HeaderPanel(Collection<ServerPlayer> players) {
 		super();

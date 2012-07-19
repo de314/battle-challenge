@@ -62,8 +62,8 @@ public class BoardPanel extends Panel {
 	private void updateSizeVariables() {
 		this.widthPx = this.getWidth();
 		this.heightPx = this.getHeight();
-		colPx = this.widthPx / this.widthSpaces;
-		rowPx = this.heightPx / this.heightSpaces;
+		colPx = (double)this.widthPx / (double)this.widthSpaces;
+		rowPx = (double)this.heightPx / (double)this.heightSpaces;
 	}
 
 	@Override

@@ -127,7 +127,8 @@ public class BCViz extends JFrame {
 	/**
 	 * Update graphics.
 	 */
-	public void updateGraphics() {
+	public void updateGraphics(int numTurns) {
+		hp.setNumTurns(numTurns);
 		this.repaint();
 	}
 

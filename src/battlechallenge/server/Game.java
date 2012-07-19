@@ -131,7 +131,7 @@ public class Game extends Thread {
 		}
 		for (int turnCount = 0; turnCount<MAX_NUM_TURNS && livePlayers > 1;turnCount++) {
 			doTurn(actionResults, turnCount);
-			viz.updateGraphics();
+			viz.updateGraphics(turnCount);
 			livePlayers = 0;
 			for (ServerPlayer player: players.values()) {
 				if (player.isAlive()) {
