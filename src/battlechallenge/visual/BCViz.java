@@ -10,6 +10,8 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
+import com.sun.xml.internal.bind.v2.TODO;
+
 import battlechallenge.server.ServerPlayer;
 import battlechallenge.structures.Structure;
 
@@ -153,8 +155,8 @@ public class BCViz extends JFrame {
 
 	public BufferedImage getScreenShot() {
 
-		BufferedImage image = new BufferedImage(this.getWidth(),
-				this.getHeight(), BufferedImage.TYPE_INT_RGB);
+		BufferedImage image = new BufferedImage(TOTAL_WIDTH_PX,
+				TOTAL_HEIGHT_PX, BufferedImage.TYPE_INT_RGB);
 		contentPane.paint(image.getGraphics());
 		hp.paint(image.getGraphics());
 		scL.paint(image.getGraphics());
