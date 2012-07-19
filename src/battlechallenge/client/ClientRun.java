@@ -1,6 +1,7 @@
 package battlechallenge.client;
 
 import uk.co.flamingpenguin.jewel.cli.Option;
+//http://jewelcli.lexicalscope.com/usage.html
 
 public interface ClientRun {
 
