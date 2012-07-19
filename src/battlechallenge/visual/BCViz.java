@@ -5,8 +5,11 @@ import java.awt.Graphics;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import javax.swing.*;
 
 import javax.swing.JFrame;
+
+import com.sun.xml.internal.ws.api.server.Container;
 
 import battlechallenge.server.ServerPlayer;
 import battlechallenge.structures.Structure;
@@ -58,6 +61,8 @@ public class BCViz extends JFrame {
 	private StatsContainer scR;
 	
 	private HeaderPanel hp;
+	
+	private java.awt.Container contentPane = this.getContentPane();
 
 	/**
 	 * Instantiates a new bC viz.
@@ -77,11 +82,11 @@ public class BCViz extends JFrame {
 		switch (players.size()) {
 		case 2 :
 			scL = new StatsContainer(players);
-			this.add(scL, BorderLayout.WEST);
+			contentPane.add(scL, BorderLayout.WEST);
 			break;
 		case 4 :
 			scL = new StatsContainer(players);
-			this.add(scL, BorderLayout.WEST);
+			contentPane.add(scL, BorderLayout.WEST);
 			break;
 		case 8 :;
 		List<ServerPlayer> playersList = new LinkedList<ServerPlayer>(players);
@@ -89,31 +94,30 @@ public class BCViz extends JFrame {
 			for (int i=0;i<4;i++)
 				temp.add(playersList.get(i));
 			scL = new StatsContainer(temp);
-			this.add(scL, BorderLayout.WEST);
+			contentPane.add(scL, BorderLayout.WEST);
 			temp = new LinkedList<ServerPlayer>();
 			for (int i=4;i<8;i++)
 				temp.add(playersList.get(i));
 			scR = new StatsContainer(temp);
-			this.add(scR, BorderLayout.EAST);
+			contentPane.add(scR, BorderLayout.EAST);
 			break;
 		default :
 			// error, invalid players list size
 			return;
 		}
-		
 		// add header panel
+		
 		this.hp = new HeaderPanel(players);
-		this.add(hp, BorderLayout.NORTH);
-
+		contentPane.add(hp, BorderLayout.NORTH);
 		// add board panel
 		bp = new BoardPanel(totalWidth, totalHeight, players, structures);
-		this.add(bp, BorderLayout.CENTER);
-		
+		//bp.setOpaque(true);
+		contentPane.add(bp, BorderLayout.CENTER);
 		this.setSize(DEFAULT_WIDTH_PX, DEFAULT_HEIGHT_PX);
 		this.setResizable(false);
 		this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+	//	this.pack();
 		this.setVisible(true);
-		
 		this.validate();
 	}
 	
@@ -137,6 +141,7 @@ public class BCViz extends JFrame {
 	 */
 	@Override
 	public void paint(Graphics g) {
+		super.paint(g);
 		bp.repaint();
 		scL.repaint();
 		if (scR != null)
