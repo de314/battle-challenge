@@ -22,7 +22,7 @@ public class HeaderPanel extends Panel {
 	private int numTurns = 0;
 
 	public void setNumTurns(int numTurns) {
-		this.numTurns = numTurns;
+		this.numTurns = numTurns + 1;
 	}
 	
 	public HeaderPanel(Collection<ServerPlayer> players) {
@@ -41,7 +41,7 @@ public class HeaderPanel extends Panel {
 			g.drawString(p.getName() == null ? "**DEAD**" : p.getName(), ((i++) * spacing) + (spacing/4), 20);
 		}
 		g.setColor(Color.black);
-		g.drawString((numTurns++) + "/" + Game.MAX_NUM_TURNS, ((i++) * spacing) + (spacing/4), 20);
+		g.drawString(numTurns + "/" + Game.MAX_NUM_TURNS, ((i++) * spacing) + (spacing/4), 20);
 	}
 	
 }

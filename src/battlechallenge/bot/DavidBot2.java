@@ -57,8 +57,9 @@ public class DavidBot2 extends ClientPlayer {
 		
 		// keep ships on cities still
 		for (City c : ClientGame.getMyCities()) {
-			shipMoves.put(dMap.getShip(c), Direction.STOP);
-			myShips.remove(dMap.getShip(c));
+			shipMoves.put(dMap.getShip(c.getLocation()), Direction.STOP);
+			moves.add(c.getLocation().toString());
+			myShips.remove(dMap.getShip(c.getLocation()));
 		}
 		
 		// move assigned ships
@@ -74,7 +75,6 @@ public class DavidBot2 extends ClientPlayer {
 		// assign and move other ships
 		for (Ship s : myShips) {
 			AssignedShip as = AssignedShip.getAssignment(s);
-			System.out.println(as);
 			ships.put(s.getIdentifier().toString(), as);
 			shipMoves.put(s, as.getMove(s));
 		}
@@ -82,7 +82,6 @@ public class DavidBot2 extends ClientPlayer {
 		// choose shots and build action list
 		List<ShipAction> actions = new LinkedList<ShipAction>();
 		for (Entry<Ship,Direction> e : shipMoves.entrySet()) {
-			System.out.println(e);
 			actions.add(new ShipAction(e.getKey().getIdentifier(), getShot(e.getKey()), e.getValue()));
 		}
 		return actions;
@@ -157,35 +156,40 @@ public class DavidBot2 extends ClientPlayer {
 				oppBases[i++] = b.getLocation();
 		}
 		public static AssignedShip getAssignment(Ship s) {
-			if (!sortedCities.isEmpty())
-				return new AssignedShip(s.getIdentifier(), sortedCities.poll().getLocation());
+			if (!sortedCities.isEmpty()) {
+				City c = sortedCities.poll();
+				dMap.put(s, c.getLocation());
+				return new AssignedShip(s.getIdentifier(), c.getLocation());
+			}
 			if (oppBases == null)
 				setBases();
-			return new AssignedShip(s.getIdentifier(), oppBases[(int)(Math.random()*oppBases.length)]);
+			int rand = (int)(Math.random()*oppBases.length);
+			dMap.put(s, oppBases[rand]);
+			return new AssignedShip(s.getIdentifier(), oppBases[rand]);
 		}
 	}
 
  	private static class DoubleMap {
-		private Map<Ship, City> shipMap;
-		private Map<City, Ship> cityMap;
+		private Map<Ship, Coordinate> shipMap;
+		private Map<Coordinate, Ship> coordinateMap;
 	
 		public DoubleMap() {
-			this.shipMap = new HashMap<Ship, City>();
-			this.cityMap = new HashMap<City, Ship>();
+			this.shipMap = new HashMap<Ship, Coordinate>();
+			this.coordinateMap = new HashMap<Coordinate, Ship>();
 		}
 	
 		public void clear() {
 			this.shipMap.clear();
-			this.cityMap.clear();
+			this.coordinateMap.clear();
 		}
 	
-		public void put(Ship s, City c) {
+		public void put(Ship s, Coordinate c) {
 			shipMap.put(s, c);
-			cityMap.put(c, s);
+			coordinateMap.put(c, s);
 		}
 	
-		public Ship getShip(City c) {
-			return cityMap.get(c);
+		public Ship getShip(Coordinate c) {
+			return coordinateMap.get(c);
 		}
 	
 		public Collection<Ship> getAllShips() {
@@ -196,19 +200,19 @@ public class DavidBot2 extends ClientPlayer {
 			return shipMap.containsKey(s);
 		}
 	
-		public City getCity(Ship s) {
+		public Coordinate getGoal(Ship s) {
 			return shipMap.get(s);
 		}
 	
-		public boolean containsCity(City c) {
-			return cityMap.containsKey(c);
+		public boolean containsCoordinate(Coordinate c) {
+			return coordinateMap.containsKey(c);
 		}
 	
 		public void update(List<Ship> ships) {
-			for (Entry<Ship, City> e : shipMap.entrySet()) {
+			for (Entry<Ship, Coordinate> e : shipMap.entrySet()) {
 				if (!ships.contains(e.getKey())) {
 					shipMap.remove(e.getKey());
-					cityMap.remove(e.getValue());
+					coordinateMap.remove(e.getValue());
 				}
 			}
 		}
@@ -220,7 +224,7 @@ public class DavidBot2 extends ClientPlayer {
 		public double dist;
 		public SortedMove(Coordinate c, Direction d, double dist) {
 			this.c = c;
-			this.d = d;
+			this.d = d; 
 			this.dist = dist;
 		}
 		@Override

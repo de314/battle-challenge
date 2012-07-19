@@ -488,6 +488,7 @@ public class ServerPlayer {
 
 	public void setBase(Base base, List<Ship> ships) {
 		this.base = base;
+		base.setOwner(this.id);
 		for (Ship ship: ships) {
 			ship.setPlayerId(id);
 		}

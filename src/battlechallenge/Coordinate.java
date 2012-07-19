@@ -89,7 +89,8 @@ public class Coordinate implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return row+ "," + col;
+		StringBuilder sb = new StringBuilder();
+		return sb.append(row).append(",").append(col).toString();
 	}
 	
 	/* (non-Javadoc)
@@ -97,7 +98,7 @@ public class Coordinate implements Serializable {
 	 */
 	@Override
 	public int hashCode() {
-		return (this.row + "," + this.col).hashCode();
+		return this.toString().hashCode();
 	}
 	
 	/* (non-Javadoc)
@@ -120,5 +121,4 @@ public class Coordinate implements Serializable {
 	public double distanceTo(Coordinate coord) {
 		return Math.sqrt(Math.pow(this.getRow() - coord.getRow(), 2) + Math.pow(this.getCol() - coord.getCol(), 2));
 	}
-	
 } // End Coordinate Class

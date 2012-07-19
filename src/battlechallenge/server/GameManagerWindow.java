@@ -95,7 +95,8 @@ public class GameManagerWindow extends JFrame {
 					randomMapCheckBox.setEnabled(false);
 					playerDropDown.setEnabled(false);
 					mapDropDown.setEnabled(false);
-					infoTextArea.setText("Number of Players: Random\nMaps: Random");
+					infoTextArea.setText("  Number of Players: Random  \n  Maps: Random  ");
+					System.out.println("Number of Players: Random\tMaps: Random");
 					mapTextArea.setText("");
 				} else {
 					randomMapCheckBox.setEnabled(true);
@@ -110,6 +111,7 @@ public class GameManagerWindow extends JFrame {
 				if (randomMapCheckBox.isSelected()) {
 					mapDropDown.setEnabled(false);
 					infoTextArea.setText("  Number of Players: " + playerDropDown.getSelectedItem() + "  \n  Maps: Random\n  ");
+					System.out.println("Number of Players: " + playerDropDown.getSelectedItem() + "\tMaps: Random");
 					mapTextArea.setText("");
 				} else {
 					mapDropDown.setEnabled(true);
@@ -127,6 +129,7 @@ public class GameManagerWindow extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if (playerDropDown.getItemCount() > 0) {
 					currNumPlayers = (Integer)playerDropDown.getSelectedItem();
+					System.out.println("Setting Number of players: " + currNumPlayers);
 					updateMapDropDown();
 				}
 			}
@@ -135,6 +138,7 @@ public class GameManagerWindow extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if (mapDropDown.getItemCount() > 0) {
 					MapDescription map = (MapDescription)mapDropDown.getSelectedItem();
+					System.out.println("Setting current map: " + map.getName());
 					infoTextArea.setText(map.infoString());
 					mapTextArea.setText(map.getMap());		
 				}
