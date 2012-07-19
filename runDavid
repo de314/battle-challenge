@@ -1,0 +1,8 @@
+#!/bin/bash
+
+cd bin/
+
+clear
+
+java -cp ../libs/jewelcli-0.7.6.jar:. battlechallenge.client.BattleshipClient -n=$1 -b=DavidBot2
+
