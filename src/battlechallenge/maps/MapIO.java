@@ -9,17 +9,18 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Scanner;
 
-public class MapIO {
+import battlechallenge.settings.Config;
 
-	// FIXME: choose the correct paths and provide an external config file
-	public static final String DEFAULT_MAP_DIR = "../Maps/";
-	public static final String DEFAULT_MAP_DIR_WINDOWS = "Maps\\";
-	public static final String SEPERATOR = "/";
+public class MapIO {
 
 	public static Map<Integer, Collection<MapDescription>> getAvailableMaps() {
 		HashMap<Integer, Collection<MapDescription>> maps = new HashMap<Integer, Collection<MapDescription>>();
 		Queue<File> mapFiles = new LinkedList<File>();
+<<<<<<< HEAD
 		getFile(new File(DEFAULT_MAP_DIR_WINDOWS), mapFiles);
+=======
+		getFile(new File(Config.mapDir), mapFiles);
+>>>>>>> 660264b250e0a8a3178df956f8bb19a8838dfa87
 		while (!mapFiles.isEmpty()) {
 			MapDescription temp = getMapDescription(mapFiles.poll());
 			if (!maps.containsKey(temp.getNumPlayers()))
@@ -53,7 +54,7 @@ public class MapIO {
 
 	private static void getFile(File dir, Queue<File> mapFiles) {
 		for (String filename : dir.list()) {
-			File f = new File(dir.getAbsolutePath()+SEPERATOR+filename);
+			File f = new File(dir.getAbsolutePath()+Config.sep+filename);
 			if (f.isDirectory())
 				getFile(f, mapFiles);
 			else

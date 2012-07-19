@@ -12,12 +12,6 @@ import battlechallenge.bot.KevinBot;
  */
 public class BattleshipClient {
 	
-	/** The Constant IP. */
-	public static final String DEFAULT_IP = "127.0.0.1";
-	
-	/** The Constant PORT. */
-	public static final int DEFAULT_PORT = 3000;
-	
 	/**
 	 * Bot to play. Allows user to develop multiple AI bots.
 	 *
@@ -25,7 +19,10 @@ public class BattleshipClient {
 	 * @return the client player
 	 */
 	public static ClientPlayer botToPlay(String botName) {
-		if (botName.equals("DavidBot")) {
+		if (botName.equals("StarterBot")) {
+			return new DavidBot(botName, 0, 0, 0);
+		}
+		if (botName.equals("David")) {
 			return new DavidBot(botName, 0, 0, 0);
 		}
 		if (botName.equals("DavidBot2")) {
@@ -35,7 +32,7 @@ public class BattleshipClient {
 			return new KevinBot(botName, 0, 0, 0);
 		}
 		else {
-			return new ClientPlayer(botName, 0, 0, 0);
+			return new DavidBot(botName, 0, 0, 0);
 		}
 	}
 	
