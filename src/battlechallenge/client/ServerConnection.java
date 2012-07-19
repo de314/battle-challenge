@@ -158,11 +158,14 @@ public class ServerConnection {
 			game.setShipMap((Map<Integer,List<Ship>>)socket.readObject(true));
 			game.setActionResults((Map<Integer, List<ActionResult>>)socket.readObject(true));
 			game.setMap((BattleMap)socket.readObject(true));
+			int turnCount = (Integer) socket.readObject(true);
 			
 			// doTurn and send resulting coordinates to server
 			List<ShipAction> actions = bot.doTurn();
-			if (actions != null)
+			if (actions != null) {
+				socket.writeObject(turnCount);
 				socket.writeObject(actions);
+			}
 			return;
 		} catch (ClassCastException e) {
 			System.err.println("Network Exception: Unexpected game object from server. Check server version.");

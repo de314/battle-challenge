@@ -1,13 +1,11 @@
 package battlechallenge.bot;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.*;
 
 import battlechallenge.ActionResult;
 import battlechallenge.Coordinate;
 import battlechallenge.ShipAction;
+import battlechallenge.ShipIdentifier;
 import battlechallenge.client.ClientGame;
 import battlechallenge.ship.Ship;
 import battlechallenge.ship.Ship.Direction;
@@ -307,6 +305,8 @@ public class KevinBot extends ClientPlayer {
 	public List<ShipAction> doTurn() {
 		
 		List<ShipAction> actions = new LinkedList<ShipAction>();
+		Map<Coordinate, Ship> moveMap = new HashMap<Coordinate, Ship>();
+		Map<Coordinate, Ship> shotMap = new HashMap<Coordinate, Ship>();
 		List<Ship> myShips = ClientGame.getMyShips();
 		List<Ship> enemyShips = ClientGame.getOpponentShips();
 		List<City> cityList = ClientGame.getAllCities();
@@ -335,6 +335,7 @@ public class KevinBot extends ClientPlayer {
 				moveDirection = Direction.STOP;
 				moveTargets.add(s.getLocation());
 				moves.add(moveDirection);
+				moveMap.put(s.getLocation(), s);
 			}
 
 			closeEnemy = closestEnemyShip(s, enemyShips);
@@ -350,7 +351,6 @@ public class KevinBot extends ClientPlayer {
 					movingTowardsShip = true;
 				}
 			}
-			System.out.println(moveDirection);
 			if (moveDirection != null) {
 				Coordinate newCoord = move(moveDirection, s.getLocation());
 //				if (moveTargets.contains(newCoord)) {
@@ -365,13 +365,14 @@ public class KevinBot extends ClientPlayer {
 					oldShipLocation = s.getLocation();
 					s.setLocation(newCoord);
 				}
-				
 			}
 			
 			if (moves.isEmpty()) { // No movement for ship so must be stopped
 				moveTargets.add(s.getLocation());
 				moves.add(Direction.STOP);
 			}
+			
+			
 			// Decide where to shoot
 			
 			Coordinate newCloseEnemyCoordGuess = move(moveTowardsCoord(closeEnemy, oldShipLocation), closeEnemy.getLocation());		
@@ -434,7 +435,6 @@ public class KevinBot extends ClientPlayer {
 					oldShipLocation = s.getLocation();
 					s.setLocation(newCoord);
 				}
-				
 			}
 			
 			if (moves.isEmpty()) { // No movement for ship so must be stopped
@@ -457,8 +457,7 @@ public class KevinBot extends ClientPlayer {
 							shotCoordinates.add(closeEnemy.getLocation()); // shoot at closest enemy anyway
 							shotTargets.add(closeEnemy.getLocation());
 						}
-					}
-						
+					}					
 			}
 			
 			actions.add(new ShipAction(s.getIdentifier(), shotCoordinates, moves));

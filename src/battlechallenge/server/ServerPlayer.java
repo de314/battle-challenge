@@ -279,11 +279,19 @@ public class ServerPlayer {
 	 * @return the list
 	 */
 	private void moveShips(List<ShipAction> shipAction, int boardWidth, int boardHeight, List<Structure> structures) {
+		Map<String, String> shipIDMap = new HashMap<String, String>();
 		for (ShipAction shipAct: shipAction) {
-			if (this.id != shipAct.getShipIdentifier().playerId) { // playerId does not match shipId
+			if (shipAct.getShipIdentifier() == null || this.id != shipAct.getShipIdentifier().playerId) { // playerId does not match shipId
 				System.out.println("Attempted to act on ship that isn't players");
 				continue;
 			}
+			// Prevent same ship from getting multiple move commands
+			if (shipIDMap.get(shipAct.getShipIdentifier().toString()) != null) {
+				continue;
+			}
+			
+			shipIDMap.put(shipAct.getShipIdentifier().toString(), shipAct.getShipIdentifier().toString());
+			
 			Ship s = ships.getShip(shipAct.getShipIdentifier());
 			if (s != null && shipAct.getMoveDir() != null && !s.isSunken()) {
 				lastShipPositions.put(s.getIdentifier().toString(), s.getLocation());
@@ -347,10 +355,10 @@ public class ServerPlayer {
 	 * @param actionResults the action results
 	 * @return true, if successful
 	 */
-	public boolean requestTurn(Map<Integer, List<Ship>> allPlayersShips, Map<Integer, List<ActionResult>> actionResults, BattleMap map) {
+	public boolean requestTurn(Map<Integer, List<Ship>> allPlayersShips, Map<Integer, List<ActionResult>> actionResults, BattleMap map, int turnCount) {
 		setLastActionResults(actionResults.get(id));
 		this.actionLog.addAll(actionResults.get(this.id));
-		return conn.requestTurn(allPlayersShips, actionResults, map);
+		return conn.requestTurn(allPlayersShips, actionResults, map, turnCount);
 	}
 
 	/**
@@ -360,10 +368,10 @@ public class ServerPlayer {
 	 * @param boardHeight the game board height
 	 * @return a list of ship actions from the ClientPlayer
 	 */
-	public List<ShipAction> getTurn(int boardWidth, int boardHeight, List<Structure> structures) {
+	public List<ShipAction> getTurn(int boardWidth, int boardHeight, List<Structure> structures, int turnCount) {
 		List<ShipAction> shipActions = new LinkedList<ShipAction>();
 		try {
-			shipActions = conn.getTurn(); // get the ship action list from the client player
+			shipActions = conn.getTurn(turnCount); // get the ship action list from the client player
 			moveShips(shipActions, boardWidth, boardHeight, structures);
 			return shipActions;
 		} catch (ConnectionLostException e) {

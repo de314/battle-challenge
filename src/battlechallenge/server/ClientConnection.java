@@ -132,7 +132,7 @@ public class ClientConnection {
 	 * @return true, if successful
 	 * @throws ConnectionLostException a lost connection exception
 	 */
-	public boolean requestTurn(Map<Integer, List<Ship>> ships, Map<Integer, List<ActionResult>> actionResults, BattleMap map) {
+	public boolean requestTurn(Map<Integer, List<Ship>> ships, Map<Integer, List<ActionResult>> actionResults, BattleMap map, int turnCount) {
 		try {
 			// send command
 			socket.writeObject(CommunicationConstants.REQUEST_DO_TURN);
@@ -142,6 +142,8 @@ public class ClientConnection {
 			socket.writeObject(actionResults);
 			// send list of structures
 			socket.writeObject(map);
+			// send current turn number game is on
+			socket.writeObject(turnCount);
 			return true;
 		} catch (ConnectionLostException e) {
 			System.err.println("Socket Exception: Client disconnected. Disqualifying player and ending game.");
@@ -155,13 +157,29 @@ public class ClientConnection {
 	 * @return the list of coordinates returned by the ClientPlayer's doTurn method
 	 * @throws ConnectionLostException the connection lost exception
 	 */
-	public List<ShipAction> getTurn() throws ConnectionLostException {
+	public List<ShipAction> getTurn(Integer turnCount) throws ConnectionLostException {
 		try {
 			/*
 			 * check to see if something is arrived in time. Otherwise, assume
 			 * no input. 
 			 */
 			@SuppressWarnings("unchecked")
+			Integer returnedTurnCount = (Integer)socket.readObject(false);
+			if (returnedTurnCount == null) { // Player has not returned ship actions yet
+				return new LinkedList<ShipAction>();
+			}
+			while (!(turnCount.equals(returnedTurnCount))) { // Player returned a diff turn than expected
+				
+				List<ShipAction> invalidTurn = (List<ShipAction>)socket.readObject(false);
+				System.out.println("Expected: " + turnCount + " Played Returned Turn Num: " + returnedTurnCount);
+				returnedTurnCount = (Integer)socket.readObject(false);
+				if (returnedTurnCount == null) { // Second check for 
+					return new LinkedList<ShipAction>();
+				}
+//				if (!(turnCount.equals(returnedTurnCount))) {
+//					List<ShipAction> invalidTurn = (List<ShipAction>)socket.readObject(false);
+//				}
+			}
 			List<ShipAction> temp = (List<ShipAction>)socket.readObject(false);
 			// check that list is not null
 			if (temp == null)
