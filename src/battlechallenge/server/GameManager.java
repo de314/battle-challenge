@@ -15,7 +15,7 @@ public class GameManager {
 	public static final int DEFAULT_NUM_PLAYERS;
 	
 	static {
-		DEFAULT_NUM_PLAYERS = 4;
+		DEFAULT_NUM_PLAYERS = 2;
 	}
 	
 	/** The games. */
