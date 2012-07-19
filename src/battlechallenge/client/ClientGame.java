@@ -168,6 +168,10 @@ public class ClientGame {
 		return null;
 	}
 	
+	public static List<Base> getAllBases() {
+		return map.getBases();
+	}
+	
 	/**
 	 * Gets the opponent bases.
 	 *
