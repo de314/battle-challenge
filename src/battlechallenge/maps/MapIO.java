@@ -19,7 +19,7 @@ public class MapIO {
 	public static Map<Integer, Collection<MapDescription>> getAvailableMaps() {
 		HashMap<Integer, Collection<MapDescription>> maps = new HashMap<Integer, Collection<MapDescription>>();
 		Queue<File> mapFiles = new LinkedList<File>();
-		getFile(new File(DEFAULT_MAP_DIR), mapFiles);
+		getFile(new File(DEFAULT_MAP_DIR_WINDOWS), mapFiles);
 		while (!mapFiles.isEmpty()) {
 			MapDescription temp = getMapDescription(mapFiles.poll());
 			if (!maps.containsKey(temp.getNumPlayers()))
