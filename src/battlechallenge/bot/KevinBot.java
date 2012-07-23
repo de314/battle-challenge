@@ -10,6 +10,7 @@ import battlechallenge.ShipIdentifier;
 import battlechallenge.client.ClientGame;
 import battlechallenge.ship.Ship;
 import battlechallenge.ship.Ship.Direction;
+import battlechallenge.structures.Barrier;
 import battlechallenge.structures.City;
 import battlechallenge.structures.Structure;
 import battlechallenge.bot.Node;
@@ -263,12 +264,12 @@ public class KevinBot extends ClientPlayer {
 		return closestShip;
 	}
 
-	public City closestCity(Ship myShip, List<City> cities) {
+	public City closestCity(Ship myShip, List<City> cities) {//, Map<Coordinate, Ship> moveMap) {
 		City closestCity = null;
 		double currDist;
 		double minDist = Double.MAX_VALUE;
 		for (City city: cities) {
-			if (city.getOwnerId() == ClientGame.getNetworkID()) { // I own the city
+			if (city.getOwnerId() == ClientGame.getNetworkID()) {// || moveMap.get(city.getLocation()) != null) { // I own the city or one of my boats is moving towards it
 				continue;
 			}
 			currDist = myShip.distanceFromCoord(city.getLocation());
@@ -320,7 +321,7 @@ public class KevinBot extends ClientPlayer {
 	}
 
 
-	public Direction BFS(Ship s, Coordinate goal, List<Coordinate> myShipCoord) {
+	public Direction BFS(Ship s, Coordinate goal, List<Coordinate> myShipCoord, List<Coordinate> barriers) {
 		System.out.println("Goal: " + goal.toString());
 		
 		Map<Node, Node> prev = new HashMap<Node, Node>();
@@ -348,7 +349,7 @@ public class KevinBot extends ClientPlayer {
 			
 				Node adjNode = new Node (newCoord, currNode, dir, currNode.getgScore() + 1 + manhattanDistance(newCoord, goal), currNode.getgScore() + 1);
 				//adjNode.setDistance(adjNode.getDistance() + adjNode.getLocation().distanceTo(coord));
-				if (visited.get(adjNode) != null || myShipCoord.contains(adjNode.getLocation())) { // don't use path along friendly ship
+				if (visited.get(adjNode) != null || myShipCoord.contains(adjNode.getLocation()) || barriers.contains(adjNode.getLocation())) { // don't use path along friendly ship
 					continue;
 				}
 				if (!q.contains(adjNode)) { // || adjNode.getDistance() < gScore) {
@@ -363,18 +364,22 @@ public class KevinBot extends ClientPlayer {
 				expandedNodes++;
 			}
 		}
-		if (!(currNode.getLocation().equals(goal))) {
-			System.out.println("Current Node: " + currNode.getLocation());
-			System.out.println("Expanded Nodes: " + expandedNodes);
-			System.out.println("Failed to find a path");
-			return null;
-		}
+//		if (!(currNode.getLocation().equals(goal))) {
+//			System.out.println("Current Node: " + currNode.getLocation());
+//			System.out.println("Expanded Nodes: " + expandedNodes);
+//			System.out.println("Failed to find a path");
+//			return null;
+//		}
 				
 		for(Node node = currNode; node != null; node = prev.get(node)) {
 	        directions.add(node.getDir());
 	    }
 		System.out.println(directions);
-	    return directions.get(directions.size()-2);
+		if (directions.size() > 2) {
+	    	return directions.get(directions.size()-2);
+		}
+		else return directions.get(directions.size()-1);
+			
 	}
 	
 	public Map<Coordinate, City> getCityCoordMap() {
@@ -394,8 +399,13 @@ public class KevinBot extends ClientPlayer {
 		List<Ship> myShips = ClientGame.getMyShips();
 		Map<Coordinate, City> cityCoordMap = getCityCoordMap();
 		List<Coordinate> myShipLocations = new LinkedList<Coordinate>();
+		List<Coordinate> barriers = new LinkedList<Coordinate>(); ClientGame.getBarriers();
+		
 		for (Ship s : myShips) {
 			myShipLocations.add(s.getLocation());
+		}
+		for (Barrier b : ClientGame.getBarriers()) {
+			barriers.add(b.getLocation());
 		}
 		List<Ship> myMovedShips = new LinkedList<Ship>();
 		List<Ship> enemyShips = ClientGame.getOpponentShips();
@@ -404,11 +414,7 @@ public class KevinBot extends ClientPlayer {
 		List<Coordinate> moveTargets = new LinkedList<Coordinate>();
 		List<Coordinate> shotTargets = new LinkedList<Coordinate>();
 		Map<Ship, Direction> shipMoves = new HashMap<Ship, Direction>();
-//		for (City city: ClientGame.getMyCities()) {
-//			moveTargets.add(city.getLocation());
-//		}
-		// System.out.println(enemyShips);
-		// System.out.println(enemyShipCoord);
+
 		City closeCity;
 		boolean movingTowardsCity;
 		boolean movingTowardsShip;
@@ -419,9 +425,9 @@ public class KevinBot extends ClientPlayer {
 			closeCity = null;
 			Direction moveDirection = null;
 			closeEnemy = closestEnemyShip(s, enemyShips);
-			closeCity = closestCity(s, cityList);
+			closeCity = closestCity(s, cityList);//, moveMap);
 			if (isOnMyCity(s)) {
-				if (moveMap.get(s.getLocation()) == null) {
+			//	if (moveMap.get(s.getLocation()) == null) { // No ship is currently suppose to move to this location
 				
 //					Ship ship = moveMap.get(s.getLocation());
 //					shipMoves.remove(moveMap.get(s.getLocation()));
@@ -431,7 +437,7 @@ public class KevinBot extends ClientPlayer {
 //					}
 					moveDirection = moveTowardsCoord(s, closeCity.getLocation());
 					Coordinate newCoord = move(moveDirection, s.getLocation());
-					if (moveMap.get(newCoord) != null) { // someone already moving there so stay on city
+					if (moveMap.get(newCoord) != null) { // someone already moving to new coord so stay on city
 						moveDirection = Direction.STOP;
 						moveMap.put(s.getLocation(), s); // stay on city
 					}
@@ -444,14 +450,14 @@ public class KevinBot extends ClientPlayer {
 					}
 					shipMoves.put(s, moveDirection);
 					continue;
-				}
+			//	}
 			}
 
 		
 
 			if (moveDirection == null) {
 				if (closeCity != null && moveMap.get(closeCity.getLocation()) == null) { // no ship moving onto city already
-					moveDirection = BFS(s, closeCity.getLocation(), myShipLocations);
+					moveDirection = BFS(s, closeCity.getLocation(), myShipLocations, barriers);
 					if (moveDirection == null) {
 						moveDirection = moveTowardsCoord(s, closeCity.getLocation());
 					}
@@ -459,7 +465,7 @@ public class KevinBot extends ClientPlayer {
 					movingTowardsCity = true;
 				}
 				else {
-					moveDirection = BFS(s, closeEnemy.getLocation(), myShipLocations);
+					moveDirection = BFS(s, closeEnemy.getLocation(), myShipLocations, barriers);
 					if (moveDirection == null) {
 						moveDirection = moveTowardsCoord(s, closeEnemy.getLocation());
 					}

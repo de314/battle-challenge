@@ -44,4 +44,21 @@ public class HeaderPanel extends Panel {
 		g.drawString(numTurns + "/" + Game.MAX_NUM_TURNS, ((i++) * spacing) + (spacing/4), 20);
 	}
 	
+//	public void paintComponent(Graphics g) {
+//		super.paintComponent(g);       // paint background
+//		Graphics2D g2 = (Graphics2D)g; 
+//		BufferedImage grid = (BufferedImage)(this.createImage(BCViz.DEFAULT_WIDTH_PX , 40));
+//		Graphics2D gc = grid.createGraphics();
+//		gc.setFont(new Font(Font.MONOSPACED, Font.BOLD, 18));
+//		int spacing = BCViz.DEFAULT_WIDTH_PX / (players.size() + 1);
+//		int i = 0;
+//		for (ServerPlayer p : players) {
+//			gc.setColor(BoardPanel.PLAYER_COLORS[i]);
+//			gc.drawString(p.getName() == null ? "**DEAD**" : p.getName(), ((i++) * spacing) + (spacing/4), 20);
+//		}
+//		gc.setColor(Color.black);
+//		gc.drawString(numTurns + "/" + Game.MAX_NUM_TURNS, ((i++) * spacing) + (spacing/4), 20);
+//		g2.drawImage(grid, null, 0, 0);
+//	}
+	
 }

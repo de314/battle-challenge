@@ -159,7 +159,7 @@ public class BCViz extends JFrame {
 				TOTAL_HEIGHT_PX, BufferedImage.TYPE_INT_RGB);
 		contentPane.paint(image.getGraphics());
 		hp.paint(image.getGraphics());
-		scL.paint(image.getGraphics());
+		scL.paint2(image.getGraphics());
 		return image;
 	}
 

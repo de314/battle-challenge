@@ -21,7 +21,7 @@ public class ImageExporter {
 	}
 	
 	public void saveNewImage(int turnCount, BufferedImage img) {
-		this.saveNewImage(saveDir.getAbsoluteFile()+Config.sep+turnCount+".jpg", img);
+		this.saveNewImage(saveDir.getAbsoluteFile()+ Config.sep + turnCount + ".jpg", img);
 	}
 	
 	private void saveNewImage(String filename, BufferedImage img) {

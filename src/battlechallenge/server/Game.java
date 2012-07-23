@@ -36,7 +36,7 @@ public class Game extends Thread {
 		DEFAULT_WIDTH = 15;
 		DEFAULT_HEIGHT = 15;
 		DEFAULT_SPEED = 750; // number of milliseconds to sleep between turns
-		MAX_NUM_TURNS = 100; //300; // 5 minutes if 1 turn per second
+		MAX_NUM_TURNS = 300; //300; // 5 minutes if 1 turn per second
 	}
 	
 	/** The players. */

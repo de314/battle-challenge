@@ -17,6 +17,7 @@ public class Config {
 	public static final String sep;
 	public static final String n;
 	public static final String mapDir;
+	public static final String gameDir;
 	private static final Map<String, String> params;
 
 	static {
@@ -35,6 +36,7 @@ public class Config {
 		params = new HashMap<String, String>();
 		parseConfigFile();
 		mapDir = params.get("mapDir");
+		gameDir = params.get("gameDir");
 	}
 
 	private static void parseConfigFile() {
