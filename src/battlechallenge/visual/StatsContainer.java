@@ -8,8 +8,10 @@ import java.awt.Panel;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JPanel;
 
@@ -62,18 +64,28 @@ public class StatsContainer extends JPanel {
 	}
 
 	public void paint2 (Graphics g) {
-		//super.paintComponent(g);       // paint background
+
 		Graphics2D g2 = (Graphics2D)g; 
-		//BufferedImage grid = new BufferedImage(120, 760, BufferedImage.TYPE_INT_RGB);
-		BufferedImage grid = (BufferedImage)(this.createImage(120, 760));
-		Graphics2D gc = grid.createGraphics();
+		BufferedImage image = new BufferedImage(120, 720/panels.size(), BufferedImage.TYPE_INT_RGB);
+		BufferedImage image2 = new BufferedImage(120, 720/panels.size(), BufferedImage.TYPE_INT_RGB);
+		BufferedImage image3 = new BufferedImage(120, 720/panels.size(), BufferedImage.TYPE_INT_RGB);
+		BufferedImage image4 = new BufferedImage(120, 720/panels.size(), BufferedImage.TYPE_INT_RGB);
+		Map<Integer, BufferedImage> imageMap = new HashMap<Integer, BufferedImage>();
+		imageMap.put(0, image);
+		imageMap.put(1, image2);
+		imageMap.put(2, image3);
+		imageMap.put(3, image4);
+
+		int yCoord = 0;
+		int i = 0;
 		for(StatPanel panel : panels) {
-			gc.clearRect(0, 40, 120, 760);
-			panel.paint(gc);
-			g2.drawImage(grid, null, panel.getX(), panel.getY() + 40);
+			if (i == 0)
+				yCoord = 40;
+			panel.paint(imageMap.get(i).getGraphics());
+			g2.drawImage(imageMap.get(i), null, 0, i * 80 + yCoord); 
+			i++;
 			
 		}
-	
 	}
 } 
 
