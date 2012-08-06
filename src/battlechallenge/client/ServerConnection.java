@@ -90,6 +90,10 @@ public class ServerConnection {
 					System.out.println("You have lost the game.");
 					break;
 				}
+				if (req.equals(CommunicationConstants.RESULT_DRAW)) {
+					System.out.println("The game resulted in a draw.");
+					break;
+				}
 			} catch (ConnectionLostException e) {
 				System.err.println("Socket Exception: Connection lost, disconnecting.");
 				this.kill();

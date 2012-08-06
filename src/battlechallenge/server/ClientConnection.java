@@ -176,9 +176,6 @@ public class ClientConnection {
 				if (returnedTurnCount == null) { // Second check for 
 					return new LinkedList<ShipAction>();
 				}
-//				if (!(turnCount.equals(returnedTurnCount))) {
-//					List<ShipAction> invalidTurn = (List<ShipAction>)socket.readObject(false);
-//				}
 			}
 			List<ShipAction> temp = (List<ShipAction>)socket.readObject(false);
 			// check that list is not null

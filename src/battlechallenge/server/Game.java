@@ -146,7 +146,17 @@ public class Game extends Thread {
 		/*
 		 * 			[[ END GAME ]]
 		 */
-		ServerPlayer winner = getWinner();
+		List<ServerPlayer> winnerList = getWinner();
+		ServerPlayer winner = null;
+		Boolean draw = false;
+		if (winnerList.size() == 1) { // Only one winner
+			winner = winnerList.get(0);
+		}
+		if (winnerList.size() == players.size()) {
+			draw = true;
+			winner = winnerList.get(0); // Done so that videos are still generated
+		}
+			
 		if (winner != null) {
 			System.out.println("Winner is " + winner.getName());
 			GenerateVideo video = new GenerateVideo(viz.getCurrentFolderName());
@@ -161,9 +171,14 @@ public class Game extends Thread {
 			}
 		}
 		else
-			System.out.println("Error: Winner not found.");
+			//System.out.println("Error: Winner not found.");
+			System.out.println("Game ended in a draw");
 		
 		for(ServerPlayer p : players.values()) {
+			if (draw == true) {
+				p.endGame(CommunicationConstants.RESULT_DRAW);
+				continue;
+			}
 			if (winner == p)
 				p.endGame(CommunicationConstants.RESULT_WIN);
 			else {
@@ -270,7 +285,7 @@ public class Game extends Thread {
 		// Now that all ships are moved, evaluate shots for each player
 		Map<String, String> shipIDMap = new HashMap<String, String>(); // keep track of ships already given actions
 		for(ServerPlayer p : players.values()) {
-			if (!p.isAlive()) // Player is dead no need to get actions when they cannot act
+			if (playerActions.get(p.getId()) == null) // Player is dead no need to get actions when they cannot act
 				continue;
 			for(ShipAction sa : playerActions.get(p.getId())) {
 				// NOTE: moves are processed in: ServerPlayer.getTurn(...);
@@ -291,8 +306,8 @@ public class Game extends Thread {
 				for (int k=0;k<s.getNumShots() && k<sa.getShotCoordList().size(); k++) {
 					Coordinate c = sa.getShotCoordList().get(k);
 					if (c == null || (s.distanceFromCoord(c) > s.getRange()) || 
-							!c.inBoundsInclusive(0, map.getNumRows()-1, 0, map.getNumCols()-1) || 
-							s.isSunken()) {
+							!c.inBoundsInclusive(0, map.getNumRows()-1, 0, map.getNumCols()-1)) {// || 
+							//s.isSunken()) {
 						// ignore shot out of bounds or invalid shot range
 						continue;
 					} else {
@@ -343,25 +358,35 @@ public class Game extends Thread {
 	 *
 	 * @return the winner who is the only player with at least one ship left unsunk.
 	 */
-	public ServerPlayer getWinner() {
+	public List<ServerPlayer> getWinner() {
 		List<ServerPlayer> validPlayers = new LinkedList<ServerPlayer>();
-		for (ServerPlayer player: players.values())
-			if (player.isAlive())
+		List<ServerPlayer> maxPlayerList = new LinkedList<ServerPlayer>();
+		ServerPlayer maxPlayer = null;
+		
+		for (ServerPlayer player: players.values()) {
+			if (player.isAlive()) {
 				validPlayers.add(player);
+			}
+		}	
 		if (validPlayers.size() == 1)
-			return validPlayers.get(0);
+			return validPlayers;
 		if (validPlayers.size() == 0)
 			validPlayers = new LinkedList<ServerPlayer>(players.values());
 		int maxScore = -1;
-		ServerPlayer maxPlayer = null;
 		// TODO: handle tie when selecting winner
 		for (ServerPlayer p : validPlayers) {
-			if (p.getScore() > maxScore) {
-				maxScore = p.getScore();
-				maxPlayer = p;
+			if (p.getScore() >= maxScore) {
+				if (p.getScore() == maxScore) {
+					maxPlayerList.add(p);
+				}
+				if (p.getScore() > maxScore) {
+					maxPlayerList.clear();
+					maxScore = p.getScore();
+					maxPlayerList.add(maxPlayer);
+				}
 			}
 		}
-		return maxPlayer;
+		return maxPlayerList;
 	}
 	
 	public void allocateIncome() {

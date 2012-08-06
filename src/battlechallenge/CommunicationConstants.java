@@ -38,6 +38,9 @@ public class CommunicationConstants {
 	/** The Constant SERVER_RESULT_LOSER. */
 	public static final String RESULT_LOSE;
 	
+	/** The Constant SERVER_RESULT_DRAW. */
+	public static final String RESULT_DRAW;
+	
 	public static final int SOCKET_WAIT_TIME;
 
 	static {
@@ -55,9 +58,10 @@ public class CommunicationConstants {
 		REQUEST_PLACE_SHIPS = "P";
 		REQUEST_DO_TURN = "T";
 		// Results
-		RESULT_DISQUALIFIED = "D";
+		RESULT_DISQUALIFIED = "Q";
 		RESULT_WIN = "W";
 		RESULT_LOSE = "L";
+		RESULT_DRAW = "D";
 		
 		SOCKET_WAIT_TIME = 1000;
 	}

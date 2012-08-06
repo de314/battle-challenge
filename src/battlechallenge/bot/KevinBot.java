@@ -8,6 +8,7 @@ import battlechallenge.Coordinate;
 import battlechallenge.ShipAction;
 import battlechallenge.ShipIdentifier;
 import battlechallenge.client.ClientGame;
+import battlechallenge.maps.BattleMap;
 import battlechallenge.ship.Ship;
 import battlechallenge.ship.Ship.Direction;
 import battlechallenge.structures.Barrier;
@@ -322,7 +323,7 @@ public class KevinBot extends ClientPlayer {
 
 
 	public Direction BFS(Ship s, Coordinate goal, List<Coordinate> myShipCoord, List<Coordinate> barriers) {
-		System.out.println("Goal: " + goal.toString());
+		//System.out.println("Goal: " + goal.toString());
 		
 		Map<Node, Node> prev = new HashMap<Node, Node>();
 		Map<Node, String> visited = new HashMap<Node, String>();
@@ -374,7 +375,7 @@ public class KevinBot extends ClientPlayer {
 		for(Node node = currNode; node != null; node = prev.get(node)) {
 	        directions.add(node.getDir());
 	    }
-		System.out.println(directions);
+		//System.out.println(directions);
 		if (directions.size() > 2) {
 	    	return directions.get(directions.size()-2);
 		}
@@ -389,7 +390,19 @@ public class KevinBot extends ClientPlayer {
 		}
 		return cityMap;
 	}
-
+	
+//	public void floydWarshall() {
+//		BattleMap map = ClientGame.getMap();
+//		int numVertices = map.getNumCols() * map.getNumRows();
+//		int[][] path = new int [map.getNumRows()][map.getNumCols()];
+//	    for (int k = 0; k < numVertices; k++) {
+//	      for (int i = 0; i < numVertices; i++) {
+//	        for (int j = 0; j < numVertices; j++) {
+//	          path[i][j] = Math.min(path[i][j], path[i][k] + path[k][j]);
+//	        }
+//	      }
+//	    }
+//	}
 
 	public List<ShipAction> doTurn() {
 
@@ -418,6 +431,7 @@ public class KevinBot extends ClientPlayer {
 		City closeCity;
 		boolean movingTowardsCity;
 		boolean movingTowardsShip;
+		
 		for (Ship s : myShips) {
 			movingTowardsCity = false;
 			movingTowardsShip = false;
@@ -461,7 +475,7 @@ public class KevinBot extends ClientPlayer {
 					if (moveDirection == null) {
 						moveDirection = moveTowardsCoord(s, closeCity.getLocation());
 					}
-					System.out.println(moveDirection);
+					//System.out.println(moveDirection);
 					movingTowardsCity = true;
 				}
 				else {
@@ -547,7 +561,7 @@ public class KevinBot extends ClientPlayer {
 
 
 			actions.add(new ShipAction(s.getIdentifier(), shotCoordinates, moves));
-			// System.out.println(actions);
+			System.out.println(actions);
 		}
 		//System.out.println("Target List: " + shotTargets);
 		cityCoordMap.clear();

@@ -84,6 +84,7 @@ public class DavidBot2 extends ClientPlayer {
 		for (Entry<Ship,Direction> e : shipMoves.entrySet()) {
 			actions.add(new ShipAction(e.getKey().getIdentifier(), getShot(e.getKey()), e.getValue()));
 		}
+		//System.out.println(actions);
 		return actions;
 	}
 	
