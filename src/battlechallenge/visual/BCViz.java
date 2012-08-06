@@ -65,6 +65,16 @@ public class BCViz extends JFrame {
 	private StatsContainer scR;
 
 	private HeaderPanel hp;
+	
+	private String currentFolderName;
+
+	public String getCurrentFolderName() {
+		return currentFolderName;
+	}
+
+	public void setCurrentFolderName(String currentFolderName) {
+		this.currentFolderName = currentFolderName;
+	}
 
 	private java.awt.Container contentPane = this.getContentPane();
 	private ImageExporter iExp = new ImageExporter(
@@ -151,15 +161,16 @@ public class BCViz extends JFrame {
 		} catch (Exception e) {}
 		BufferedImage img = getScreenShot();
 		iExp.saveNewImage(numTurns, img);
+		currentFolderName= iExp.getSaveDirFilename();
 	}
 
 	public BufferedImage getScreenShot() {
 
 		BufferedImage image = new BufferedImage(TOTAL_WIDTH_PX,
 				TOTAL_HEIGHT_PX, BufferedImage.TYPE_INT_RGB);
-		contentPane.paint(image.getGraphics());
+		contentPane.paint(image.getGraphics());;
+		scL.paint2(image.getGraphics());
 		hp.paint(image.getGraphics());
-		scL.paint(image.getGraphics());
 		return image;
 	}
 

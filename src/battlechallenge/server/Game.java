@@ -1,5 +1,6 @@
 package battlechallenge.server;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -19,6 +20,7 @@ import battlechallenge.ship.ShipCollection;
 import battlechallenge.structures.City;
 import battlechallenge.structures.Structure;
 import battlechallenge.visual.BCViz;
+import battlechallenge.visual.GenerateVideo;
 
 /**
  * The Class Game.
@@ -36,7 +38,7 @@ public class Game extends Thread {
 		DEFAULT_WIDTH = 15;
 		DEFAULT_HEIGHT = 15;
 		DEFAULT_SPEED = 750; // number of milliseconds to sleep between turns
-		MAX_NUM_TURNS = 100; //300; // 5 minutes if 1 turn per second
+		MAX_NUM_TURNS = 300; //300; // 5 minutes if 1 turn per second
 	}
 	
 	/** The players. */
@@ -145,8 +147,19 @@ public class Game extends Thread {
 		 * 			[[ END GAME ]]
 		 */
 		ServerPlayer winner = getWinner();
-		if (winner != null)
+		if (winner != null) {
 			System.out.println("Winner is " + winner.getName());
+			GenerateVideo video = new GenerateVideo(viz.getCurrentFolderName());
+			try {
+				video.genVideo();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		else
 			System.out.println("Error: Winner not found.");
 		

@@ -14,14 +14,23 @@ public class ImageExporter {
 
 	private File saveDir;
 	
+	private String saveDirFilename;
+	
+	public String getSaveDirFilename() {
+		return saveDirFilename;
+	}
+
+
 	public ImageExporter(String saveDirFilename) {
 		this.saveDir = new File(saveDirFilename);
-		if (!this.saveDir.exists())
-			this.saveDir.mkdirs();
+		if (!this.saveDir.exists()) {
+			this.saveDir.mkdirs(); 
+			this.saveDirFilename = saveDirFilename;
+		}
 	}
 	
 	public void saveNewImage(int turnCount, BufferedImage img) {
-		this.saveNewImage(saveDir.getAbsoluteFile()+Config.sep+turnCount+".jpg", img);
+		this.saveNewImage(saveDir.getAbsoluteFile()+ Config.sep + turnCount + ".jpg", img);
 	}
 	
 	private void saveNewImage(String filename, BufferedImage img) {
@@ -29,7 +38,7 @@ public class ImageExporter {
 		File f = new File(filename);
 		ImageIO.write(img, "jpg", f);
 		} catch (IOException e) {
-			
+			System.out.println("Failed to write");
 		}
 	}
 }

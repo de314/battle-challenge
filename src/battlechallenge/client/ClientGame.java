@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import battlechallenge.ActionResult;
 import battlechallenge.maps.BattleMap;
 import battlechallenge.ship.Ship;
+import battlechallenge.structures.Barrier;
 import battlechallenge.structures.Base;
 import battlechallenge.structures.City;
 import battlechallenge.structures.Structure;
@@ -218,5 +219,21 @@ public class ClientGame {
 			}
 		}
 		return cities;
+	}
+	
+	/**
+	 * returns all barriers
+	 *
+	 * @return the all cities
+	 */
+	public static List<Barrier> getBarriers() {
+		List<Barrier> barriers = new ArrayList<Barrier>();
+		for (Structure str : map.getStructures()) {
+			if (str instanceof Barrier) { 
+				Barrier b = (Barrier) str;
+				barriers.add(b);
+			}
+		}
+		return barriers;
 	}
 }

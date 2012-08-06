@@ -1,0 +1,9 @@
+#!/bin/bash
+#143.215.110.249
+
+cd bin/
+
+clear
+
+java battlechallenge.client.BattleshipClient Kevin 3000 127.0.0.1 KevinBot 
+
