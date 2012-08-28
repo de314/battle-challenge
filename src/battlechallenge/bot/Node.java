@@ -31,6 +31,13 @@ public class Node implements Comparable<Node>, Comparator<Node> {
 		this.distance = distance;
 		this.gScore = gScore;
 	}
+	
+	public Node(Coordinate c1, Node prev, Direction dir) {
+		this.c1 = c1;
+		this.dir = dir;
+		this.prev = prev;
+	}
+	
 	@Override
 	public int compareTo(Node other) {
 		return this.distance < other.distance ? -1 : this.distance == other.distance ? 0 : 1; // fix

@@ -50,8 +50,9 @@ public class GenerateVideo {
 		//System.out.println(currDirectory);
 		PriorityQueue<File> gameFrames = getAvailableGameFrames();
 		int numFrames = gameFrames.size();
-	    //System.out.println(numFrames); 
-	    //System.out.println(gameFrames);
+		if (numFrames == 0) { // No Images were saved so don't create a video
+			return;
+		}
 	    //make a IMediaWriter to write the file.
 	    String videoName = currDirectory+".mp4";
 	    //System.out.println(videoName);
@@ -59,16 +60,14 @@ public class GenerateVideo {
 	    writer.addVideoStream(0, 0,
 	    		BCViz.DEFAULT_WIDTH_PX, BCViz.DEFAULT_HEIGHT_PX);
 	    
-	    long startTime = System.currentTimeMillis();
 	    BufferedImage gameFrame = null;
 	    //ImageIO.read(gameFrames.poll()); // b/c of git file is the first index FIX
-	    for (int index = 0; index < numFrames; index++) { // b/c of git file is the first index FIX
+	    for (int index = 0; index < numFrames; index++) {
 	      gameFrame = ImageIO.read(gameFrames.poll());
 	      // encode the image to stream #0
 	      writer.encodeVideo(0,gameFrame,
 	              index*1000, TimeUnit.MILLISECONDS);
 	      //System.out.println("encoded image: " + gameFrame + " Index: " + index);
-//	      writer.flush();
 	    }
 	    writer.encodeVideo(0,gameFrame,
 	              (numFrames + 3)*1000, TimeUnit.MILLISECONDS);
@@ -81,5 +80,3 @@ public class GenerateVideo {
 	    writer.close();  
 	  }
 }
-	// REMOVE THIS
-	//Developer Key: AI39si4cu606Qf5HNIbsyfIDH6JVoMcbMTeOvfxLmG3UCIBXN-zv-SRw-wOQiwW9fGSHEkt7t7iFQPmvva7KxwPlvK5rcjBG7A

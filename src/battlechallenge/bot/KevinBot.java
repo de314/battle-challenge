@@ -296,9 +296,9 @@ public class KevinBot extends ClientPlayer {
 		return closestCity;
 	}
 
-	public boolean isOnMyCity(Ship s) {
+	public boolean isOnMyCity(Coordinate coord) {
 		for (City city: ClientGame.getMyCities()) {
-			if (city.getLocation().equals(s.getLocation())) {
+			if (city.getLocation().equals(coord)) {
 				return true;
 			}
 		}
@@ -333,8 +333,8 @@ public class KevinBot extends ClientPlayer {
 		int expandedNodes = 0;
 		List<Direction> directions = new LinkedList<Direction>();
 		Comparator<Node> comparator = new Node(null, null, null, null, 0);
-		PriorityQueue<Node> q = new PriorityQueue<Node>(100, comparator);
-		q.add(currNode);//, currNode.getLocation().distanceTo(coord));
+		PriorityQueue<Node> q = new PriorityQueue<Node>(500, comparator);
+		q.add(currNode);
 		while (!q.isEmpty() && expandedNodes <= maxNodes) {
 			expandedNodes++;
 			currNode = (Node) q.poll();
@@ -382,6 +382,67 @@ public class KevinBot extends ClientPlayer {
 		else return directions.get(directions.size()-1);
 			
 	}
+	/*
+	 * Used to find closest ship and fastest direction to move to get to that location
+	 */
+	public Direction aStar(Coordinate c, List<Coordinate> myShipCoord, List<Coordinate> barriers) {
+		Map<Node, Node> prev = new HashMap<Node, Node>();
+		Map<Node, String> visited = new HashMap<Node, String>();
+		Node currNode = new Node(c, null, null); // Coordinate, Node, Direction, Distance, gScore
+		int maxNodes = 2000;
+		Ship ship = null;
+		int expandedNodes = 0;
+		List<Direction> directions = new LinkedList<Direction>();
+		Comparator<Node> comparator = new Node(null, null, null);
+		PriorityQueue<Node> q = new PriorityQueue<Node>(200, comparator);
+		q.add(currNode);
+		while (!q.isEmpty() && expandedNodes <= maxNodes) {
+			expandedNodes++;
+			currNode = (Node) q.poll();
+			visited.put(currNode, currNode.toString());
+			if ((myShipCoord.contains(currNode.getLocation())) && !isOnMyCity(currNode.getLocation())) { // Found a ship
+				break;
+			}
+			for (Direction dir: directionList) { // look into
+				if (dir == Direction.STOP) {
+					continue;
+				}
+				Coordinate newCoord = move(dir, currNode.getLocation());
+			
+				Node adjNode = new Node (newCoord, currNode, dir);
+				
+				if (visited.get(adjNode) != null || barriers.contains(adjNode.getLocation())) { // don't use path along friendly ship
+					continue;
+				}
+				if (!q.contains(adjNode)) {
+					q.offer((adjNode));
+					visited.put(adjNode, adjNode.toString());
+					prev.put(adjNode, currNode);	
+				}
+				if (myShipCoord.contains(adjNode.getLocation()) & !isOnMyCity(adjNode.getLocation())) { // Found where we want to go
+					currNode = adjNode;
+					//Ship ship = 
+//					break;
+				}
+				expandedNodes++;
+			}
+		}
+		
+		if (!myShipCoord.contains(currNode.getLocation()) && !isOnMyCity(currNode.getLocation())) { // didnt end up on a ship
+			return null;
+		}
+		
+		for(Node node = currNode; node != null; node = prev.get(node)) {
+	        directions.add(node.getDir());
+	    }
+		
+		if (directions.size() > 2) { // redundant fix
+			//moveMap.add((currNode.getLocation())
+	    	return directions.get(0);
+		}
+		else return directions.get(0);
+			
+	}
 	
 	public Map<Coordinate, City> getCityCoordMap() {
 		Map<Coordinate, City> cityMap = new HashMap<Coordinate, City>();
@@ -403,11 +464,12 @@ public class KevinBot extends ClientPlayer {
 //	      }
 //	    }
 //	}
-
+	Map<Coordinate, Ship> moveMap;
+	
 	public List<ShipAction> doTurn() {
 
 		List<ShipAction> actions = new LinkedList<ShipAction>();
-		Map<Coordinate, Ship> moveMap = new HashMap<Coordinate, Ship>();
+		moveMap = new HashMap<Coordinate, Ship>();
 		Map<Coordinate, Ship> shotMap = new HashMap<Coordinate, Ship>();
 		List<Ship> myShips = ClientGame.getMyShips();
 		Map<Coordinate, City> cityCoordMap = getCityCoordMap();
@@ -432,6 +494,9 @@ public class KevinBot extends ClientPlayer {
 		boolean movingTowardsCity;
 		boolean movingTowardsShip;
 		
+		for (City city: cityList) {
+		}
+		
 		for (Ship s : myShips) {
 			movingTowardsCity = false;
 			movingTowardsShip = false;
@@ -440,7 +505,7 @@ public class KevinBot extends ClientPlayer {
 			Direction moveDirection = null;
 			closeEnemy = closestEnemyShip(s, enemyShips);
 			closeCity = closestCity(s, cityList);//, moveMap);
-			if (isOnMyCity(s)) {
+			if (isOnMyCity(s.getLocation())) {
 			//	if (moveMap.get(s.getLocation()) == null) { // No ship is currently suppose to move to this location
 				
 //					Ship ship = moveMap.get(s.getLocation());
