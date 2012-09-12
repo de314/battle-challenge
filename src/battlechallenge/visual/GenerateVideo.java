@@ -7,6 +7,8 @@ import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.concurrent.TimeUnit;
 import battlechallenge.settings.Config;
+
+import com.google.gdata.util.ServiceException;
 import com.xuggle.mediatool.IMediaWriter;
 import com.xuggle.mediatool.ToolFactory;
 import javax.imageio.ImageIO;
@@ -46,16 +48,15 @@ public class GenerateVideo {
 		this.currDirectory = currDirectory;
 	}
 	
-	public void genVideo() throws IOException, InterruptedException {
-		//System.out.println(currDirectory);
+	public boolean genVideo() throws IOException, InterruptedException, ServiceException {
 		PriorityQueue<File> gameFrames = getAvailableGameFrames();
 		int numFrames = gameFrames.size();
 		if (numFrames == 0) { // No Images were saved so don't create a video
-			return;
+			System.out.println("No Frames");
+			return false;
 		}
 	    //make a IMediaWriter to write the file.
 	    String videoName = currDirectory+".mp4";
-	    //System.out.println(videoName);
 	    final IMediaWriter writer = ToolFactory.makeWriter(videoName);
 	    writer.addVideoStream(0, 0,
 	    		BCViz.DEFAULT_WIDTH_PX, BCViz.DEFAULT_HEIGHT_PX);
@@ -77,6 +78,7 @@ public class GenerateVideo {
 	              (numFrames + 5)*1000, TimeUnit.MILLISECONDS);
 	    
 	    // tell the writer to close and write the trailer 
-	    writer.close();  
+	    writer.close();
+	    return true;
 	  }
 }

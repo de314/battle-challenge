@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.google.gdata.util.ServiceException;
+
 import battlechallenge.ActionResult;
 import battlechallenge.ActionResult.ShotResult;
 import battlechallenge.CommunicationConstants;
@@ -21,6 +23,7 @@ import battlechallenge.structures.City;
 import battlechallenge.structures.Structure;
 import battlechallenge.visual.BCViz;
 import battlechallenge.visual.GenerateVideo;
+import battlechallenge.visual.YoutubeUploader;
 
 /**
  * The Class Game.
@@ -155,17 +158,24 @@ public class Game extends Thread {
 		if (winnerList.size() == players.size()) {
 			draw = true;
 			winner = winnerList.get(0); // Done so that videos are still generated
+			System.out.println(winner);
 		}
 			
 		if (winner != null) {
 			System.out.println("Winner is " + winner.getName());
 			GenerateVideo video = new GenerateVideo(viz.getCurrentFolderName());
 			try {
-				video.genVideo();
+				if (video.genVideo()) {
+					YoutubeUploader uploader = new YoutubeUploader(viz.getCurrentFolderName() + ".mp4");
+					uploader.uploadVideo();
+				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ServiceException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -373,7 +383,7 @@ public class Game extends Thread {
 		if (validPlayers.size() == 0)
 			validPlayers = new LinkedList<ServerPlayer>(players.values());
 		int maxScore = -1;
-		// TODO: handle tie when selecting winner
+
 		for (ServerPlayer p : validPlayers) {
 			if (p.getScore() >= maxScore) {
 				if (p.getScore() == maxScore) {
@@ -382,7 +392,7 @@ public class Game extends Thread {
 				if (p.getScore() > maxScore) {
 					maxPlayerList.clear();
 					maxScore = p.getScore();
-					maxPlayerList.add(maxPlayer);
+					maxPlayerList.add(p);
 				}
 			}
 		}
