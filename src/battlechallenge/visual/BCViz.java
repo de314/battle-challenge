@@ -67,6 +67,11 @@ public class BCViz extends JFrame {
 	private HeaderPanel hp;
 	
 	private String currentFolderName;
+	
+	private java.awt.Container contentPane = this.getContentPane();
+	
+	private ImageExporter iExp = new ImageExporter(
+			System.currentTimeMillis() + "");
 
 	public String getCurrentFolderName() {
 		return currentFolderName;
@@ -76,9 +81,9 @@ public class BCViz extends JFrame {
 		this.currentFolderName = currentFolderName;
 	}
 
-	private java.awt.Container contentPane = this.getContentPane();
-	private ImageExporter iExp = new ImageExporter(
-			ImageExporter.DEFAULT_GAME_DIR + System.currentTimeMillis());
+	public ImageExporter getiExp() {
+		return iExp;
+	}
 
 	/**
 	 * Instantiates a new bC viz.
@@ -161,7 +166,7 @@ public class BCViz extends JFrame {
 		} catch (Exception e) {}
 		BufferedImage img = getScreenShot();
 		iExp.saveNewImage(numTurns, img);
-		currentFolderName= iExp.getSaveDirFilename();
+		currentFolderName = iExp.getSaveDirFilename(); // TODO: I believe this should only be called once
 	}
 
 	public BufferedImage getScreenShot() {

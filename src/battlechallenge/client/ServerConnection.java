@@ -83,9 +83,10 @@ public class ServerConnection {
 					break;
 				}
 				if (req.equals(CommunicationConstants.RESULT_WIN)) {
-					System.out.println("You have WON the game!!");
+					System.out.println("You have WON the game.");
 					break;
 				}
+				//TODO: Account for rankings within game
 				if (req.equals(CommunicationConstants.RESULT_LOSE)) {
 					System.out.println("You have lost the game.");
 					break;

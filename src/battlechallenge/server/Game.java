@@ -17,6 +17,7 @@ import battlechallenge.Coordinate;
 import battlechallenge.ShipAction;
 import battlechallenge.maps.BattleMap;
 import battlechallenge.maps.MapImporter;
+import battlechallenge.settings.Config;
 import battlechallenge.ship.Ship;
 import battlechallenge.ship.ShipCollection;
 import battlechallenge.structures.City;
@@ -56,6 +57,8 @@ public class Game extends Thread {
 	private ShipCollection ships;
 	
 	private int minsPerShip = 10; // TODO: Make variable per game
+	
+	private String videoURL;
 	
 	/**
 	 * Used to check how many players are in the game
@@ -157,17 +160,24 @@ public class Game extends Thread {
 		}
 		if (winnerList.size() == players.size()) {
 			draw = true;
-			winner = winnerList.get(0); // Done so that videos are still generated
+			winner = winnerList.get(0); // Picks a winner so winner is not null 
 			System.out.println(winner);
 		}
 			
-		if (winner != null) {
+		if (winner != null) { 
 			System.out.println("Winner is " + winner.getName());
+			// Generate video because the game returned a winner implying a successful game
 			GenerateVideo video = new GenerateVideo(viz.getCurrentFolderName());
 			try {
-				if (video.genVideo()) {
-					YoutubeUploader uploader = new YoutubeUploader(viz.getCurrentFolderName() + ".mp4");
-					uploader.uploadVideo();
+				if (video.genVideo()) { // if video was generated successfully
+					YoutubeUploader uploader = new YoutubeUploader(viz.getCurrentFolderName() + Config.sep + viz.getiExp().getTimeStamp() + ".mp4");
+					uploader.uploadVideo(); 
+					videoURL = uploader.getVideoURL();
+					System.out.println(videoURL);
+					viz.getiExp().deleteCurrDir(); // delete the game directory with screen shots of frames to make video;
+				}
+				else {
+					System.out.println("Video was unable to be created");
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -180,16 +190,14 @@ public class Game extends Thread {
 				e.printStackTrace();
 			}
 		}
-		else
-			//System.out.println("Error: Winner not found.");
-			System.out.println("Game ended in a draw");
+
 		
 		for(ServerPlayer p : players.values()) {
 			if (draw == true) {
 				p.endGame(CommunicationConstants.RESULT_DRAW);
 				continue;
 			}
-			if (winner == p)
+			if (winner == p) //TODO: Handle multiple winners and losers
 				p.endGame(CommunicationConstants.RESULT_WIN);
 			else {
 				p.endGame(CommunicationConstants.RESULT_LOSE);

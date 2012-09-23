@@ -22,10 +22,11 @@ import javax.imageio.ImageIO;
 public class GenerateVideo {
 	
 	private String currDirectory;
+	private File f;
 	
 	public PriorityQueue<File> getAvailableGameFrames() {
 		PriorityQueue<File> gamePictures = new PriorityQueue<File>(300, comp);
-		File f = new File(currDirectory); //Config.sep+filename);
+		f = new File(currDirectory);
 		for (String filename: f.list()) {
 			File file = new File(f.getAbsolutePath()+Config.sep+filename);
 			gamePictures.offer(file);
@@ -33,7 +34,7 @@ public class GenerateVideo {
 		return gamePictures;
 	}
 	
-	static Comparator<File> comp = new Comparator<File>() {
+	static Comparator<File> comp = new Comparator<File>() { // frames are created with IDs in order, sort them this way
 		  public int compare(File f1, File f2) {
 		    String name1 = f1.getName().substring(0, f1.getName().length()-4);
 		    String name2 = f2.getName().substring(0, f2.getName().length()-4);
@@ -45,38 +46,36 @@ public class GenerateVideo {
 	
 
 	public GenerateVideo(String currDirectory) {
-		this.currDirectory = currDirectory;
+		this.currDirectory = currDirectory; // the directory where the images for this game are stored
 	}
 	
 	public boolean genVideo() throws IOException, InterruptedException, ServiceException {
 		PriorityQueue<File> gameFrames = getAvailableGameFrames();
 		int numFrames = gameFrames.size();
 		if (numFrames == 0) { // No Images were saved so don't create a video
-			System.out.println("No Frames");
+			System.out.println("No game images exist, an error must have occured");
 			return false;
 		}
 	    //make a IMediaWriter to write the file.
-	    String videoName = currDirectory+".mp4";
-	    final IMediaWriter writer = ToolFactory.makeWriter(videoName);
+	    String videoPath = currDirectory+Config.sep+ f.getName() + ".mp4";
+	    final IMediaWriter writer = ToolFactory.makeWriter(videoPath);
 	    writer.addVideoStream(0, 0,
 	    		BCViz.DEFAULT_WIDTH_PX, BCViz.DEFAULT_HEIGHT_PX);
 	    
 	    BufferedImage gameFrame = null;
-	    //ImageIO.read(gameFrames.poll()); // b/c of git file is the first index FIX
+	 
 	    for (int index = 0; index < numFrames; index++) {
 	      gameFrame = ImageIO.read(gameFrames.poll());
 	      // encode the image to stream #0
-	      writer.encodeVideo(0,gameFrame,
+	      writer.encodeVideo(0,gameFrame, // encode each game image
 	              index*1000, TimeUnit.MILLISECONDS);
-	      //System.out.println("encoded image: " + gameFrame + " Index: " + index);
 	    }
 	    writer.encodeVideo(0,gameFrame,
 	              (numFrames + 3)*1000, TimeUnit.MILLISECONDS);
 	    writer.encodeVideo(0,gameFrame,
 	              (numFrames + 4)*1000, TimeUnit.MILLISECONDS);
-	    writer.encodeVideo(0,gameFrame,
-	              (numFrames + 5)*1000, TimeUnit.MILLISECONDS);
-	    
+//	    writer.encodeVideo(0,gameFrame,
+//	              (numFrames + 5)*1000, TimeUnit.MILLISECONDS);
 	    // tell the writer to close and write the trailer 
 	    writer.close();
 	    return true;

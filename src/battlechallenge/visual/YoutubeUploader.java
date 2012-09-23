@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import battlechallenge.settings.Config;
+
 import com.google.gdata.client.youtube.YouTubeService;
 import com.google.gdata.data.media.MediaFileSource;
 import com.google.gdata.data.media.MediaStreamSource;
@@ -36,7 +38,12 @@ public class YoutubeUploader {
 	private String username = "AutonomousArmada@gmail.com";
 	private String password = "DavidKevin";
 	private String videoName;
+	private String videoURL;
 	
+	public String getVideoURL() {
+		return videoURL;
+	}
+
 	public YoutubeUploader(String videoName) throws MalformedURLException, IOException, ServiceException {
 		this.videoName = videoName;
 	}
@@ -44,7 +51,7 @@ public class YoutubeUploader {
 	public void uploadVideo() throws MalformedURLException, IOException, ServiceException {
 		YouTubeService service = new YouTubeService("test", "AI39si4cu606Qf5HNIbsyfIDH6JVoMcbMTeOvfxLmG3UCIBXN-zv-SRw-wOQiwW9fGSHEkt7t7iFQPmvva7KxwPlvK5rcjBG7A");
 		service.setUserCredentials(username, password);
-		System.out.println("Gets Past setCredentials");
+
 		VideoEntry newEntry = new VideoEntry();
 		YouTubeMediaGroup mg = newEntry.getOrCreateMediaGroup();
 		mg.setTitle(new MediaTitle());
@@ -61,8 +68,8 @@ public class YoutubeUploader {
 	    newEntry.setLocation("Atlanta, GA");
 		mg.addCategory(new MediaCategory(YouTubeNamespace.DEVELOPER_TAG_SCHEME, "tag 1"));
 		mg.addCategory(new MediaCategory(YouTubeNamespace.DEVELOPER_TAG_SCHEME, "tag 2"));
-		
 		File video = new File(videoName);
+		
 		if (!video.exists()) {
 			System.out.println("Video does not exist");
 			return;
@@ -73,15 +80,14 @@ public class YoutubeUploader {
 
 		String uploadUrl =
 				"http://uploads.gdata.youtube.com/feeds/api/users/default/uploads";
-		
-		//http://www.youtube.com/watch?v=vDJ3iwItbx0&feature=g-upl
-		VideoEntry createdEntry = service.insert(new URL(uploadUrl), newEntry);
-		//System.out.println("end of upload method");
-	}
+		VideoEntry createdEntry = service.insert(new URL(uploadUrl), newEntry); // upload video, get video entry object
+		videoURL = getVideoLink(createdEntry);
+		}
 	
-//	public static void main(String[] args) throws MalformedURLException, IOException, ServiceException {
-//		YoutubeUploader t = new YoutubeUploader("");
-//		t.uploadVideo();
-//		System.out.println("Ran test");
-//	}
+	public String getVideoLink(VideoEntry videoEntry) {
+		YouTubeMediaGroup mediaGroup = videoEntry.getMediaGroup(); 
+		MediaPlayer mediaPlayer = mediaGroup.getPlayer();
+		videoURL = mediaPlayer.getUrl();
+		return videoURL;
+	}
 }
