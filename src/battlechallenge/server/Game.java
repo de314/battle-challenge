@@ -473,11 +473,12 @@ public class Game extends Thread {
 		int maxScore = -1;
 
 		for (ServerPlayer p : validPlayers) {
-			playerList.add(p); // Sorted by player Score
+			playerList.offer(p); // Sorted by player Score
 		}
 		
 		int currRank = 1;
 		for (ServerPlayer p: playerList) { // assign player ranks
+			System.out.println(p.getName() + " " + p.getScore());
 			if (p.getScore() < maxScore) {
 				currRank++;
 			}
@@ -567,7 +568,7 @@ public class Game extends Thread {
 		  public int compare(ServerPlayer p1, ServerPlayer p2) {
 			Integer p1Score = p1.getScore();
 			Integer p2Score = p2.getScore();
-		    return p1Score.compareTo(p2Score);
+		    return p2Score.compareTo(p1Score);
 		  }
 	};
 }
