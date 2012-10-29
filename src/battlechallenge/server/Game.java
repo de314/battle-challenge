@@ -1,11 +1,23 @@
 package battlechallenge.server;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Map.Entry;
 
 import com.google.gdata.util.ServiceException;
@@ -152,8 +164,69 @@ public class Game extends Thread {
 		/*
 		 * 			[[ END GAME ]]
 		 */
+		
 		List<ServerPlayer> winnerList = getWinner();
+		List<String> rankList = new ArrayList<String>();
 		ServerPlayer winner = null;
+		String url = "127.0.0.1";
+		String charset = "UTF-8";
+		String param = "";
+//		String param1 = "value1";
+//		String param2 = "value2";
+		String query = "";
+		int count = 0;
+		//Contestant.1=first place player name
+		for (ServerPlayer p: winnerList) { // store params as "Contestant.#=playerName"
+			rankList.add("Rank: " + p.getEndGameRank() + " = " + p.getName());
+			param = "Contestant." + p.getEndGameRank() + "=" + p.getName();			
+			try {
+				query += URLEncoder.encode(param, charset);
+				if (count < winnerList.size() -1) {
+					query += "&"; // params must be seperated by '&'
+				}
+				count++;
+			} catch (UnsupportedEncodingException e) { // failed to encode
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		System.out.println("Query: " + query);
+		
+//		try {
+//			query = String.format("param1=%s&param2=%s", 
+//			     URLEncoder.encode(param1, charset), 
+//			     URLEncoder.encode(param2, charset));
+//		} catch (UnsupportedEncodingException e1) { // failed to encode
+//			e1.printStackTrace();
+//		}
+		
+		URLConnection connection = null;
+		
+		try {
+			connection = new URL(url).openConnection();
+		} catch (MalformedURLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		connection.setDoOutput(true); // Triggers POST.
+		connection.setRequestProperty("Accept-Charset", charset);
+		connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=" + charset);
+		OutputStream output = null;
+		try {
+		     output = connection.getOutputStream();
+		     output.write(query.getBytes(charset));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+		     if (output != null) try { output.close(); } catch (IOException logOrIgnore) {}
+		}
+		//InputStream response = connection.getInputStream();
+		
 		Boolean draw = false;
 		if (winnerList.size() == 1) { // Only one winner
 			winner = winnerList.get(0);
@@ -166,6 +239,9 @@ public class Game extends Thread {
 			
 		if (winner != null) { 
 			System.out.println("Winner is " + winner.getName());
+			for (String s: rankList) {
+				System.out.println(s);
+			}
 			// Generate video because the game returned a winner implying a successful game
 			GenerateVideo video = new GenerateVideo(viz.getCurrentFolderName());
 			try {
@@ -379,6 +455,7 @@ public class Game extends Thread {
 	public List<ServerPlayer> getWinner() {
 		List<ServerPlayer> validPlayers = new LinkedList<ServerPlayer>();
 		List<ServerPlayer> maxPlayerList = new LinkedList<ServerPlayer>();
+		PriorityQueue<ServerPlayer> playerList = new PriorityQueue<ServerPlayer>(8, comp);
 		ServerPlayer maxPlayer = null;
 		
 		for (ServerPlayer player: players.values()) {
@@ -393,17 +470,34 @@ public class Game extends Thread {
 		int maxScore = -1;
 
 		for (ServerPlayer p : validPlayers) {
-			if (p.getScore() >= maxScore) {
-				if (p.getScore() == maxScore) {
-					maxPlayerList.add(p);
-				}
-				if (p.getScore() > maxScore) {
-					maxPlayerList.clear();
-					maxScore = p.getScore();
-					maxPlayerList.add(p);
-				}
-			}
+			playerList.add(p); // Sorted by player Score
 		}
+		
+		int currRank = 1;
+		for (ServerPlayer p: playerList) { // assign player ranks
+			if (p.getScore() < maxScore) {
+				currRank++;
+			}
+			else {
+				maxScore = p.getScore();
+			}
+			p.setEndGameRank(currRank);
+			maxPlayerList.add(p);
+		}
+		
+//		for (ServerPlayer p : validPlayers) {
+//			if (p.getScore() >= maxScore) {
+//				if (p.getScore() == maxScore) {
+//					maxPlayerList.add(p);
+//				}
+//				if (p.getScore() > maxScore) {
+//					maxPlayerList.clear();
+//					maxScore = p.getScore();
+//					maxPlayerList.add(p);
+//				}
+//			}
+//		}
+		
 		return maxPlayerList;
 	}
 	
@@ -464,4 +558,13 @@ public class Game extends Thread {
 		ships.add(new Ship());
 		return ships;
 	}
+	
+	
+	static Comparator<ServerPlayer> comp = new Comparator<ServerPlayer>() { // frames are created with IDs in order, sort them this way
+		  public int compare(ServerPlayer p1, ServerPlayer p2) {
+			Integer p1Score = p1.getScore();
+			Integer p2Score = p2.getScore();
+		    return p1Score.compareTo(p2Score);
+		  }
+	};
 }

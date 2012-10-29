@@ -75,6 +75,16 @@ public class ServerPlayer {
 	
 	private int lastIncome;
 	
+	private int endGameRank;
+	
+	public int getEndGameRank() {
+		return endGameRank;
+	}
+
+	public void setEndGameRank(int endGameRank) {
+		this.endGameRank = endGameRank;
+	}
+
 	public int getLastIncome() {
 		return lastIncome;
 	}
