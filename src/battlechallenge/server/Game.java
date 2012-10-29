@@ -167,84 +167,16 @@ public class Game extends Thread {
 		
 		List<ServerPlayer> winnerList = getWinner();
 		List<String> rankList = new ArrayList<String>();
-		ServerPlayer winner = null;
-		String url = "http://www.google.com";
+		//ServerPlayer winner = null;
+		String url = "http://www.yahoo.com";
 		String charset = "UTF-8";
 		String param = "";
 		String query = "";
-		int count = 0;
-		//Contestant.1=first place player name
-		for (ServerPlayer p: winnerList) { // store params as "Contestant.#=playerName"
-			rankList.add("Rank: " + p.getEndGameRank() + " = " + p.getName());
-			param = "Contestant." + p.getEndGameRank() + "=" + p.getName();	
-			query += param;
-			if (count < winnerList.size() -1) {
-				query += "&"; // params must be seperated by '&'
-			}
-			count++;
-//			try {
-//				query += URLEncoder.encode(param, charset);
-//				if (count < winnerList.size() -1) {
-//					query += "&"; // params must be seperated by '&'
-//				}
-//				count++;
-//			} catch (UnsupportedEncodingException e) { // failed to encode
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-		}
 		
-		System.out.println("Query: " + query);
-		
-//		try {
-//			query = String.format("param1=%s&param2=%s", 
-//			     URLEncoder.encode(param1, charset), 
-//			     URLEncoder.encode(param2, charset));
-//		} catch (UnsupportedEncodingException e1) { // failed to encode
-//			e1.printStackTrace();
-//		}
-		
-		URLConnection connection = null;
-		
-		try {
-			connection = new URL(url).openConnection();
-		} catch (MalformedURLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		connection.setDoOutput(true); // Triggers POST.
-		connection.setRequestProperty("Accept-Charset", charset);
-		connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=" + charset);
-		OutputStream output = null;
-		try {
-		     output = connection.getOutputStream();
-		     output.write(query.getBytes(charset));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-		     if (output != null) try { output.close(); } catch (IOException logOrIgnore) {}
-		}
-		//InputStream response = connection.getInputStream();
 		
 		Boolean draw = false;
-		if (winnerList.size() == 1) { // Only one winner
-			winner = winnerList.get(0);
-		}
-		if (winnerList.size() == players.size()) {
-			draw = true;
-			winner = winnerList.get(0); // Picks a winner so winner is not null 
-			System.out.println(winner);
-		}
 			
-		if (winner != null) { 
-			System.out.println("Winner is " + winner.getName());
-			for (String s: rankList) {
-				System.out.println(s);
-			}
+		if (winnerList != null) { 
 			// Generate video because the game returned a winner implying a successful game
 			GenerateVideo video = new GenerateVideo(viz.getCurrentFolderName());
 			try {
@@ -253,6 +185,7 @@ public class Game extends Thread {
 					uploader.uploadVideo(); 
 					videoURL = uploader.getVideoURL();
 					System.out.println(videoURL);
+					query += "link=" + videoURL + "&"; // add video link query string
 					viz.getiExp().deleteCurrDir(); // delete the game directory with screen shots of frames to make video;
 				}
 				else {
@@ -268,19 +201,69 @@ public class Game extends Thread {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+			int count = 0;
+			//Contestant.1=first place player name
+			for (ServerPlayer p: winnerList) { // store params as "Contestant.#=playerName"
+				rankList.add("Rank: " + p.getEndGameRank() + " = " + p.getName());
+				param = "Contestant." + p.getEndGameRank() + "=" + p.getName();	
+				query += param;
+				if (count < winnerList.size() -1) {
+					query += "&"; // params must be seperated by '&'
+				}
+				count++;
+			}
+			
+			//System.out.println("Query: " + query);
+			
+			URLConnection connection = null;
+			
+			try {
+				connection = new URL(url).openConnection();
+			} catch (MalformedURLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			connection.setDoOutput(true); // Triggers POST.
+			connection.setRequestProperty("Accept-Charset", charset);
+			connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=" + charset);
+			OutputStream output = null;
+			try {
+			     output = connection.getOutputStream();
+			     output.write(query.getBytes(charset));
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+			     if (output != null) try { output.close(); } catch (IOException logOrIgnore) {
+			    	 System.out.println("error on output");
+			     }
+			}
+			InputStream response = null;
+			try {
+				response = connection.getInputStream();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				System.out.println("Response Error");
+				e1.printStackTrace();
+			}
+			
+			//System.out.println("Response: " + response);
 		}
-
+		// Prints the final game rankings
+		for (String s: rankList) {
+			System.out.println(s);
+		}
 		
-		for(ServerPlayer p : players.values()) {
+		for(ServerPlayer p : winnerList) {
 			if (draw == true) {
 				p.endGame(CommunicationConstants.RESULT_DRAW);
 				continue;
 			}
-			if (winner == p) //TODO: Handle multiple winners and losers
-				p.endGame(CommunicationConstants.RESULT_WIN);
-			else {
-				p.endGame(CommunicationConstants.RESULT_LOSE);
-			}
+			p.endGame(CommunicationConstants.RESULT_RANKED + "You finished ranked: " + p.getEndGameRank() + "/" + winnerList.size());
+			
 		}
 		manager.removeGame(this);
 	}
@@ -456,29 +439,27 @@ public class Game extends Thread {
 	 * @return the winner who is the only player with at least one ship left unsunk.
 	 */
 	public List<ServerPlayer> getWinner() {
-		List<ServerPlayer> validPlayers = new LinkedList<ServerPlayer>();
+//		List<ServerPlayer> validPlayers = new LinkedList<ServerPlayer>();
 		List<ServerPlayer> maxPlayerList = new LinkedList<ServerPlayer>();
 		PriorityQueue<ServerPlayer> playerList = new PriorityQueue<ServerPlayer>(8, comp);
-		ServerPlayer maxPlayer = null;
+//		ServerPlayer maxPlayer = null;
+//		
+//		for (ServerPlayer player: players.values()) {{
+//				validPlayers.add(player);
+//		}	
+//		if (validPlayers.size() == 1)
+//			return validPlayers;
+//		if (validPlayers.size() == 0)
+//			validPlayers = new LinkedList<ServerPlayer>(players.values());
 		
-		for (ServerPlayer player: players.values()) {
-			//if (player.isAlive()) {
-				validPlayers.add(player);
-			//}
-		}	
-		if (validPlayers.size() == 1)
-			return validPlayers;
-		if (validPlayers.size() == 0)
-			validPlayers = new LinkedList<ServerPlayer>(players.values());
 		int maxScore = -1;
 
-		for (ServerPlayer p : validPlayers) {
+		for (ServerPlayer p : players.values()) {
 			playerList.offer(p); // Sorted by player Score
 		}
 		
 		int currRank = 1;
 		for (ServerPlayer p: playerList) { // assign player ranks
-			System.out.println(p.getName() + " " + p.getScore());
 			if (p.getScore() < maxScore) {
 				currRank++;
 			}
@@ -486,23 +467,9 @@ public class Game extends Thread {
 				maxScore = p.getScore();
 			}
 			p.setEndGameRank(currRank);
-			maxPlayerList.add(p);
+			maxPlayerList.add(p); 
 		}
-		
-//		for (ServerPlayer p : validPlayers) {
-//			if (p.getScore() >= maxScore) {
-//				if (p.getScore() == maxScore) {
-//					maxPlayerList.add(p);
-//				}
-//				if (p.getScore() > maxScore) {
-//					maxPlayerList.clear();
-//					maxScore = p.getScore();
-//					maxPlayerList.add(p);
-//				}
-//			}
-//		}
-		
-		return maxPlayerList;
+		return maxPlayerList; // TODO: Change to return a priority queue
 	}
 	
 	public void allocateIncome() {

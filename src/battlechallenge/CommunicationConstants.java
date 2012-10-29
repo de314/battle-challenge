@@ -41,6 +41,9 @@ public class CommunicationConstants {
 	/** The Constant SERVER_RESULT_DRAW. */
 	public static final String RESULT_DRAW;
 	
+	/** The Constant SERVER_RESULT_RANKED. */
+	public static final String RESULT_RANKED;
+	
 	public static final int SOCKET_WAIT_TIME;
 
 	static {
@@ -62,7 +65,7 @@ public class CommunicationConstants {
 		RESULT_WIN = "W";
 		RESULT_LOSE = "L";
 		RESULT_DRAW = "D";
-		
+		RESULT_RANKED = "R";
 		SOCKET_WAIT_TIME = 1000;
 	}
 	

@@ -95,6 +95,12 @@ public class ServerConnection {
 					System.out.println("The game resulted in a draw.");
 					break;
 				}
+				// Remove the "R"
+				if (req.length() > 0 && req.substring(0,1).equals(CommunicationConstants.RESULT_RANKED)) {
+					System.out.println(req.substring(1));
+					break;
+				}
+	
 			} catch (ConnectionLostException e) {
 				System.err.println("Socket Exception: Connection lost, disconnecting.");
 				this.kill();
