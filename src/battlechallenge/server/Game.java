@@ -168,27 +168,30 @@ public class Game extends Thread {
 		List<ServerPlayer> winnerList = getWinner();
 		List<String> rankList = new ArrayList<String>();
 		ServerPlayer winner = null;
-		String url = "127.0.0.1";
+		String url = "http://www.google.com";
 		String charset = "UTF-8";
 		String param = "";
-//		String param1 = "value1";
-//		String param2 = "value2";
 		String query = "";
 		int count = 0;
 		//Contestant.1=first place player name
 		for (ServerPlayer p: winnerList) { // store params as "Contestant.#=playerName"
 			rankList.add("Rank: " + p.getEndGameRank() + " = " + p.getName());
-			param = "Contestant." + p.getEndGameRank() + "=" + p.getName();			
-			try {
-				query += URLEncoder.encode(param, charset);
-				if (count < winnerList.size() -1) {
-					query += "&"; // params must be seperated by '&'
-				}
-				count++;
-			} catch (UnsupportedEncodingException e) { // failed to encode
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			param = "Contestant." + p.getEndGameRank() + "=" + p.getName();	
+			query += param;
+			if (count < winnerList.size() -1) {
+				query += "&"; // params must be seperated by '&'
 			}
+			count++;
+//			try {
+//				query += URLEncoder.encode(param, charset);
+//				if (count < winnerList.size() -1) {
+//					query += "&"; // params must be seperated by '&'
+//				}
+//				count++;
+//			} catch (UnsupportedEncodingException e) { // failed to encode
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 		}
 		
 		System.out.println("Query: " + query);
@@ -459,9 +462,9 @@ public class Game extends Thread {
 		ServerPlayer maxPlayer = null;
 		
 		for (ServerPlayer player: players.values()) {
-			if (player.isAlive()) {
+			//if (player.isAlive()) {
 				validPlayers.add(player);
-			}
+			//}
 		}	
 		if (validPlayers.size() == 1)
 			return validPlayers;
