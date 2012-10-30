@@ -168,7 +168,7 @@ public class Game extends Thread {
 		List<ServerPlayer> winnerList = getWinner();
 		List<String> rankList = new ArrayList<String>();
 		//ServerPlayer winner = null;
-		String url = "http://www.yahoo.com";
+		String url = "http://autonomousarmada.azurewebsites.net/Match/Record";
 		String charset = "UTF-8";
 		String param = "";
 		String query = "";
@@ -205,8 +205,8 @@ public class Game extends Thread {
 			int count = 0;
 			//Contestant.1=first place player name
 			for (ServerPlayer p: winnerList) { // store params as "Contestant.#=playerName"
-				rankList.add("Rank: " + p.getEndGameRank() + " = " + p.getName());
-				param = "Contestant." + p.getEndGameRank() + "=" + p.getName();	
+				rankList.add("Rank: " + (p.getEndGameRank()-1) + " = " + p.getName());
+				param = "Contestant[" + (p.getEndGameRank()-1) + "]=" + p.getName();	
 				query += param;
 				if (count < winnerList.size() -1) {
 					query += "&"; // params must be seperated by '&'
