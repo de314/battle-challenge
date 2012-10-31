@@ -214,7 +214,7 @@ public class Game extends Thread {
 				count++;
 			}
 			
-			query += "mapName=" + map.getName();
+			//query += "mapName=" + map.getName();
 			//System.out.println("Query: " + query);
 			
 			URLConnection connection = null;
