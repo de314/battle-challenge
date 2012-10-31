@@ -121,4 +121,10 @@ public class Coordinate implements Serializable {
 	public double distanceTo(Coordinate coord) {
 		return Math.sqrt(Math.pow(this.getRow() - coord.getRow(), 2) + Math.pow(this.getCol() - coord.getCol(), 2));
 	}
+	
+	
+	public int manhattanDistance(Coordinate other) {
+		return Math.abs(other.getCol()-this.getCol()) + Math.abs(other.getRow()-this.getRow());
+	} 
+	
 } // End Coordinate Class

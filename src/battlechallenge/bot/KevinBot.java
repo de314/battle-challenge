@@ -1,5 +1,6 @@
 package battlechallenge.bot;
 
+import java.io.File;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -39,11 +40,13 @@ public class KevinBot extends ClientPlayer {
 	private List<Direction> directionList = new LinkedList<Direction>();
 
 	public void fillDirectionList() {
-		directionList.add(Direction.NORTH);
-		directionList.add(Direction.SOUTH);
-		directionList.add(Direction.EAST);
-		directionList.add(Direction.WEST);
-		directionList.add(Direction.STOP);
+		if (directionList.size() == 0) {
+			directionList.add(Direction.NORTH);
+			directionList.add(Direction.SOUTH);
+			directionList.add(Direction.EAST);
+			directionList.add(Direction.WEST);
+			directionList.add(Direction.STOP);
+		}
 	}
 
 	/**
@@ -62,8 +65,12 @@ public class KevinBot extends ClientPlayer {
 		case NORTH: {
 			Coordinate newCoord = new Coordinate(coor.getRow()-1, coor.getCol());
 			if (validCoordinate(newCoord)) {
+				//System.out.println("Old: " + coor + "New: " + newCoord);
 				return newCoord;
 			}
+//			else {
+//				System.out.println(newCoord + " Is Invalid");
+//			}
 		}
 		case SOUTH: {
 			Coordinate newCoord = new Coordinate(coor.getRow()+1, coor.getCol());
@@ -108,7 +115,7 @@ public class KevinBot extends ClientPlayer {
 	}
 
 	public boolean validCoordinate(Coordinate coord) {
-		if (coord.getRow() < 0 || coord.getRow() >= boardHeight || coord.getCol() < 0 || coord.getCol() >= boardWidth)
+		if (coord.getRow() < 0 || coord.getRow() > ClientGame.getMap().getNumRows() || coord.getCol() < 0 || coord.getCol() > ClientGame.getMap().getNumCols())
 			return false;
 		return true;
 	}
@@ -122,8 +129,8 @@ public class KevinBot extends ClientPlayer {
 			switch (d) {
 			case NORTH: {
 				newCoord = new Coordinate(s1.getLocation().getRow()-1, s1.getLocation().getCol());
-				newDist = s2.distanceFromCoord(newCoord);
-				if (newDist < s2.distanceFromCoord(s1.getLocation())) {
+				newDist = s2.getLocation().manhattanDistance(newCoord);
+				if (newDist < s2.getLocation().manhattanDistance(s1.getLocation())) {
 					if (newDist < minDistance) {
 						minDistance = newDist;
 						bestDirection = Direction.NORTH;
@@ -133,8 +140,8 @@ public class KevinBot extends ClientPlayer {
 			}
 			case SOUTH: {
 				newCoord = new Coordinate(s1.getLocation().getRow()+1, s1.getLocation().getCol());
-				newDist = s2.distanceFromCoord(newCoord);
-				if (newDist < s2.distanceFromCoord(s1.getLocation())) {
+				newDist = s2.getLocation().manhattanDistance(newCoord);
+				if (newDist < s2.getLocation().manhattanDistance(s1.getLocation())) {
 					if (newDist < minDistance) {
 						minDistance = newDist;
 						bestDirection = Direction.SOUTH;
@@ -144,8 +151,8 @@ public class KevinBot extends ClientPlayer {
 			}
 			case EAST: {
 				newCoord = new Coordinate(s1.getLocation().getRow(), s1.getLocation().getCol() + 1);
-				newDist = s2.distanceFromCoord(newCoord);
-				if (newDist < s2.distanceFromCoord(s1.getLocation())) {
+				newDist = s2.getLocation().manhattanDistance(newCoord);
+				if (newDist < s2.getLocation().manhattanDistance(s1.getLocation())) {
 					if (newDist < minDistance) {
 						minDistance = newDist;
 						bestDirection = Direction.EAST;
@@ -156,7 +163,7 @@ public class KevinBot extends ClientPlayer {
 			case WEST: {
 				newCoord = new Coordinate(s1.getLocation().getRow(), s1.getLocation().getCol() - 1);
 				newDist = s2.distanceFromCoord(newCoord);
-				if (newDist < s2.distanceFromCoord(s1.getLocation())) {
+				if (newDist < s2.getLocation().manhattanDistance(s1.getLocation())) {
 					if (newDist < minDistance) {
 						minDistance = newDist;
 						bestDirection = Direction.WEST;
@@ -167,8 +174,8 @@ public class KevinBot extends ClientPlayer {
 
 			case STOP: {
 				newCoord = s1.getLocation();
-				newDist = s2.distanceFromCoord(newCoord);
-				if (newDist < s2.distanceFromCoord(s1.getLocation())) {
+				newDist = s2.getLocation().manhattanDistance(newCoord);
+				if (newDist < s2.getLocation().manhattanDistance(s1.getLocation())) {
 					if (newDist < minDistance) {
 						minDistance = newDist;
 						bestDirection = Direction.STOP;
@@ -184,66 +191,66 @@ public class KevinBot extends ClientPlayer {
 
 	public Direction moveTowardsCoord(Ship s1, Coordinate coord) {
 		Direction bestDirection = null;
-		double minDistance = Double.MAX_VALUE;
+		int minDistance = Integer.MAX_VALUE;
 		for (Direction d : directionList) {
 			Coordinate newCoord;
-			double newDist = 0.0;
+			int newDist = 0;
 			switch (d) {
 			case NORTH: {
 				newCoord = new Coordinate(s1.getLocation().getRow()-1, s1.getLocation().getCol());
-				newDist = coord.distanceTo(newCoord);
-				if (newDist < coord.distanceTo(s1.getLocation())) {
+				newDist = coord.manhattanDistance(newCoord);
+				if (newDist < coord.manhattanDistance(s1.getLocation())) {
 					if (newDist < minDistance) {
 						minDistance = newDist;
 						bestDirection = Direction.NORTH;
 					}
 				}
-				continue;
+				break;
 			}
 			case SOUTH: {
 				newCoord = new Coordinate(s1.getLocation().getRow()+1, s1.getLocation().getCol());
-				newDist = coord.distanceTo(newCoord);
-				if (newDist < coord.distanceTo(s1.getLocation())) {
+				newDist = coord.manhattanDistance(newCoord);
+				if (newDist < coord.manhattanDistance(s1.getLocation())) {
 					if (newDist < minDistance) {
 						minDistance = newDist;
 						bestDirection = Direction.SOUTH;
 					}
 				}
-				continue;
+				break;
 			}
 			case EAST: {
 				newCoord = new Coordinate(s1.getLocation().getRow(), s1.getLocation().getCol() + 1);
-				newDist = coord.distanceTo(newCoord);
-				if (newDist < coord.distanceTo(s1.getLocation())) {
+				newDist = coord.manhattanDistance(newCoord);
+				if (newDist < coord.manhattanDistance(s1.getLocation())) {
 					if (newDist < minDistance) {
 						minDistance = newDist;
 						bestDirection = Direction.EAST;
 					}
 				}
-				continue;
+				break;
 			}
 			case WEST: {
 				newCoord = new Coordinate(s1.getLocation().getRow(), s1.getLocation().getCol() - 1);
-				newDist = coord.distanceTo(newCoord);
-				if (newDist < coord.distanceTo(s1.getLocation())) {
+				newDist = coord.manhattanDistance(newCoord);
+				if (newDist < coord.manhattanDistance(s1.getLocation())) {
 					if (newDist < minDistance) {
 						minDistance = newDist;
 						bestDirection = Direction.WEST;
 					}
 				}
-				continue;
+				break;
 			}
 
 			case STOP: {
 				newCoord = s1.getLocation();
-				newDist = coord.distanceTo(newCoord);
-				if (newDist <= coord.distanceTo(s1.getLocation())) {
+				newDist = coord.manhattanDistance(newCoord);
+				if (newDist <= coord.manhattanDistance(s1.getLocation())) {
 					if (newDist < minDistance) {
 						minDistance = newDist;
 						bestDirection = Direction.STOP;
 					}
 				}
-				continue;
+				break;
 
 			}
 			}
@@ -253,10 +260,10 @@ public class KevinBot extends ClientPlayer {
 
 	public Ship closestEnemyShip(Ship myShip, List<Ship> enemyShips) {
 		Ship closestShip = null;
-		double currDist;
-		double minDist = Double.MAX_VALUE;
+		int currDist;
+		int minDist = Integer.MAX_VALUE;
 		for (Ship eShip: enemyShips) {
-			currDist = myShip.distanceFromCoord(eShip.getLocation());
+			currDist = myShip.getLocation().manhattanDistance(eShip.getLocation());
 			if (currDist < minDist) {
 				closestShip = eShip;
 				minDist = currDist;
@@ -267,14 +274,14 @@ public class KevinBot extends ClientPlayer {
 
 	public City closestCity(Ship myShip, List<City> cities) {//, Map<Coordinate, Ship> moveMap) {
 		City closestCity = null;
-		double currDist;
-		double minDist = Double.MAX_VALUE;
+		int currDist;
+		int minDist = Integer.MAX_VALUE;
 		for (City city: cities) {
-			if (city.getOwnerId() == ClientGame.getNetworkID()) {// || moveMap.get(city.getLocation()) != null) { // I own the city or one of my boats is moving towards it
+			if (city.getOwnerId() == ClientGame.getNetworkID()) { // I own the city
 				continue;
 			}
-			currDist = myShip.distanceFromCoord(city.getLocation());
-			if (currDist < minDist) {
+			currDist = myShip.getLocation().manhattanDistance(city.getLocation());
+			if (currDist < minDist && currDist != 0) {
 				closestCity = city;
 				minDist = currDist;
 			}
@@ -284,10 +291,10 @@ public class KevinBot extends ClientPlayer {
 
 	public City theClosestCity(Ship ship, List<City> cities) {
 		City closestCity = null;
-		double currDist;
-		double minDist = Double.MAX_VALUE;
+		int currDist;
+		int minDist = Integer.MAX_VALUE;
 		for (City city: cities) {
-			currDist = ship.distanceFromCoord(city.getLocation());
+			currDist = ship.getLocation().manhattanDistance(city.getLocation());
 			if (currDist < minDist) {
 				closestCity = city;
 				minDist = currDist;
@@ -319,7 +326,7 @@ public class KevinBot extends ClientPlayer {
 	
 	public double manhattanDistance(Coordinate c1, Coordinate c2) {
 		return (double) Math.abs(c2.getCol()-c1.getCol()) + Math.abs(c2.getRow()-c1.getRow());
-	}
+	} 
 
 
 	public Direction BFS(Ship s, Coordinate goal, List<Coordinate> myShipCoord, List<Coordinate> barriers) {
@@ -327,18 +334,20 @@ public class KevinBot extends ClientPlayer {
 		
 		Map<Node, Node> prev = new HashMap<Node, Node>();
 		Map<Node, String> visited = new HashMap<Node, String>();
+		ArrayList<Node> visited2 = new ArrayList<Node>();
 		int gScore = 0;
-		Node currNode = new Node(s.getLocation(), null, null, 0.0, gScore); // Coordinate, Node, Direction, Distance, gScore
+		Node currNode = new Node(s.getLocation(), null, null, 0.0, gScore); // Coordinate, Prev Node, Direction, Distance, gScore
 		int maxNodes = 1500;
 		int expandedNodes = 0;
 		List<Direction> directions = new LinkedList<Direction>();
 		Comparator<Node> comparator = new Node(null, null, null, null, 0);
-		PriorityQueue<Node> q = new PriorityQueue<Node>(500, comparator);
+		PriorityQueue<Node> q = new PriorityQueue<Node>(500, comp);
 		q.add(currNode);
 		while (!q.isEmpty() && expandedNodes <= maxNodes) {
 			expandedNodes++;
 			currNode = (Node) q.poll();
 			visited.put(currNode, currNode.toString());
+			visited2.add(currNode);
 			if ((currNode.getLocation()).equals(goal)) { // Found where we want to go
 				break;
 			}
@@ -348,14 +357,18 @@ public class KevinBot extends ClientPlayer {
 				}
 				Coordinate newCoord = move(dir, currNode.getLocation());
 			
-				Node adjNode = new Node (newCoord, currNode, dir, currNode.getgScore() + 1 + manhattanDistance(newCoord, goal), currNode.getgScore() + 1);
+//				Node adjNode = new Node (newCoord, currNode, dir, currNode.getgScore() + 1 + manhattanDistance(newCoord, goal), currNode.getgScore() + 1);
+				Node adjNode = new Node (newCoord, currNode, dir, manhattanDistance(newCoord, goal), currNode.getgScore() + 1);
 				//adjNode.setDistance(adjNode.getDistance() + adjNode.getLocation().distanceTo(coord));
-				if (visited.get(adjNode) != null || myShipCoord.contains(adjNode.getLocation()) || barriers.contains(adjNode.getLocation())) { // don't use path along friendly ship
+//				if (visited.get(adjNode) != null || myShipCoord.contains(adjNode.getLocation()) || barriers.contains(adjNode.getLocation())) { // don't use path along friendly ship
+				if (visited2.contains(adjNode)|| barriers.contains(adjNode.getLocation())) {
+					//System.out.println("Already visited");
 					continue;
 				}
+				//visited.put(adjNode, adjNode.toString());
 				if (!q.contains(adjNode)) { // || adjNode.getDistance() < gScore) {
 					q.offer((adjNode));
-					visited.put(adjNode, adjNode.toString());
+//					visited.put(adjNode, adjNode.toString());
 					prev.put(adjNode, currNode);	
 				}
 				if ((adjNode.getLocation()).equals(goal)) { // Found where we want to go
@@ -365,12 +378,13 @@ public class KevinBot extends ClientPlayer {
 				expandedNodes++;
 			}
 		}
-//		if (!(currNode.getLocation().equals(goal))) {
+		if (!(currNode.getLocation().equals(goal))) {
 //			System.out.println("Current Node: " + currNode.getLocation());
+//			System.out.println("Goal Coord:: " + goal);
 //			System.out.println("Expanded Nodes: " + expandedNodes);
-//			System.out.println("Failed to find a path");
-//			return null;
-//		}
+			System.out.println("Failed to find a path");
+			return null;
+		}
 				
 		for(Node node = currNode; node != null; node = prev.get(node)) {
 	        directions.add(node.getDir());
@@ -385,6 +399,14 @@ public class KevinBot extends ClientPlayer {
 	/*
 	 * Used to find closest ship and fastest direction to move to get to that location
 	 */
+	static Comparator<Node> comp = new Comparator<Node>() { // frames are created with IDs in order, sort them this way
+		  public int compare(Node n1, Node n2) {
+//		    return n1.getgScore().compareTo(n2.getgScore());
+			  return n1.getDistance().compareTo(n2.getDistance());
+		  }
+	};
+	
+	
 	public Direction aStar(Coordinate c, List<Coordinate> myShipCoord, List<Coordinate> barriers) {
 		Map<Node, Node> prev = new HashMap<Node, Node>();
 		Map<Node, String> visited = new HashMap<Node, String>();
@@ -394,7 +416,7 @@ public class KevinBot extends ClientPlayer {
 		int expandedNodes = 0;
 		List<Direction> directions = new LinkedList<Direction>();
 		Comparator<Node> comparator = new Node(null, null, null);
-		PriorityQueue<Node> q = new PriorityQueue<Node>(200, comparator);
+		PriorityQueue<Node> q = new PriorityQueue<Node>(300, comp);
 		q.add(currNode);
 		while (!q.isEmpty() && expandedNodes <= maxNodes) {
 			expandedNodes++;
@@ -416,8 +438,8 @@ public class KevinBot extends ClientPlayer {
 				}
 				if (!q.contains(adjNode)) {
 					q.offer((adjNode));
-					visited.put(adjNode, adjNode.toString());
-					prev.put(adjNode, currNode);	
+//					visited.put(adjNode, adjNode.toString());
+//					prev.put(adjNode, currNode);	
 				}
 				if (myShipCoord.contains(adjNode.getLocation()) & !isOnMyCity(adjNode.getLocation())) { // Found where we want to go
 					currNode = adjNode;
@@ -466,16 +488,30 @@ public class KevinBot extends ClientPlayer {
 //	}
 	Map<Coordinate, Ship> moveMap;
 	
+	Comparator<Ship> cityComp = new Comparator<Ship>() { // frames are created with IDs in order, sort them this way
+		  public int compare(Ship s1, Ship s2) {
+			  if (isOnMyCity(s1.getLocation())) {
+				  return 1; 
+			  }
+			  if (isOnMyCity(s2.getLocation())) {
+				  return 0;
+			  }
+			  return 1;
+			//  return s1.getLocation()..compareTo(n2.getDistance());
+		  }
+	};
+	
 	public List<ShipAction> doTurn() {
-
+//		System.out.println(ClientGame.getMap().getNumCols());
 		List<ShipAction> actions = new LinkedList<ShipAction>();
 		moveMap = new HashMap<Coordinate, Ship>();
 		Map<Coordinate, Ship> shotMap = new HashMap<Coordinate, Ship>();
 		List<Ship> myShips = ClientGame.getMyShips();
 		Map<Coordinate, City> cityCoordMap = getCityCoordMap();
 		List<Coordinate> myShipLocations = new LinkedList<Coordinate>();
-		List<Coordinate> barriers = new LinkedList<Coordinate>(); ClientGame.getBarriers();
-		
+		List<Coordinate> barriers = new LinkedList<Coordinate>(); 
+		//ClientGame.getBarriers();
+		fillDirectionList();
 		for (Ship s : myShips) {
 			myShipLocations.add(s.getLocation());
 		}
@@ -485,7 +521,6 @@ public class KevinBot extends ClientPlayer {
 		List<Ship> myMovedShips = new LinkedList<Ship>();
 		List<Ship> enemyShips = ClientGame.getOpponentShips();
 		List<City> cityList = ClientGame.getAllCities();
-		fillDirectionList();
 		List<Coordinate> moveTargets = new LinkedList<Coordinate>();
 		List<Coordinate> shotTargets = new LinkedList<Coordinate>();
 		Map<Ship, Direction> shipMoves = new HashMap<Ship, Direction>();
@@ -494,8 +529,17 @@ public class KevinBot extends ClientPlayer {
 		boolean movingTowardsCity;
 		boolean movingTowardsShip;
 		
-		for (City city: cityList) {
-		}
+		Collections.sort(myShips, cityComp);
+		
+//		for (Ship s: myShips) {
+//			if (isOnMyCity(s.getLocation())) {
+//			System.out.println("On City " + s.getLocation());
+//			}
+//			else {
+//				System.out.println("Not on city " + s.getLocation());
+//			}
+//		}
+//		
 		
 		for (Ship s : myShips) {
 			movingTowardsCity = false;
@@ -553,6 +597,7 @@ public class KevinBot extends ClientPlayer {
 				}
 			}
 			if (moveDirection != null) {
+//				System.out.println(moveDirection);
 				Coordinate newCoord = move(moveDirection, s.getLocation());
 //				 if (moveMap.get(newCoord) != null) {
 //					 if (movingTowardsShip == false) {
@@ -560,12 +605,20 @@ public class KevinBot extends ClientPlayer {
 //						 newCoord = move(moveDirection, s.getLocation());
 //					 }
 //				 }
-
-			if (moveMap.get(newCoord) == null) { // Avoid collisions
-					shipMoves.put(s, moveDirection);
-					moveMap.put(newCoord, s);
+			// Avoid collisions
+//				System.out.println(s.getLocation());
+////				System.out.println(myShipLocations);
+//				System.out.println(newCoord);
+//				System.out.println(moveDirection);
+			if (moveMap.get(newCoord) == null && !myShipLocations.contains(newCoord)) { // No Ship is moving here
+				int index = myShipLocations.indexOf(s.getLocation());
+				myShipLocations.remove(index);
+				myShipLocations.add(newCoord); // update current ship locations
+				shipMoves.put(s, moveDirection);
+				moveMap.put(newCoord, s);
 				}
 			}
+		
 			
 			if (shipMoves.get(s) == null) {
 				shipMoves.put(s, Direction.STOP);
@@ -587,21 +640,21 @@ public class KevinBot extends ClientPlayer {
 			// Decide where to shoot
 			
 					
-			if (isOnCity(closeEnemy) && s.inRange(closeEnemy.getLocation())) {
+			if (shotCoordinates.isEmpty() && !shotTargets.contains(closeEnemy.getLocation()) && s.inRange(closeEnemy.getLocation())) {
 				shotCoordinates.add(closeEnemy.getLocation());
 				shotTargets.add(closeEnemy.getLocation());
 			}
 					
 			Coordinate secondCloseEnemyCoordGuess = move(moveTowardsCoord(closeEnemy, theClosestCity(closeEnemy, cityList).getLocation()), closeEnemy.getLocation());
 			
-			if ((!shotTargets.contains(secondCloseEnemyCoordGuess))) {
+			if (shotCoordinates.isEmpty() && (!shotTargets.contains(secondCloseEnemyCoordGuess)) && s.inRange(secondCloseEnemyCoordGuess)) {
 				shotCoordinates.add(secondCloseEnemyCoordGuess);
 				shotTargets.add(secondCloseEnemyCoordGuess);
 			}
 			
 			Coordinate newCloseEnemyCoordGuess = move(moveTowardsCoord(closeEnemy, oldShipLocation), closeEnemy.getLocation());	
 			
-			if (s.inRange(newCloseEnemyCoordGuess) && !shotTargets.contains(newCloseEnemyCoordGuess)) {
+			if (shotCoordinates.isEmpty() && s.inRange(newCloseEnemyCoordGuess) && !shotTargets.contains(newCloseEnemyCoordGuess)) {
 				shotCoordinates.add(newCloseEnemyCoordGuess);
 				shotTargets.add(newCloseEnemyCoordGuess);
 			}
@@ -614,10 +667,10 @@ public class KevinBot extends ClientPlayer {
 				for (Ship eShip: enemyShips) {
 					Coordinate coord = eShip.getLocation();
 					if (s.inRange(coord) && (!shotTargets.contains(coord))) {
-						if (isOnCity(eShip)) {
+						//if (isOnCity(eShip)) {
 							shotCoordinates.add(coord);
 							shotTargets.add(coord);
-						}
+						//}
 					}
 				}
 			}
@@ -626,11 +679,12 @@ public class KevinBot extends ClientPlayer {
 
 
 			actions.add(new ShipAction(s.getIdentifier(), shotCoordinates, moves));
-			System.out.println(actions);
+			//System.out.println(actions);
 		}
 		//System.out.println("Target List: " + shotTargets);
 		cityCoordMap.clear();
 		moveMap.clear();
+		shipMoves.clear();
 		return actions;
 	}
 }

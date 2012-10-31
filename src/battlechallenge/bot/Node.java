@@ -12,7 +12,7 @@ public class Node implements Comparable<Node>, Comparator<Node> {
 	private Double distance;
 	private int gScore;
 	
-	public int getgScore() {
+	public Integer getgScore() {
 		return gScore;
 	}
 	public void setgScore(int gScore) {
@@ -92,20 +92,12 @@ public class Node implements Comparable<Node>, Comparator<Node> {
 	}
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
 		Node other = (Node) obj;
-		if (c1 == null) {
-			if (other.c1 != null)
-				return false;
-		} else if (!c1.equals(other.c1))
-			return false;
+		if (this.getLocation() == other.getLocation()) {
+			return true;
+		}
 
-		return true;
+		return false;
 	}
 	
 

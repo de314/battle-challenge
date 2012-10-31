@@ -37,7 +37,7 @@ public class DavidBot extends ClientPlayer {
 
 	@Override
 	public List<ShipAction> doTurn() {
-		System.out.println("[[TURN]]");
+		//System.out.println("[[TURN]]");
 		setClosestEnemies();
 		setClosestCities();
 		assignShipsToCities();
@@ -107,7 +107,7 @@ public class DavidBot extends ClientPlayer {
 	private Map<Ship, Direction> moveShips() {
 		nextPositions.clear();
 		Map<Ship, Direction> actions = new HashMap<Ship, Direction>();
-		System.out.println(investments.size());
+		//System.out.println(investments.size());
 		for (Entry<Coordinate, Ship> e : investments.entrySet()) {
 			Ship s = e.getValue();
 			Coordinate c = s.getLocation();
@@ -144,8 +144,8 @@ public class DavidBot extends ClientPlayer {
 				actions.put(s, Direction.EAST);
 			else
 				actions.put(s, Direction.WEST);
-			System.out.println(s.getLocation() + ":" + closest + ":"
-					+ actions.get(s));
+//			System.out.println(s.getLocation() + ":" + closest + ":"
+//					+ actions.get(s));
 		}
 		return actions;
 	}
