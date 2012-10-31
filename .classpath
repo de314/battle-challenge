@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="libs/jewelcli-0.7.6.jar"/>
 	<classpathentry kind="lib" path="libs/activation.jar"/>
 	<classpathentry kind="lib" path="libs/gdata-client-1.0.jar"/>
 	<classpathentry kind="lib" path="libs/gdata-client-meta-1.0.jar"/>
@@ -10,10 +9,9 @@
 	<classpathentry kind="lib" path="libs/gdata-media-1.0.jar"/>
 	<classpathentry kind="lib" path="libs/gdata-youtube-2.0.jar"/>
 	<classpathentry kind="lib" path="libs/gdata-youtube-meta-2.0.jar"/>
+	<classpathentry kind="lib" path="libs/jewelcli-0.7.6.jar"/>
 	<classpathentry kind="lib" path="libs/mail.jar"/>
 	<classpathentry kind="lib" path="libs/slf4j-api-1.6.6.jar"/>
 	<classpathentry kind="lib" path="libs/xuggle-xuggler-5.4.jar"/>
-	<classpathentry kind="lib" path="C:/Users/mamid_000/Documents/GitHub/battle-challenge/libs/guava-11.0.2.jar"/>
-	<classpathentry kind="lib" path="C:/Users/mamid_000/Documents/GitHub/battle-challenge/libs/jsr305.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

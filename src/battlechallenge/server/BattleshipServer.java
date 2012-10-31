@@ -65,7 +65,7 @@ public class BattleshipServer extends Thread {
 	 *            the arguments
 	 */
 	public static void main(String[] args) {
-		int port = 3002;
+		int port = 3000;
 		if (args.length > 0)
 			try {
 				port = Integer.parseInt(args[0]);
