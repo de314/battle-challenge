@@ -3,14 +3,9 @@
  */
 package battlechallenge.server;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import battlechallenge.Coordinate;
-//import battlechallenge.bot.BoardLocation;
-//import battlechallenge.bot.GameState;
-import battlechallenge.maps.BattleMap;
 
 /**
  * @author Daniel Nussenbaum
@@ -30,18 +25,13 @@ public class GameState {
 		return a.concat(b).concat(separator);
 	}
 	
-	//TODO which class will we get information from?? for current state...
 	public GameState(){
 		HashMap<String, List<BoardLocation>> gplayerShipLocations = new HashMap<String, List<BoardLocation>>(); 
 		HashMap<String, int[]> gplayerScoreMinerals = new HashMap<String, int[]>();
 		playerShipLocations = gplayerShipLocations;
 		playerScoreMinerals = gplayerScoreMinerals;
-//		ClientGame.
-//		GameState gs = new GameState(gplayerShipLocations, gplayerScoreMinerals);
-		
 	}
 	
-	//TODO
 	private String getscoreMineralDifference(HashMap<String, int[]> otherScoreMinerals){ 
 		String a = "";
 		int scoreDiff = 0;
@@ -118,7 +108,6 @@ public class GameState {
 			a = a.concat(k + " score:" + playerScoreMinerals.get(k)[0] + "\n");
 			a = a.concat(k + " minerals:" + playerScoreMinerals.get(k)[1] + "\n");
 		}
-		//TODO add equivalent to getscoreMineralDifference
 		return a.concat(separator);
 	}
 
@@ -130,34 +119,15 @@ public class GameState {
 
 class BoardLocation {
 	int row, col; double value;
-//	BattleMap bm;
 	@Override
 	public boolean equals(Object obj) {
-		// TODO Auto-generated method stub
 		if(obj.getClass() != this.getClass()) return false;
-//		return super.equals(obj);
 		if(((BoardLocation) obj).row != this.row) return false;
 		if(((BoardLocation) obj).col != this.col) return false;
 		return true;
 	}
-//	public BoardLocation(int grow, int gcol, BattleMap gbm){row = grow; col = gcol; bm = gbm;}
-//	public BoardLocation(Coordinate coord, BattleMap gbm){row = coord.getRow(); col = coord.getCol(); bm = gbm;}
 	public BoardLocation(int grow, int gcol){row = grow; col = gcol;}
 	public BoardLocation(Coordinate coord){row = coord.getRow(); col = coord.getCol();}
-//	public int getManhattanDistanceTo(BoardLocation bl){return 1;} // TODO
-//	public boolean isValid(){return !(row < 0 || row >= bm.getNumRows() || col < 0 || col >= bm.getNumCols());}
-//	public List<BoardLocation> getAdjacent(){
-//		ArrayList<BoardLocation> adj = new ArrayList<BoardLocation>();
-//		BoardLocation north = (new BoardLocation(row-1, col, bm));
-//		BoardLocation south =(new BoardLocation(row+1, col, bm));
-//		BoardLocation east = (new BoardLocation(row, col+1, bm));
-//		BoardLocation west = (new BoardLocation(row, col-1, bm));
-//		if (north.isValid()) adj.add(north);
-//		if (south.isValid()) adj.add(south);
-//		if (east.isValid()) adj.add(east);
-//		if (west.isValid()) adj.add(west);	
-//		return adj;
-//	}
 }
 
 
