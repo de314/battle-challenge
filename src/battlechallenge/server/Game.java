@@ -1,7 +1,9 @@
 
 package battlechallenge.server;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -33,6 +35,8 @@ import battlechallenge.maps.MapImporter;
 import battlechallenge.settings.Config;
 import battlechallenge.ship.Ship;
 import battlechallenge.ship.ShipCollection;
+import battlechallenge.structures.Barrier;
+import battlechallenge.structures.Base;
 import battlechallenge.structures.City;
 import battlechallenge.structures.Structure;
 import battlechallenge.visual.BCViz;
@@ -57,6 +61,9 @@ public class Game extends Thread {
 		DEFAULT_SPEED = 750; // number of milliseconds to sleep between turns
 		MAX_NUM_TURNS = 300; //300; // 5 minutes if 1 turn per second
 	}
+	
+	/** Game State**/
+	private GameState prevGameState;
 	
 	/** The players. */
 	private Map<Integer, ServerPlayer> players;
@@ -137,6 +144,9 @@ public class Game extends Thread {
 		setGameConstants();
 		viz = new BCViz(players.values(), map.getStructures(), map.getNumCols(), map.getNumRows());
 		
+		//record the initial game settings into the transcript file
+		recordGameSettings();
+		
 		/*
 		 * 			[[ PLAY GAME ]]
 		 */
@@ -159,8 +169,10 @@ public class Game extends Thread {
 					livePlayers++;
 				}
 			}
+			recordGameChange(turnCount);
 		}
 		
+		recordGameEnd();
 		
 		/*
 		 * 			[[ END GAME ]]
@@ -215,7 +227,7 @@ public class Game extends Thread {
 				count++;
 			}
 			
-			//query += "mapName=" + map.getName();
+			query += "&mapName=" + map.getName();
 			//System.out.println("Query: " + query);
 			
 			URLConnection connection = null;
@@ -540,4 +552,144 @@ public class Game extends Thread {
 		    return p2Score.compareTo(p1Score);
 		  }
 	};
+	
+	public void recordGameSettings(){
+		BattleMap bm = map;
+		String a = "BattleMap\n";
+		a = a.concat(bm.getNumRows() + "," + bm.getNumCols() + "\n");
+		
+		a=a.concat("Bases\n");
+		for(Base b : map.getBases()){
+			a = a.concat("player " + b.getOwnerId() + ": " + b.getLocation().getRow() + "," + b.getLocation().getCol() + "\n");
+		}
+		a = a.concat("Cities\n");
+		for(Structure c : map.getStructures()){
+			if(c instanceof City )
+				a = a.concat(c.getLocation().getRow() + "," + c.getLocation().getCol() + "\n");
+		}
+		a = a.concat("Barriers\n");
+		int barriers = 0;
+		for(Structure b : map.getStructures()){
+			if(b instanceof Barrier){
+				a = a.concat(b.getLocation().getRow() + "," + b.getLocation().getCol() + "\n");
+				barriers++;
+			}
+		}
+		if(barriers == 0){a = a.concat("there are no barriers!\n");}
+		
+//		make the game state and set it
+		HashMap<String, List<BoardLocation>> gplayerShipLocations = new HashMap<String, List<BoardLocation>>(); 
+		HashMap<String, int[]> gplayerScoreMinerals = new HashMap<String, int[]>();
+		for (ServerPlayer p : players.values()) {
+			List<Ship> ships = p.getUnsunkenShips(p);
+			List<BoardLocation> locations = new ArrayList<BoardLocation>();
+			for(Ship s : ships){locations.add(new BoardLocation(s.getLocation()));}
+			gplayerShipLocations.put(String.valueOf(p.getId()), locations); // List of all players ships to send to each player	
+		}
+		
+		for (ServerPlayer p : players.values()) {
+			int[] scoreMineral = new int[2];
+			scoreMineral[0] = p.getScore();
+			scoreMineral[1] = p.getMinerals();
+			gplayerScoreMinerals.put(String.valueOf(p.getId()), scoreMineral); // List of all players ships to send to each player	
+		}
+		
+		GameState gs = new GameState(gplayerShipLocations,gplayerScoreMinerals);
+//		now call get game state string
+		initializeTranscriptFile();
+		writeTranscriptFile(a);
+		writeTranscriptFile("Initial Game State:\n" + gs.toString());
+		this.prevGameState = gs;
+	}
+	
+	/**
+	 * Each turn, call this. At the end, set the new created game state to be prevGameState
+	 */
+	public void recordGameChange(int turn){
+		HashMap<String, List<BoardLocation>> gplayerShipLocations = new HashMap<String, List<BoardLocation>>(); 
+		HashMap<String, int[]> gplayerScoreMinerals = new HashMap<String, int[]>();
+		for (ServerPlayer p : players.values()) {
+			List<Ship> ships = p.getUnsunkenShips(p);
+			List<BoardLocation> locations = new ArrayList<BoardLocation>();
+			for(Ship s : ships){locations.add(new BoardLocation(s.getLocation()));}
+			gplayerShipLocations.put(String.valueOf(p.getId()), locations); // List of all players ships to send to each player	
+		}
+		
+		for (ServerPlayer p : players.values()) {
+			int[] scoreMineral = new int[2];
+			scoreMineral[0] = p.getScore();
+			scoreMineral[1] = p.getMinerals();
+			gplayerScoreMinerals.put(String.valueOf(p.getId()), scoreMineral); // List of all players ships to send to each player	
+		}
+		
+		GameState gs = new GameState(gplayerShipLocations,gplayerScoreMinerals);
+		try {
+			String diff = gs.getDifferenceToGameState(prevGameState);
+			writeTranscriptFile("t:" + turn + "\n" + diff);
+			prevGameState = gs;
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println(prevGameState);
+			System.out.println(gs);
+		}
+	}
+	
+	public void recordGameEnd(){
+		HashMap<String, List<BoardLocation>> gplayerShipLocations = new HashMap<String, List<BoardLocation>>(); 
+		HashMap<String, int[]> gplayerScoreMinerals = new HashMap<String, int[]>();
+		for (ServerPlayer p : players.values()) {
+			List<Ship> ships = p.getUnsunkenShips(p);
+			List<BoardLocation> locations = new ArrayList<BoardLocation>();
+			for(Ship s : ships){locations.add(new BoardLocation(s.getLocation()));}
+			gplayerShipLocations.put(String.valueOf(p.getId()), locations); // List of all players ships to send to each player	
+		}
+		for (ServerPlayer p : players.values()) {
+			int[] scoreMineral = new int[2];
+			scoreMineral[0] = p.getScore();
+			scoreMineral[1] = p.getMinerals();
+			gplayerScoreMinerals.put(String.valueOf(p.getId()), scoreMineral); // List of all players ships to send to each player	
+		}
+		
+		GameState gs = new GameState(gplayerShipLocations,gplayerScoreMinerals);
+		writeTranscriptFile("Final Game State:\n" + gs.toString());
+	}
+	
+	public void writeTranscriptFile(String s){
+		try {
+			String currentDir = System.getProperty("user.dir");
+			System.out.println(currentDir);
+			File file = new File(currentDir + "/transcript.txt");
+			// if file doesnt exists, then create it
+			if (!file.exists()) {
+				System.out.println(currentDir + "/transcript.txt created!");
+				file.createNewFile();
+			}
+ 
+			FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(s);
+			bw.close();
+		} catch (IOException e) {
+			System.out.println("not writting!");
+			e.printStackTrace();
+		}
+	}
+	
+	public void initializeTranscriptFile(){
+		try {
+			String currentDir = System.getProperty("user.dir");
+			File file = new File(currentDir + "/transcript.txt");
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+ 
+			FileWriter fw = new FileWriter(file.getAbsoluteFile());
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write("");
+			bw.close();
+		} catch (IOException e) {
+			System.out.println("not writting!");
+			e.printStackTrace();
+		}
+	}
 }
