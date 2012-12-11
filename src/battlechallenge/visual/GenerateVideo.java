@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.PriorityQueue;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import battlechallenge.settings.Config;
 
@@ -63,6 +64,8 @@ public class GenerateVideo {
 	    		BCViz.DEFAULT_WIDTH_PX, BCViz.DEFAULT_HEIGHT_PX);
 	    
 	    BufferedImage gameFrame = null;
+	    
+	    Random rand = new Random();
 	 
 	    for (int index = 0; index < numFrames; index++) {
 	      gameFrame = ImageIO.read(gameFrames.poll());
@@ -73,7 +76,7 @@ public class GenerateVideo {
 	    writer.encodeVideo(0,gameFrame,
 	              (numFrames + 3)*1000, TimeUnit.MILLISECONDS);
 	    writer.encodeVideo(0,gameFrame,
-	              (numFrames + 4)*1000, TimeUnit.MILLISECONDS);
+	              (numFrames + 4)*1000 + rand.nextInt(5), TimeUnit.MILLISECONDS);
 //	    writer.encodeVideo(0,gameFrame,
 //	              (numFrames + 5)*1000, TimeUnit.MILLISECONDS);
 	    // tell the writer to close and write the trailer 

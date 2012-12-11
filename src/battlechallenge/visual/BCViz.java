@@ -140,7 +140,7 @@ public class BCViz extends JFrame {
 		bp = new BoardPanel(totalWidth, totalHeight, players, structures);
 		contentPane.add(bp, BorderLayout.CENTER);
 		this.setSize(DEFAULT_WIDTH_PX, DEFAULT_HEIGHT_PX);
-		this.setResizable(true);
+		this.setResizable(false);
 		this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		this.setVisible(true);
 		this.validate();
