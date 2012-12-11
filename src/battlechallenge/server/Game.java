@@ -176,6 +176,7 @@ public class Game extends Thread {
 		 * 			[[ END GAME ]]
 		 */
 		
+
 		recordGameEnd();
 		endGameGenerateResults();
 		manager.removeGame(this);

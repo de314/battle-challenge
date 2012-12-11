@@ -129,6 +129,8 @@ public class ClientConnection {
 	 * the current list of ships and actionResult list to the client
 	 * @param ships the current list of ships as of last turn
 	 * @param actionResults list of actionResults from last turn
+	 * @param map the list of structures
+	 * @param turnCount the current turn the game is on
 	 * @return true, if successful
 	 * @throws ConnectionLostException a lost connection exception
 	 */

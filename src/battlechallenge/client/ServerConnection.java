@@ -3,6 +3,8 @@ package battlechallenge.client;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gson.Gson;
+
 import battlechallenge.ActionResult;
 import battlechallenge.CommunicationConstants;
 import battlechallenge.ShipAction;
@@ -170,7 +172,15 @@ public class ServerConnection {
 			game.setActionResults((Map<Integer, List<ActionResult>>)socket.readObject(true));
 			game.setMap((BattleMap)socket.readObject(true));
 			int turnCount = (Integer) socket.readObject(true);
+			Gson gson = new Gson();
 			
+			String jsonShipMap  = gson.toJson(game.getShipMap());
+			String jsonBattleMap  = gson.toJson(game.getMap());
+			String jsonActionResults  = gson.toJson(game.getActionResults());
+			
+			System.out.println("Ship Map: " + jsonShipMap);
+			System.out.println("BattleMap: " + jsonBattleMap);
+			System.out.println("ActionResults: " + jsonActionResults);
 			// doTurn and send resulting coordinates to server
 			List<ShipAction> actions = bot.doTurn();
 			if (actions != null) {
