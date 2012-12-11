@@ -54,12 +54,14 @@ public class Game extends Thread {
 	public static final int DEFAULT_HEIGHT;
 	public static final int DEFAULT_SPEED;
 	public static final int MAX_NUM_TURNS;
+	public static final String WEBSITE_URL;
 	
 	static {
 		DEFAULT_WIDTH = 15;
 		DEFAULT_HEIGHT = 15;
-		DEFAULT_SPEED = 750; // number of milliseconds to sleep between turns
+		DEFAULT_SPEED = 1000; // number of milliseconds to sleep between turns
 		MAX_NUM_TURNS = 300; //300; // 5 minutes if 1 turn per second
+		WEBSITE_URL = "http://autonomousarmada.azurewebsites.net/Match/Record";
 	}
 	
 	/** Game State**/
@@ -129,11 +131,10 @@ public class Game extends Thread {
 	}
 	
 	
-	/* (non-Javadoc)
-	 * @see java.lang.Thread#run()
+	/**
+	 * Thread that runs a game
 	 */
 	public void run() {
-		// TODO: Start playing game
 		// FIXME: Do not allow other players to be added.
 		/*
 		 * 			[[ INITIALIZE GAME ]]
@@ -150,7 +151,6 @@ public class Game extends Thread {
 		/*
 		 * 			[[ PLAY GAME ]]
 		 */
-		// TODO: set structures to players and vice-versa
 		Map<Integer, List<ActionResult>> actionResults = new HashMap<Integer, List<ActionResult>>();
 		for(ServerPlayer p : players.values())
 			actionResults.put(p.getId(), new LinkedList<ActionResult>());
@@ -172,113 +172,12 @@ public class Game extends Thread {
 			recordGameChange(turnCount);
 		}
 		
-		recordGameEnd();
-		
 		/*
 		 * 			[[ END GAME ]]
 		 */
 		
-		List<ServerPlayer> winnerList = getWinner();
-		List<String> rankList = new ArrayList<String>();
-		//ServerPlayer winner = null;
-		String url = "http://autonomousarmada.azurewebsites.net/Match/Record";
-		String charset = "UTF-8";
-		String param = "";
-		String query = "";
-		
-		
-		Boolean draw = false;
-			
-		if (winnerList != null) { 
-			// Generate video because the game returned a winner implying a successful game
-			GenerateVideo video = new GenerateVideo(viz.getCurrentFolderName());
-			try {
-				if (video.genVideo()) { // if video was generated successfully
-					YoutubeUploader uploader = new YoutubeUploader(viz.getCurrentFolderName() + Config.sep + viz.getiExp().getTimeStamp() + ".mp4");
-					uploader.uploadVideo(); 
-					videoURL = uploader.getVideoURL();
-					System.out.println(videoURL);
-					query += "link=" + videoURL + "&"; // add video link query string
-					viz.getiExp().deleteCurrDir(); // delete the game directory with screen shots of frames to make video;
-				}
-				else {
-					System.out.println("Video was unable to be created");
-				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ServiceException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			int count = 0;
-			//Contestant.1=first place player name
-			for (ServerPlayer p: winnerList) { // store params as "Contestant.#=playerName"
-				rankList.add("Rank: " + (p.getEndGameRank()-1) + " = " + p.getName());
-				param = "Contestant[" + (p.getEndGameRank()-1) + "]=" + p.getName();	
-				query += param;
-				if (count < winnerList.size() -1) {
-					query += "&"; // params must be seperated by '&'
-				}
-				count++;
-			}
-			
-			//query += "mapName=" + map.getName();
-			//System.out.println("Query: " + query);
-			
-			URLConnection connection = null;
-			
-			try {
-				connection = new URL(url).openConnection();
-			} catch (MalformedURLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			connection.setDoOutput(true); // Triggers POST.
-			connection.setRequestProperty("Accept-Charset", charset);
-			connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=" + charset);
-			OutputStream output = null;
-			try {
-			     output = connection.getOutputStream();
-			     output.write(query.getBytes(charset));
-			} catch (IOException e) {
-				e.printStackTrace();
-			} finally {
-			     if (output != null) try { output.close(); } catch (IOException logOrIgnore) {
-			    	 System.out.println("error on output");
-			     }
-			}
-			InputStream response = null;
-			try {
-				response = connection.getInputStream();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				System.out.println("Response Error");
-				e1.printStackTrace();
-			}
-			
-			//System.out.println("Response: " + response);
-		}
-		// Prints the final game rankings
-		for (String s: rankList) {
-			System.out.println(s);
-		}
-		
-		for(ServerPlayer p : winnerList) {
-			if (draw == true) {
-				p.endGame(CommunicationConstants.RESULT_DRAW);
-				continue;
-			}
-			p.endGame(CommunicationConstants.RESULT_RANKED + "You finished ranked: " + p.getEndGameRank() + "/" + winnerList.size());
-			
-		}
+		recordGameEnd();
+		endGameGenerateResults();
 		manager.removeGame(this);
 	}
 	
@@ -453,18 +352,9 @@ public class Game extends Thread {
 	 * @return the winner who is the only player with at least one ship left unsunk.
 	 */
 	public List<ServerPlayer> getWinner() {
-//		List<ServerPlayer> validPlayers = new LinkedList<ServerPlayer>();
 		List<ServerPlayer> maxPlayerList = new LinkedList<ServerPlayer>();
 		PriorityQueue<ServerPlayer> playerList = new PriorityQueue<ServerPlayer>(8, comp);
-//		ServerPlayer maxPlayer = null;
-//		
-//		for (ServerPlayer player: players.values()) {{
-//				validPlayers.add(player);
-//		}	
-//		if (validPlayers.size() == 1)
-//			return validPlayers;
-//		if (validPlayers.size() == 0)
-//			validPlayers = new LinkedList<ServerPlayer>(players.values());
+
 		
 		int maxScore = -1;
 
@@ -657,7 +547,7 @@ public class Game extends Thread {
 	public void writeTranscriptFile(String s){
 		try {
 			String currentDir = System.getProperty("user.dir");
-			System.out.println(currentDir);
+			//System.out.println(currentDir);
 			File file = new File(currentDir + "/transcript.txt");
 			// if file doesnt exists, then create it
 			if (!file.exists()) {
@@ -690,6 +580,102 @@ public class Game extends Thread {
 		} catch (IOException e) {
 			System.out.println("not writting!");
 			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Will generate the youtube video and send a query with the results of the game to the web server
+	 */
+	public void endGameGenerateResults() {
+		List<ServerPlayer> winnerList = getWinner();
+		List<String> rankList = new ArrayList<String>();
+
+		String charset = "UTF-8";
+		String param = "";
+		String query = "";
+		Boolean draw = false;
+			
+		if (winnerList != null) { 
+			// Generate video because the game returned a winner implying a successful game
+			GenerateVideo video = new GenerateVideo(viz.getCurrentFolderName());
+			try {
+				if (video.genVideo()) { // if video was generated successfully
+					YoutubeUploader uploader = new YoutubeUploader(viz.getCurrentFolderName() + Config.sep + viz.getiExp().getTimeStamp() + ".mp4");
+					uploader.uploadVideo(); 
+					videoURL = uploader.getVideoURL();
+					System.out.println(videoURL);
+					query += "link=" + videoURL + "&"; // add video link query string
+					viz.getiExp().deleteCurrDir(); // delete the game directory with screen shots of frames to make video;
+				}
+				else {
+					System.out.println("Video was unable to be created");
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ServiceException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			int count = 0;
+			//Contestant.1=first place player name
+			for (ServerPlayer p: winnerList) { // store params as "Contestant.#=playerName"
+				rankList.add("Rank: " + (p.getEndGameRank()-1) + " = " + p.getName());
+				param = "Contestant[" + (p.getEndGameRank()-1) + "]=" + p.getName();	
+				query += param;
+				if (count < winnerList.size() -1) {
+					query += "&"; // params must be seperated by '&'
+				}
+				count++;
+			}
+			
+			query += "&mapName=" + map.getName();
+			
+			URLConnection connection = null;
+			
+			try {
+				connection = new URL(WEBSITE_URL).openConnection();
+			} catch (MalformedURLException e1) {
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			connection.setDoOutput(true); // Triggers POST.
+			connection.setRequestProperty("Accept-Charset", charset);
+			connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=" + charset);
+			OutputStream output = null;
+			try {
+			     output = connection.getOutputStream();
+			     output.write(query.getBytes(charset));
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+			     if (output != null) try { output.close(); } catch (IOException logOrIgnore) {
+			    	 System.out.println("error on output");
+			     }
+			}
+			InputStream response = null;
+			try {
+				response = connection.getInputStream();
+			} catch (IOException e1) {
+			}
+		}
+		// Prints the final game rankings
+		for (String s: rankList) {
+			System.out.println(s);
+		}
+		
+		for(ServerPlayer p : winnerList) {
+			if (draw == true) {
+				p.endGame(CommunicationConstants.RESULT_DRAW);
+				continue;
+			}
+			p.endGame(CommunicationConstants.RESULT_RANKED + "You finished ranked: " + p.getEndGameRank() + "/" + winnerList.size()
+					+ " Video url: " + videoURL);			
 		}
 	}
 }

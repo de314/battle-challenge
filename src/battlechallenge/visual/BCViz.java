@@ -132,18 +132,16 @@ public class BCViz extends JFrame {
 			// error, invalid players list size
 			return;
 		}
+		
 		// add header panel
-
 		this.hp = new HeaderPanel(players);
 		contentPane.add(hp, BorderLayout.NORTH);
 		// add board panel
 		bp = new BoardPanel(totalWidth, totalHeight, players, structures);
-		// bp.setOpaque(true);
 		contentPane.add(bp, BorderLayout.CENTER);
 		this.setSize(DEFAULT_WIDTH_PX, DEFAULT_HEIGHT_PX);
-		this.setResizable(false);
+		this.setResizable(true);
 		this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		// this.pack();
 		this.setVisible(true);
 		this.validate();
 	}
@@ -170,7 +168,6 @@ public class BCViz extends JFrame {
 	}
 
 	public BufferedImage getScreenShot() {
-
 		BufferedImage image = new BufferedImage(TOTAL_WIDTH_PX,
 				TOTAL_HEIGHT_PX, BufferedImage.TYPE_INT_RGB);
 		contentPane.paint(image.getGraphics());;
@@ -179,15 +176,6 @@ public class BCViz extends JFrame {
 		return image;
 	}
 
-	public void finalize() {
-		// TODO:
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Container#paint(java.awt.Graphics)
-	 */
 	@Override
 	public void paint(Graphics g) {
 		super.paint(g);

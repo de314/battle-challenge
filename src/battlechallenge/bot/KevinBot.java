@@ -115,7 +115,8 @@ public class KevinBot extends ClientPlayer {
 	}
 
 	public boolean validCoordinate(Coordinate coord) {
-		if (coord.getRow() < 0 || coord.getRow() > ClientGame.getMap().getNumRows() || coord.getCol() < 0 || coord.getCol() > ClientGame.getMap().getNumCols())
+		if (coord.getRow() < 0 || coord.getRow() > ClientGame.getMap().getNumRows() || coord.getCol() < 0 || 
+				coord.getCol() > ClientGame.getMap().getNumCols())
 			return false;
 		return true;
 	}

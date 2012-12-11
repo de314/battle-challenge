@@ -5,6 +5,7 @@ import uk.co.flamingpenguin.jewel.cli.CliFactory;
 import battlechallenge.bot.ClientPlayer;
 import battlechallenge.bot.DavidBot;
 import battlechallenge.bot.DavidBot2;
+import battlechallenge.bot.JoshuaBot;
 import battlechallenge.bot.KevinBot;
 
 /**
@@ -22,17 +23,20 @@ public class BattleshipClient {
 		if (botName.equals("StarterBot")) {
 			return new DavidBot(botName, 0, 0, 0);
 		}
-		if (botName.equals("David")) {
+		else if (botName.equals("David")) {
 			return new DavidBot(botName, 0, 0, 0);
 		}
-		if (botName.equals("DavidBot2")) {
+		else if (botName.equals("DavidBot2")) {
 			return new DavidBot2(botName, 0, 0, 0);
 		}
 		else if (botName.equals("KevinBot")) {
 			return new KevinBot(botName, 0, 0, 0);
 		}
+		else if (botName.equals("JoshuaBot")) {
+			return new JoshuaBot(botName, 0, 0, 0);
+		}
 		else {
-			return new DavidBot(botName, 0, 0, 0);
+			return new DavidBot2(botName, 0, 0, 0);
 		}
 	}
 	
